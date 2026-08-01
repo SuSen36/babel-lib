@@ -1,0 +1,4 @@
+# JitPack 构建环境配置
+# NeoForge 1.21.1 + moddev 插件需要 Java 21 toolchain
+jdk:
+  - openjdk21

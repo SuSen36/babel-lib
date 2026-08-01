@@ -3,6 +3,8 @@ package com.susen36.babel;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
@@ -58,6 +60,7 @@ public class BabelConfig {
                         : "minecraft", itemName.contains(":") ? itemName.substring(itemName.indexOf(':') + 1) : itemName));
     }
 
+    @SubscribeEvent
     public static void onLoad(final ModConfigEvent.Loading event) {
         logDirtBlock = LOG_DIRT_BLOCK.get();
         magicNumber = MAGIC_NUMBER.get();

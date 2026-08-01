@@ -25,20 +25,40 @@ public class ElementEvent extends LivingEvent {
         return source;
     }
 
-    public static class Hurt extends ElementEvent implements ICancellableEvent {
-        private float amount;
+    public enum HurtType {
+        BLOCK, ENTITY, POTION, FOOD, DEFAULT
+    }
 
-        public Hurt(LivingEntity entity, AbstractEPCapability.EPType type, ElementalInjurySource<?> source, float amount) {
-            super(entity, type, source);
-            this.amount = amount;
+    public static class Hurt extends ElementEvent implements ICancellableEvent {
+        private int amount;
+        private final HurtType hurtType;
+        private final LivingEntity attacker;
+
+        public Hurt(LivingEntity entity, AbstractEPCapability.EPType type, ElementalInjurySource<?> source, int amount) {
+            this(entity, type, source, amount, HurtType.DEFAULT, null);
         }
 
-        public float getAmount() {
+        public Hurt(LivingEntity entity, AbstractEPCapability.EPType type, ElementalInjurySource<?> source, int amount, HurtType hurtType, LivingEntity attacker) {
+            super(entity, type, source);
+            this.amount = amount;
+            this.hurtType = hurtType;
+            this.attacker = attacker;
+        }
+
+        public int getAmount() {
             return amount;
         }
 
-        public void setAmount(float amount) {
+        public void setAmount(int amount) {
             this.amount = amount;
+        }
+
+        public HurtType getHurtType() {
+            return hurtType;
+        }
+
+        public LivingEntity getAttacker() {
+            return attacker;
         }
     }
 
@@ -56,18 +76,18 @@ public class ElementEvent extends LivingEvent {
     }
 
     public static class Heal extends ElementEvent implements ICancellableEvent {
-        private float amount;
+        private int amount;
 
-        public Heal(LivingEntity entity, AbstractEPCapability.EPType type, ElementalInjurySource<?> source, float amount) {
+        public Heal(LivingEntity entity, AbstractEPCapability.EPType type, ElementalInjurySource<?> source, int amount) {
             super(entity, type, source);
             this.amount = amount;
         }
 
-        public float getAmount() {
+        public int getAmount() {
             return amount;
         }
 
-        public void setAmount(float amount) {
+        public void setAmount(int amount) {
             this.amount = amount;
         }
     }
@@ -78,9 +98,13 @@ public class ElementEvent extends LivingEvent {
         }
     }
 
-    public static float onElementalHurt(LivingEntity entity, AbstractEPCapability.EPType type, ElementalInjurySource<?> source, float amount) {
-        Hurt event = new Hurt(entity, type, source, amount);
-        if (NeoForge.EVENT_BUS.post(event).isCanceled()) return 0.0F;
+    public static int onElementalHurt(LivingEntity entity, AbstractEPCapability.EPType type, ElementalInjurySource<?> source, int amount) {
+        return onElementalHurt(entity, type, source, amount, HurtType.DEFAULT, null);
+    }
+
+    public static int onElementalHurt(LivingEntity entity, AbstractEPCapability.EPType type, ElementalInjurySource<?> source, int amount, HurtType hurtType, LivingEntity attacker) {
+        Hurt event = new Hurt(entity, type, source, amount, hurtType, attacker);
+        if (NeoForge.EVENT_BUS.post(event).isCanceled()) return 0;
         return event.getAmount();
     }
 
@@ -88,9 +112,9 @@ public class ElementEvent extends LivingEvent {
         NeoForge.EVENT_BUS.post(new PostHurt(entity, type, source, result));
     }
 
-    public static float onElementalHeal(LivingEntity entity, AbstractEPCapability.EPType type, ElementalInjurySource<?> source, float amount) {
+    public static int onElementalHeal(LivingEntity entity, AbstractEPCapability.EPType type, ElementalInjurySource<?> source, int amount) {
         Heal event = new Heal(entity, type, source, amount);
-        if (NeoForge.EVENT_BUS.post(event).isCanceled()) return 0.0F;
+        if (NeoForge.EVENT_BUS.post(event).isCanceled()) return 0;
         return event.getAmount();
     }
 

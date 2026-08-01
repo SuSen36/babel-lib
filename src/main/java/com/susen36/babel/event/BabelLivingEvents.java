@@ -6,7 +6,10 @@ import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
 import com.susen36.babel.elemental.base.ElementalInjurySource;
+import com.susen36.babel.effect.NumbMobEffect;
 import com.susen36.babel.init.BabelAttributes;
+import com.susen36.babel.init.BabelMobEffects;
+import com.susen36.babel.init.BabelParticles;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -16,15 +19,21 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 import java.util.Map;
@@ -53,8 +62,9 @@ public class BabelLivingEvents {
         if (!(entity instanceof LivingEntity living)) return;
         if (living.level().isClientSide()) return;
         EPCapability ep = cachedEP(living);
-        ep.tick();
-        if (living instanceof Player && living.tickCount % 40 == 0) {
+        boolean burstJustEnded = ep.tick();
+        int syncInterval = living instanceof Player ? 10 : 20;
+        if (burstJustEnded || living.tickCount % syncInterval == 0) {
             BabelNetwork.syncEP(living, ep);
         }
     }
@@ -92,31 +102,28 @@ public class BabelLivingEvents {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onLivingDamagePreLowest(LivingDamageEvent.Pre event) {
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onWitherDamageCancel(LivingDamageEvent.Pre event) {
         LivingEntity entity = event.getEntity();
-        Entity sourceEntity = event.getSource().getEntity();
-        if (sourceEntity instanceof LivingEntity attacker) {
-            float amount = event.getNewDamage();
-            if (amount <= 0) return;
-            DamageSource damageSource = event.getSource();
-            dealAdditionalInjury(entity, attacker, damageSource, BabelAttributes.NERVOUS_RATE, AbstractEPCapability.EPType.NERVOUS, amount);
-            dealAdditionalInjury(entity, attacker, damageSource, BabelAttributes.CORROSION_RATE, AbstractEPCapability.EPType.CORROSION, amount);
-            dealAdditionalInjury(entity, attacker, damageSource, BabelAttributes.BURN_RATE, AbstractEPCapability.EPType.BURN, amount);
-            dealAdditionalInjury(entity, attacker, damageSource, BabelAttributes.NECROSIS_RATE, AbstractEPCapability.EPType.NECROSIS, amount);
-        }
+        DamageSource source = event.getSource();
+        if (!source.is(DamageTypes.WITHER)) return;
+        if (entity.level().isClientSide()) return;
+        EPCapability ep = cachedEP(entity);
+        AbstractEPCapability necrosis = ep.getEP(AbstractEPCapability.EPType.NECROSIS);
+        if (necrosis == null || !necrosis.underBurst()) return;
+        event.setNewDamage(0);
     }
 
-    public static void dealAdditionalInjury(LivingEntity victim, LivingEntity attacker, DamageSource source,
-                                             Holder<Attribute> attribute, AbstractEPCapability.EPType type, float amount) {
-        AttributeInstance instance = attacker.getAttribute(attribute);
-        if (instance != null) {
-            float injuryAmount = (float) (amount * instance.getValue());
-            if (injuryAmount > 0) {
-                EPCapability ep = BabelCapability.getEP(victim);
-                ep.hurt(type, ElementalInjurySource.fromDamageSource(source), injuryAmount);
-            }
-        }
+    @SubscribeEvent
+    public static void onNumbnessCancel(LivingIncomingDamageEvent event) {
+        if (event.isCanceled()) return;
+        LivingEntity target = event.getEntity();
+        if (target.level().isClientSide()) return;
+        Entity sourceEntity = event.getSource().getEntity();
+        if (!(sourceEntity instanceof LivingEntity attacker)) return;
+        if (!attacker.hasEffect(BabelMobEffects.NUMB)) return;
+        NumbMobEffect.onAttackBlocked(attacker, target);
+        event.setCanceled(true);
     }
 
     public static final TagKey<DamageType> FORGE_MAGIC = TagKey.create(

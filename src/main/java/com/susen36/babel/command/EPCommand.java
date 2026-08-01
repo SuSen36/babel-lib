@@ -1,6 +1,6 @@
 package com.susen36.babel.command;
 
-import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -31,10 +31,10 @@ public class EPCommand {
                     .then(Commands.argument("type", StringArgumentType.word()).suggests((ctx, builder) ->
                                     SharedSuggestionProvider.suggest(Arrays.stream(AbstractEPCapability.EPType.values()).map(Enum::name), builder))
                             .then(Commands.literal("hurt").requires(s -> s.hasPermission(2))
-                                    .then(Commands.argument("amount", FloatArgumentType.floatArg(0))
+                                    .then(Commands.argument("amount", IntegerArgumentType.integer(0))
                                             .executes(EPCommand::epHurt)))
                             .then(Commands.literal("heal").requires(s -> s.hasPermission(2))
-                                    .then(Commands.argument("amount", FloatArgumentType.floatArg(0))
+                                    .then(Commands.argument("amount", IntegerArgumentType.integer(0))
                                             .executes(EPCommand::epHeal)))
                             .then(Commands.literal("check").executes(EPCommand::sendEPValue))
                     ));
@@ -54,7 +54,7 @@ public class EPCommand {
     private static int epHurt(CommandContext<CommandSourceStack> argument) throws CommandSyntaxException {
         AbstractEPCapability.EPType type = resolveType(argument);
         Entity[] entities = EntityArgument.getEntities(argument, "entities").toArray(new Entity[0]);
-        float amount = FloatArgumentType.getFloat(argument, "amount");
+        int amount = IntegerArgumentType.getInteger(argument, "amount");
         int executedCount = 0;
         LivingEntity singleCandidate = null;
         for (Entity entity : entities) {
@@ -68,12 +68,12 @@ public class EPCommand {
         }
         if (executedCount == 1) {
             final LivingEntity finalSingleCandidate = singleCandidate;
-            argument.getSource().sendSuccess(() -> Component.literal(String.format("对 %s 造成了 %.1f 点 %s",
+            argument.getSource().sendSuccess(() -> Component.literal(String.format("对 %s 造成了 %d 点 %s",
                             finalSingleCandidate.getDisplayName().getString(), amount, type.description())),
                     true);
         } else if (executedCount > 0) {
             final int finalExecutedCount = executedCount;
-            argument.getSource().sendSuccess(() -> Component.literal(String.format("对 %d 个实体造成了 %.1f 点 %s",
+            argument.getSource().sendSuccess(() -> Component.literal(String.format("对 %d 个实体造成了 %d 点 %s",
                             finalExecutedCount, amount, type.description())),
                     true);
         } else {
@@ -85,25 +85,25 @@ public class EPCommand {
     private static int epHeal(CommandContext<CommandSourceStack> argument) throws CommandSyntaxException {
         AbstractEPCapability.EPType type = resolveType(argument);
         Entity[] entities = EntityArgument.getEntities(argument, "entities").toArray(new Entity[0]);
-        float amount = FloatArgumentType.getFloat(argument, "amount");
+        int amount = IntegerArgumentType.getInteger(argument, "amount");
         int executedCount = 0;
         LivingEntity singleCandidate = null;
         for (Entity entity : entities) {
             if (entity instanceof LivingEntity living) {
                 EPCapability ep = BabelCapability.getEP(living);
-                ep.heal(type, ElementalInjurySource.fromCommand(argument.getSource()), amount);
+                ep.heal(type, amount);
                 if (executedCount == 0) singleCandidate = living;
                 executedCount++;
             }
         }
         if (executedCount == 1) {
             final LivingEntity finalSingleCandidate = singleCandidate;
-            argument.getSource().sendSuccess(() -> Component.literal(String.format("为 %s 治愈了 %.1f 点 %s",
+            argument.getSource().sendSuccess(() -> Component.literal(String.format("为 %s 治愈了 %d 点 %s",
                             finalSingleCandidate.getDisplayName().getString(), amount, type.description())),
                     true);
         } else if (executedCount > 0) {
             final int finalExecutedCount = executedCount;
-            argument.getSource().sendSuccess(() -> Component.literal(String.format("为 %d 个实体治愈了 %.1f 点 %s",
+            argument.getSource().sendSuccess(() -> Component.literal(String.format("为 %d 个实体治愈了 %d 点 %s",
                             finalExecutedCount, amount, type.description())),
                     true);
         } else {
@@ -120,14 +120,14 @@ public class EPCommand {
                 EPCapability ep = BabelCapability.getEP(living);
                 if (entity instanceof Player player && !player.level().isClientSide()) {
                     player.displayClientMessage(Component.literal(
-                                    String.format("%s 累积的 %s 数值为： %.1f / %d",
-                                            player.getDisplayName().getString(), type.description(), ep.getVale(type),
-                                            (int) BabelAttributes.getImpairmentThreshold(living))),
+                                    String.format("%s 累积的 %s 数值为： %d / %d",
+                                            player.getDisplayName().getString(), type.description(), ep.getValue(type),
+                                            (int) BabelAttributes.getMaxElementalValue(living))),
                             false);
                 } else {
-                    argument.getSource().sendSystemMessage(Component.literal(String.format("%s 累积的 %s 数值为： %.1f / %d",
-                            living.getDisplayName().getString(), type.description(), ep.getVale(type),
-                            (int) BabelAttributes.getImpairmentThreshold(living))));
+                    argument.getSource().sendSystemMessage(Component.literal(String.format("%s 累积的 %s 数值为： %d / %d",
+                            living.getDisplayName().getString(), type.description(), ep.getValue(type),
+                            (int) BabelAttributes.getMaxElementalValue(living))));
                 }
             }
         }

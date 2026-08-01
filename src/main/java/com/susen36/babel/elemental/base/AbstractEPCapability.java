@@ -21,12 +21,11 @@ import java.util.function.Function;
 public abstract class AbstractEPCapability implements INBTSerializable<CompoundTag> {
 
     public enum EPType {
-        NERVOUS("nervous", "sanity", NervousInjury::new),
-        CORROSION("corrosion", "water", CorrosionInjury::new),
-        BURN("burn", "burn", BurnInjury::new),
-        NECROSIS("necrosis", "dark", NecrosisInjury::new),
-        EMPTY("empty", "gun_mu", null)
-        ;
+        NERVOUS("sanity", "sanity", NervousInjury::new),
+        CORROSION("water", "water", CorrosionInjury::new),
+        BURN("fire", "fire", BurnInjury::new),
+        NECROSIS("dark", "dark", NecrosisInjury::new),
+        EMPTY("empty", "gun_mu", null);
 
         private final String nickName;
         private final String descriptionID;
@@ -76,15 +75,15 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
             boolean failed,
             boolean shouldBurst,
             HurtReason reason,
-            float damage,
-            float burstDamage,
+            int damage,
+            int burstDamage,
             @Nullable ElementalInjurySource<?> source
     ) {
-        public static HurtResult fail(float damage, ElementalInjurySource<?> src) {
-            return new HurtResult(true, false, HurtReason.FAILED, damage, 0.0F, src);
+        public static HurtResult fail(int damage, ElementalInjurySource<?> src) {
+            return new HurtResult(true, false, HurtReason.FAILED, damage, 0, src);
         }
 
-        public static HurtResult success(boolean burst, HurtReason why, float damage, float burstDamage, ElementalInjurySource<?> src) {
+        public static HurtResult success(boolean burst, HurtReason why, int damage, int burstDamage, ElementalInjurySource<?> src) {
             return new HurtResult(false, burst, why, damage, burstDamage, src);
         }
     }
@@ -99,7 +98,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
 
     protected final EPType type;
     protected final LivingEntity livingEntity;
-    protected float value = 0.0F;
+    protected int value;
     protected int maxReviveTick = 200;
     protected int reviveTick = 0;
     protected int immunityTick = 0;
@@ -107,6 +106,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
     protected AbstractEPCapability(EPType pType, LivingEntity living) {
         this.type = pType;
         this.livingEntity = living;
+        this.value = getMaxValue();
     }
 
     public abstract void doPlayerBurst();
@@ -128,8 +128,14 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
         return livingEntity;
     }
 
-    public float getValue() {
+    public int getValue() {
         return value;
+    }
+
+    public int getMaxValue() {
+        float threshold = BabelAttributes.getMaxElementalValue(livingEntity);
+        if (threshold <= 0.0F) return 1000;
+        return Mth.floor(threshold);
     }
 
     public int getReviveTick() {
@@ -153,58 +159,66 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
     }
 
     public float getInjuryProgress() {
-        float threshold = BabelAttributes.getImpairmentThreshold(livingEntity);
-        if (threshold <= 0.0F) return 1.0F;
-        return 1.0F - Mth.clamp(value / threshold, 0.0F, 1.0F);
+        float threshold = BabelAttributes.getMaxElementalValue(livingEntity);
+        if (threshold <= 0.0F) return 0.0F;
+        return Mth.clamp(value / threshold, 0.0F, 1.0F);
     }
 
-    public HurtResult hurtAndBurst(ElementalInjurySource<?> source, float amount) {
+    public HurtResult hurtAndBurst(ElementalInjurySource<?> source, int amount) {
         if (isImmune(source)) {
             return HurtResult.fail(amount, source);
         }
-        AttributeInstance thresholdAttr = livingEntity.getAttribute(BabelAttributes.IMPAIRMENT_THRESHOLD);
+        AttributeInstance thresholdAttr = livingEntity.getAttribute(BabelAttributes.MAX_ELEMENTAL_VALUE);
         AttributeInstance resistanceAttr = livingEntity.getAttribute(BabelAttributes.IMPAIRMENT_RESISTANCE);
         float threshold = thresholdAttr == null ? 1000.0F : (float) thresholdAttr.getValue();
         float resistance = resistanceAttr == null ? 0.0F : (float) resistanceAttr.getValue();
 
-        float effectiveAmount = Mth.clamp(amount * (1.0F - resistance * 0.01F), 0.0F, Float.MAX_VALUE);
-        if (effectiveAmount <= 0.0F) {
-            return HurtResult.success(false, HurtReason.RESISTED, 0.0F, 0.0F, source);
+        float effectiveAmountF = Mth.clamp((float) amount * (1.0F - resistance * 0.01F), 0.0F, Float.MAX_VALUE);
+        int effectiveAmount = Mth.floor(effectiveAmountF);
+        if (effectiveAmount <= 0) {
+            return HurtResult.success(false, HurtReason.RESISTED, 0, 0, source);
         }
-        value += effectiveAmount;
+        int previousValue = value;
+        value = Mth.clamp(value - effectiveAmount, 0, getMaxValue());
 
         if (shouldBurst(source)) {
-            float overkill = value - threshold;
-            float burstDamage = Mth.clamp(overkill * 0.1F + 6.0F, 6.0F, threshold * 0.4F);
+            float overkill = (float) effectiveAmount - previousValue;
+            int burstDamage = Mth.floor(Mth.clamp(overkill * 0.1F + 6.0F, 6.0F, threshold * 0.4F));
             reviveTick = maxReviveTick;
             setImmune(maxReviveTick);
-            doBurst();
             return HurtResult.success(true, HurtReason.NORMAL, effectiveAmount, burstDamage, source);
         }
-        return HurtResult.success(false, HurtReason.NORMAL, effectiveAmount, 0.0F, source);
+        return HurtResult.success(false, HurtReason.NORMAL, effectiveAmount, 0, source);
     }
 
-    public float hurt(ElementalInjurySource<?> source, float amount) {
+    public int hurt(ElementalInjurySource<?> source, int amount) {
         return hurtAndBurst(source, amount).damage();
     }
 
-    public void heal(ElementalInjurySource<?> source, float amount) {
-        if (underBurst()) return;
-        if (amount <= 0.0F) return;
-        value = Mth.clamp(value - amount, 0.0F, Float.MAX_VALUE);
+    public int hurt(int amount) {
+        return hurt(ElementalInjurySource.fromNothing(), amount);
+    }
+
+    public void heal(int amount) {
+        if (underBurst() || immunityTick != 0) return;
+        if (amount <= 0) return;
+        value = Mth.clamp(value + amount, 0, getMaxValue());
     }
 
     public void onReviveTick() {
-        float threshold = BabelAttributes.getImpairmentThreshold(livingEntity);
-        value = threshold * (1.0F - getReviveProcess());
+        int maxValue = getMaxValue();
         reviveTick--;
+        value = Mth.floor(maxValue * (maxReviveTick - reviveTick) / (float) maxReviveTick);
         burstTick();
     }
 
     public void doBesideBurst(int lockTime) {
         if (underBurst()) return;
-        if (immunityTick > 0) setImmune(Math.max(immunityTick, lockTime));
-        value = 0.0F;
+        setImmune(Math.max(immunityTick, lockTime));
+    }
+
+    public void restoreValue() {
+        value = getMaxValue();
     }
 
     public void tick() {
@@ -227,8 +241,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
     }
 
     public boolean shouldBurst(ElementalInjurySource<?> source) {
-        float threshold = BabelAttributes.getImpairmentThreshold(livingEntity);
-        return !isImmune(source) && value >= threshold;
+        return !isImmune(source) && value <= 0;
     }
 
     public boolean underBurst() {
@@ -238,7 +251,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
     @Override
     public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
-        tag.putFloat(type.getNickName() + ".injury", value);
+        tag.putInt(type.getNickName() + ".injury", value);
         tag.putInt(type.getNickName() + ".maxReviveTick", maxReviveTick);
         tag.putInt(type.getNickName() + ".leftReviveTick", reviveTick);
         tag.putInt(type.getNickName() + ".immunityTick", immunityTick);
@@ -248,7 +261,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
     @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         String prefix = type.getNickName() + ".";
-        if (tag.contains(prefix + "injury")) this.value = tag.getFloat(prefix + "injury");
+        if (tag.contains(prefix + "injury")) this.value = Mth.clamp(tag.getInt(prefix + "injury"), 0, getMaxValue());
         if (tag.contains(prefix + "maxReviveTick")) this.maxReviveTick = tag.getInt(prefix + "maxReviveTick");
         if (tag.contains(prefix + "leftReviveTick")) this.reviveTick = tag.getInt(prefix + "leftReviveTick");
         if (tag.contains(prefix + "immunityTick")) this.immunityTick = tag.getInt(prefix + "immunityTick");

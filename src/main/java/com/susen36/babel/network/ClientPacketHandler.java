@@ -15,11 +15,12 @@ public class ClientPacketHandler {
 
     public static void handle(EPSyncMessage message, IPayloadContext context) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null) return;
-        Entity entity = mc.level.getEntity(message.entityId());
-        if (entity instanceof LivingEntity living) {
-            EPCapability ep = BabelCapability.getEP(living);
-            ep.deserializeNBT(mc.level.registryAccess(), message.nbt());
+        if (mc.level != null) {
+            Entity entity = mc.level.getEntity(message.entityId());
+            if (entity instanceof LivingEntity living) {
+                EPCapability ep = BabelCapability.getEP(living);
+                ep.deserializeNBT(mc.level.registryAccess(), message.nbt());
+            }
         }
     }
 }

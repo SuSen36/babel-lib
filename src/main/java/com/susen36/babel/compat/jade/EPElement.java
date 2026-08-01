@@ -20,11 +20,11 @@ public class EPElement extends Element {
     private final ResourceLocation icon;
     private final ResourceLocation bar;
 
-    private static final ResourceLocation SANITY_ICON = rl("sanity_icon");
-    private static final ResourceLocation SANITY_BAR = rl("sanity_bar");
+    private static final ResourceLocation NERVOUS_ICON = rl("sanity_icon");
+    private static final ResourceLocation NERVOUS_BAR = rl("sanity_bar");
     private static final ResourceLocation WATER_ICON = rl("water_icon");
     private static final ResourceLocation WATER_BAR = rl("water_bar");
-    private static final ResourceLocation FIRE_ICON = rl("fire_icon");
+    private static final ResourceLocation BURN_ICON = rl("fire_icon");
     private static final ResourceLocation FIRE_BAR = rl("fire_bar");
     private static final ResourceLocation DARK_ICON = rl("dark_icon");
     private static final ResourceLocation DARK_BAR = rl("dark_bar");
@@ -45,10 +45,11 @@ public class EPElement extends Element {
                 DisplayHelper.dfCommas.format(max));
 
         switch (type) {
+            case NERVOUS -> { this.icon = NERVOUS_ICON; this.bar = NERVOUS_BAR; }
             case CORROSION -> { this.icon = WATER_ICON; this.bar = WATER_BAR; }
-            case BURN -> { this.icon = FIRE_ICON; this.bar = FIRE_BAR; }
+            case BURN -> { this.icon = BURN_ICON; this.bar = FIRE_BAR; }
             case NECROSIS -> { this.icon = DARK_ICON; this.bar = DARK_BAR; }
-            default -> { this.icon = SANITY_ICON; this.bar = SANITY_BAR; }
+            default -> { this.icon = NERVOUS_ICON; this.bar = NERVOUS_BAR; }
         }
     }
 

@@ -19,7 +19,7 @@ import net.neoforged.neoforge.client.event.RenderGuiEvent;
 @EventBusSubscriber(value = {Dist.CLIENT}, modid = BabelMod.MODID)
 public class EPShowOverlay {
     private static final ResourceLocation SANITY_BAR = rl("sanity_player_bar");
-    private static final ResourceLocation WATER_BAR = rl("water_player_bar");
+    private static final ResourceLocation CORROSION_BAR = rl("water_player_bar");
     private static final ResourceLocation FIRE_BAR = rl("fire_player_bar");
     private static final ResourceLocation DARK_BAR = rl("dark_player_bar");
     private static final ResourceLocation SANITY_RING = rl("sanity");
@@ -38,7 +38,7 @@ public class EPShowOverlay {
         if (player == null) return;
 
         EPCapability ep = BabelCapability.getEP(player);
-        float threshold = BabelAttributes.getImpairmentThreshold(player);
+        float threshold = BabelAttributes.getMaxElementalValue(player);
         if (threshold <= 0) return;
 
         int w = mc.getWindow().getGuiScaledWidth();
@@ -46,33 +46,31 @@ public class EPShowOverlay {
         int dx = (int) Math.round(BabelConfig.epXOffset);
         int dy = (int) Math.round(BabelConfig.epYOffset);
 
-        int yOffset = 0;
-        for (AbstractEPCapability.EPType type : AbstractEPCapability.EPType.values()) {
-            if (type.isEmpty()) continue;
-            AbstractEPCapability cap = ep.getEP(type);
-            if (cap == null || cap.getValue() <= 0) continue;
+        AbstractEPCapability currentElement = ep.getCurrentElement();
+        if (currentElement == null) return;
 
-            float progress = Mth.clamp(cap.getValue() / threshold, 0.0F, 1.0F);
+        float progress = currentElement.getInjuryProgress();
+        if (progress >= 1.0F) return;
+
+        AbstractEPCapability.EPType type = currentElement.getType();
+        if (BabelConfig.epBarStyle) {
             ResourceLocation bar = getBar(type);
-
-            if (BabelConfig.epBarStyle) {
-                event.getGuiGraphics().blit(bar, w / 2 + 93 + dx, h - 12 + dy + yOffset,
-                        0, 4, 62, 8, 62, 12);
-                event.getGuiGraphics().blit(bar, w / 2 + 93 + dx + 10, h - 12 + dy + yOffset + 3,
-                        0, 0, (int) (50 * progress), 4, 62, 12);
-            } else {
-                ResourceLocation ring = getRing(type);
-                int frame = Mth.clamp((int) Math.ceil(progress * 20.0) * 16, 0, 304);
-                event.getGuiGraphics().blit(ring, w / 2 + 92 + dx, h - 19 + dy + yOffset,
-                        frame, 0, 16, 16, 320, 16);
-            }
-            yOffset += 10;
+            event.getGuiGraphics().blit(bar, w / 2 + 93 + dx, h - 12 + dy,
+                    0, 4, 62, 8, 62, 12);
+            event.getGuiGraphics().blit(bar, w / 2 + 103 + dx, h - 9 + dy,
+                    0, 0, (int) (50 * progress), 4, 62, 12);
+        } else {
+            ResourceLocation ring = getRing(type);
+            int frame = Mth.clamp(Mth.ceil(progress * 20.0F) * 16, 0, 304);
+            event.getGuiGraphics().blit(ring, w / 2 + 92 + dx, h - 19 + dy,
+                    frame, 0, 16, 16, 320, 16);
         }
     }
 
     private static ResourceLocation getBar(AbstractEPCapability.EPType type) {
         return switch (type) {
-            case CORROSION -> WATER_BAR;
+            case NERVOUS -> SANITY_BAR;
+            case CORROSION -> CORROSION_BAR;
             case BURN -> FIRE_BAR;
             case NECROSIS -> DARK_BAR;
             default -> SANITY_BAR;
@@ -81,6 +79,7 @@ public class EPShowOverlay {
 
     private static ResourceLocation getRing(AbstractEPCapability.EPType type) {
         return switch (type) {
+            case NERVOUS -> SANITY_RING;
             case CORROSION -> WATER_RING;
             case BURN -> FIRE_RING;
             case NECROSIS -> DARK_RING;
