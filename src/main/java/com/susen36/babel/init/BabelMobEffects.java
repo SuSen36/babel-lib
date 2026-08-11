@@ -1,13 +1,12 @@
 package com.susen36.babel.init;
 
 import com.susen36.babel.BabelMod;
-import com.susen36.babel.effect.DizzyMobEffect;
+import com.susen36.babel.effect.StunMobEffect;
 import com.susen36.babel.effect.EssenceResistanceMobEffect;
 import com.susen36.babel.effect.FeeblenessMobEffect;
 import com.susen36.babel.effect.LessArmorMobEffect;
-import com.susen36.babel.effect.NumbMobEffect;
-import com.susen36.babel.effect.UnderBreakMobEffect;
-import com.susen36.babel.effect.WeightlessMobEffect;
+import com.susen36.babel.effect.PalsyMobEffect;
+import com.susen36.babel.effect.MassLossMobEffect;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -16,13 +15,12 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class BabelMobEffects {
     public static final DeferredRegister<MobEffect> REGISTRY = DeferredRegister.create(BuiltInRegistries.MOB_EFFECT, BabelMod.MODID);
 
-    public static final DeferredHolder<MobEffect, MobEffect> UNDER_BREAK = REGISTRY.register("under_break", UnderBreakMobEffect::new);
     public static final DeferredHolder<MobEffect, LessArmorMobEffect> LESS_ARMOR = REGISTRY.register("less_armor", LessArmorMobEffect::new);
-    public static final DeferredHolder<MobEffect, MobEffect> DIZZY = REGISTRY.register("dizzy", DizzyMobEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> STUN = REGISTRY.register("stun", StunMobEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> ESSENCE_RESISTANCE = REGISTRY.register("essence_resistance", EssenceResistanceMobEffect::new);
-    public static final DeferredHolder<MobEffect, MobEffect> NUMB = REGISTRY.register("numb", NumbMobEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> PALSY = REGISTRY.register("palsy", PalsyMobEffect::new);
     public static final DeferredHolder<MobEffect, FeeblenessMobEffect> FEEBLENESS = REGISTRY.register("feebleness", FeeblenessMobEffect::new);
-    public static final DeferredHolder<MobEffect, WeightlessMobEffect> WEIGHTLESS = REGISTRY.register("weightless", WeightlessMobEffect::new);
+    public static final DeferredHolder<MobEffect, MassLossMobEffect> MASS_LOSS = REGISTRY.register("mass_loss", MassLossMobEffect::new);
 
     private BabelMobEffects() {
         throw new UnsupportedOperationException("Utility class");

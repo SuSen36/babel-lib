@@ -1,5 +1,6 @@
 package com.susen36.babel.elemental;
 
+import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
 import com.susen36.babel.init.BabelDamageTypes;
 import com.susen36.babel.init.BabelMobEffects;
@@ -21,8 +22,8 @@ public class NervousInjury extends AbstractEPCapability {
     @Override
     public void doPlayerBurst() {
         DamageSource sanityBreakDamage = BabelDamageTypes.source(livingEntity.level(), BabelDamageTypes.SANITY_BREAK);
-        livingEntity.addEffect(new MobEffectInstance(BabelMobEffects.UNDER_BREAK, 200, 0, false, false, true));
-        livingEntity.addEffect(new MobEffectInstance(BabelMobEffects.DIZZY, 200, 0, false, false));
+        BabelCapability.getEP(livingEntity).setUnderBreak(200);
+        livingEntity.addEffect(new MobEffectInstance(BabelMobEffects.STUN, 200, 0, false, false));
         livingEntity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0, false, true));
         livingEntity.hurt(sanityBreakDamage, SANITY_BREAK_BASE_DAMAGE);
         livingEntity.level().playSound(null,
@@ -33,12 +34,12 @@ public class NervousInjury extends AbstractEPCapability {
     @Override
     public void doNonPlayerBurst() {
         DamageSource sanityBreakDamage = BabelDamageTypes.source(livingEntity.level(), BabelDamageTypes.SANITY_BREAK);
-        livingEntity.addEffect(new MobEffectInstance(BabelMobEffects.UNDER_BREAK, 200, 0, false, false, true));
-        MobEffectInstance existingNumb = livingEntity.getEffect(BabelMobEffects.NUMB);
+        BabelCapability.getEP(livingEntity).setUnderBreak(200);
+        MobEffectInstance existingNumb = livingEntity.getEffect(BabelMobEffects.PALSY);
         int existingAmplifier = existingNumb != null ? existingNumb.getAmplifier() : -1;
         if (existingAmplifier < 2) {
-            livingEntity.removeEffect(BabelMobEffects.NUMB);
-            livingEntity.addEffect(new MobEffectInstance(BabelMobEffects.NUMB, Integer.MAX_VALUE, 2, false, false, true));
+            livingEntity.removeEffect(BabelMobEffects.PALSY);
+            livingEntity.addEffect(new MobEffectInstance(BabelMobEffects.PALSY, Integer.MAX_VALUE, 2, false, false, true));
         }
         float damage = Mth.clamp(livingEntity.getMaxHealth() * 0.8F, SANITY_BREAK_BASE_DAMAGE, SANITY_BREAK_BASE_DAMAGE * 6);
         livingEntity.hurt(sanityBreakDamage, damage);

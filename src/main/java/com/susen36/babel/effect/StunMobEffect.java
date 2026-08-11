@@ -11,8 +11,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.neoforge.common.NeoForgeMod;
 
-public class DizzyMobEffect extends MobEffect {
-    public DizzyMobEffect() {
+public class StunMobEffect extends MobEffect {
+    public StunMobEffect() {
         super(MobEffectCategory.HARMFUL, -3355444);
         this.addAttributeModifier(Attributes.ATTACK_SPEED, ResourceLocation.fromNamespaceAndPath("babel", "dizzy_attack_speed"), -1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         this.addAttributeModifier(Attributes.JUMP_STRENGTH, ResourceLocation.fromNamespaceAndPath("babel", "dizzy_jump_strength"), -1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);

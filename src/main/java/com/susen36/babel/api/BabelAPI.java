@@ -161,4 +161,9 @@ public class BabelAPI {
         AbstractEPCapability cap = ep.getEP(type);
         return cap != null && cap.underBurst();
     }
+
+    public static boolean isUnderBreak(LivingEntity entity) {
+        if (entity == null) return false;
+        return BabelCapability.getEP(entity).isUnderBreak();
+    }
 }

@@ -23,6 +23,7 @@ import java.util.function.Consumer;
 public class EPCapability implements INBTSerializable<CompoundTag> {
     private final LivingEntity entity;
     private final Map<AbstractEPCapability.EPType, AbstractEPCapability> EP_TYPES = new HashMap<>();
+    private int underBreakTick;
 
     public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(BabelMod.MODID, "ep_cap");
 
@@ -32,6 +33,20 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
         this.EP_TYPES.put(AbstractEPCapability.EPType.CORROSION, new CorrosionInjury(living));
         this.EP_TYPES.put(AbstractEPCapability.EPType.BURN, new BurnInjury(living));
         this.EP_TYPES.put(AbstractEPCapability.EPType.NECROSIS, new NecrosisInjury(living));
+    }
+
+    public void setUnderBreak(int ticks) {
+        if (ticks < 0) ticks = 0;
+        if (this.underBreakTick != ticks) {
+            this.underBreakTick = ticks;
+            if (entity != null && !entity.level().isClientSide()) {
+                BabelNetwork.syncEP(entity, this);
+            }
+        }
+    }
+
+    public boolean isUnderBreak() {
+        return underBreakTick > 0;
     }
 
     public int getValue(AbstractEPCapability.EPType pType) {
@@ -102,6 +117,9 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
         if (burstJustEnded) {
             forEachEPType(AbstractEPCapability::restoreValue);
         }
+        if (underBreakTick > 0) {
+            underBreakTick--;
+        }
         return burstJustEnded;
     }
 
@@ -147,6 +165,7 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
     public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
         forEachEPType(ep -> tag.put("ep." + ep.getType().getNickName(), ep.serializeNBT(provider)));
+        tag.putInt("underBreakTick", underBreakTick);
         return tag;
     }
 
@@ -158,6 +177,7 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
                 ep.deserializeNBT(provider, tag.getCompound(key));
             }
         });
+        underBreakTick = tag.getInt("underBreakTick");
     }
 
     @Deprecated
