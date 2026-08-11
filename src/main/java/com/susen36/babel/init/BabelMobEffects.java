@@ -3,9 +3,11 @@ package com.susen36.babel.init;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.effect.DizzyMobEffect;
 import com.susen36.babel.effect.EssenceResistanceMobEffect;
+import com.susen36.babel.effect.FeeblenessMobEffect;
 import com.susen36.babel.effect.LessArmorMobEffect;
 import com.susen36.babel.effect.NumbMobEffect;
 import com.susen36.babel.effect.UnderBreakMobEffect;
+import com.susen36.babel.effect.WeightlessMobEffect;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -19,6 +21,8 @@ public class BabelMobEffects {
     public static final DeferredHolder<MobEffect, MobEffect> DIZZY = REGISTRY.register("dizzy", DizzyMobEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> ESSENCE_RESISTANCE = REGISTRY.register("essence_resistance", EssenceResistanceMobEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> NUMB = REGISTRY.register("numb", NumbMobEffect::new);
+    public static final DeferredHolder<MobEffect, FeeblenessMobEffect> FEEBLENESS = REGISTRY.register("feebleness", FeeblenessMobEffect::new);
+    public static final DeferredHolder<MobEffect, WeightlessMobEffect> WEIGHTLESS = REGISTRY.register("weightless", WeightlessMobEffect::new);
 
     private BabelMobEffects() {
         throw new UnsupportedOperationException("Utility class");

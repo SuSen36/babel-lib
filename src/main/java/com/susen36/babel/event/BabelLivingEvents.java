@@ -1,6 +1,7 @@
 package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
+import com.susen36.babel.api.BabelAPI;
 import com.susen36.babel.api.event.ResistDamageEvent;
 import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.ep.EPCapability;
@@ -28,6 +29,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -100,6 +102,30 @@ public class BabelLivingEvents {
                 event.setNewDamage(amount);
             }
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public static void handleElementalAttackDamage(LivingDamageEvent.Pre event) {
+        LivingEntity target = event.getEntity();
+        Entity sourceEntity = event.getSource().getEntity();
+        LivingEntity attacker = sourceEntity instanceof Projectile projectile && projectile.getOwner() instanceof LivingEntity owner
+                ? owner
+                : sourceEntity instanceof LivingEntity living ? living : null;
+
+        if (attacker == null) return;
+
+        BabelAPI.ElementalAttackConfig attackConfig = BabelAPI.getElementalAttackConfig(attacker);
+        AbstractEPCapability.EPType epType = attackConfig.type();
+        double rate = attackConfig.rate();
+        double injuryDamage = attackConfig.injuryDamage();
+        BabelAPI.ElementalDefenseConfig defenseConfig = BabelAPI.getElementalDefenseConfig(target);
+        if (epType == AbstractEPCapability.EPType.NERVOUS && defenseConfig.type() == epType) {
+            rate *= defenseConfig.baseModifier() * defenseConfig.totalModifier();
+            injuryDamage *= defenseConfig.baseModifier() * defenseConfig.totalModifier();
+        }
+        double elementalDamage = injuryDamage + event.getNewDamage() * rate;
+
+        if (elementalDamage > 0 && !BabelAPI.hurtElemental(target, epType, attacker, Mth.floor(elementalDamage))) return;
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

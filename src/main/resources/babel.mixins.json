@@ -3,7 +3,9 @@
   "minVersion": "0.8",
   "package": "com.susen36.babel.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "BabelLivingEntityMixin"
+  ],
   "client": [],
   "injectors": {
     "defaultRequire": 1

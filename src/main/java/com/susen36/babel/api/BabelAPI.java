@@ -13,7 +13,9 @@ import com.susen36.babel.init.BabelAttributes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,29 +36,34 @@ public class BabelAPI {
     public record ElementalAttackConfig(AbstractEPCapability.EPType type, double rate, double injuryDamage) {
     }
 
-    public static ElementalAttackConfig getElementalAttackConfig(LivingEntity entity) {
+    public static ElementalAttackConfig getElementalAttackConfig(Entity entity) {
+        LivingEntity attackerEntity = entity instanceof Projectile projectile && projectile.getOwner() instanceof LivingEntity owner  ? owner
+                : entity instanceof LivingEntity living ? living : null;
         AbstractEPCapability.EPType type = AbstractEPCapability.EPType.NERVOUS;
         double rate = 0;
         double injuryDamage = 0;
-        if (entity instanceof ElementalAttacker attacker) {
+        if (attackerEntity instanceof ElementalAttacker attacker) {
             type = attacker.getElementalType();
-            rate = attacker.getElementalRate();
+            rate = attacker.getElementalRate() * 10.0D;
             injuryDamage = attacker.getElementalInjuryDamage();
         }
+        if (attackerEntity == null) {
+            return new ElementalAttackConfig(type, rate, injuryDamage);
+        }
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            ItemStack stack = entity.getItemBySlot(slot);
+            ItemStack stack = attackerEntity.getItemBySlot(slot);
             if (stack.getItem() instanceof ElementalAttacker attacker) {
-                rate += attacker.getElementalRate();
+                rate += attacker.getElementalRate() * 10.0D;
                 injuryDamage += attacker.getElementalInjuryDamage();
-                if (!(entity instanceof ElementalAttacker)) {
+                if (!(attackerEntity instanceof ElementalAttacker)) {
                     type = attacker.getElementalType();
                 }
             }
         }
-        for (MobEffectInstance effect : entity.getActiveEffects()) {
+        for (MobEffectInstance effect : attackerEntity.getActiveEffects()) {
             if (effect.getEffect().value() instanceof ElementalAttackModifier modifier) {
-                rate = modifier.modifyElementalRate(entity, rate, effect.getAmplifier());
-                injuryDamage += modifier.getElementalInjuryDamage(entity, effect.getAmplifier());
+                rate = modifier.modifyElementalRate(attackerEntity, rate, effect.getAmplifier());
+                injuryDamage += modifier.getElementalInjuryDamage(attackerEntity, effect.getAmplifier());
             }
         }
         return new ElementalAttackConfig(type, rate, injuryDamage);

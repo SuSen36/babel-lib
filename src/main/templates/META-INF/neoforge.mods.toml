@@ -13,6 +13,9 @@ Nervous / Corrosion / Burn / Necrosis impairment system,
 attribute-based damage scaling and capability-backed persistence.
 '''
 
+[[mixins]]
+config="babel.mixins.json"
+
 [[dependencies.${mod_id}]]
 modId="neoforge"
 type="required"

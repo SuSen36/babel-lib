@@ -22,6 +22,8 @@
   "effect.babel.dizzy": "Dizzy",
   "effect.babel.essence_resistance": "Essence Resistance",
   "effect.babel.numb": "Numb",
+  "effect.babel.feebleness": "Feebleness",
+  "effect.babel.weightless": "Weightless",
   "death.attack.sanity_break": "%1$s fall into nethersea",
   "death.attack.sanity_break.item": "%1$s fall into nethersea",
   "death.attack.sanity_break.player": "%1$s fall into nethersea",
