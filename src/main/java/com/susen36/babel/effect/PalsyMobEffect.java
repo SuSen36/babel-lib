@@ -36,15 +36,16 @@ public class PalsyMobEffect extends MobEffect {
 
     public static void onAttackBlocked(LivingEntity attacker, LivingEntity target) {
         MobEffectInstance numbInstance = attacker.getEffect(BabelMobEffects.PALSY);
-        if (numbInstance == null) return;
-        int newAmplifier = numbInstance.getAmplifier() - 1;
-        attacker.removeEffect(BabelMobEffects.PALSY);
-        if (newAmplifier >= 0) {
-            attacker.addEffect(new MobEffectInstance(BabelMobEffects.PALSY, numbInstance.getDuration(), newAmplifier,
-                numbInstance.isAmbient(), numbInstance.isVisible(), numbInstance.showIcon()));
+        if (numbInstance != null) {
+            int newAmplifier = numbInstance.getAmplifier() - 1;
+            attacker.removeEffect(BabelMobEffects.PALSY);
+            if (newAmplifier >= 0) {
+                attacker.addEffect(new MobEffectInstance(BabelMobEffects.PALSY, numbInstance.getDuration(), newAmplifier,
+                        numbInstance.isAmbient(), numbInstance.isVisible(), numbInstance.showIcon()));
+            }
+            if (target.level() instanceof ServerLevel serverLevel)
+                serverLevel.sendParticles(BabelParticles.PALSYING.get(), attacker.getX(), attacker.getY() + 1, attacker.getZ(), 12, 1, 1, 1, 0.1);
+            target.level().playSound(null, target.blockPosition(), SoundEvents.WAXED_SIGN_INTERACT_FAIL, SoundSource.HOSTILE, 2, 1);
         }
-        if (target.level() instanceof ServerLevel serverLevel)
-            serverLevel.sendParticles(BabelParticles.NUMBNESS.get(), attacker.getX(), attacker.getY() + 1, attacker.getZ(), 12, 1, 1, 1, 0.1);
-        target.level().playSound(null, target.blockPosition(), SoundEvents.WAXED_SIGN_INTERACT_FAIL, SoundSource.HOSTILE, 2, 1);
     }
 }

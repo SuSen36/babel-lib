@@ -1,7 +1,7 @@
 package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
-import com.susen36.babel.api.BabelAPI;
+import com.susen36.babel.manager.EPManager;
 import com.susen36.babel.api.event.ResistDamageEvent;
 import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.ep.EPCapability;
@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 @EventBusSubscriber(modid = BabelMod.MODID)
-public class BabelLivingEvents {
+public class LivingEvents {
 
     private static final Map<LivingEntity, CacheEntry> EP_CACHE = new WeakHashMap<>();
     private static final int CACHE_TTL = 60;
@@ -106,18 +106,18 @@ public class BabelLivingEvents {
 
         if (attacker == null) return;
 
-        BabelAPI.ElementalAttackConfig attackConfig = BabelAPI.getElementalAttackConfig(attacker);
+        EPManager.ElementalAttackConfig attackConfig = EPManager.getElementalAttackConfig(attacker);
         AbstractEPCapability.EPType epType = attackConfig.type();
         double rate = attackConfig.rate();
         double injuryDamage = attackConfig.injuryDamage();
-        BabelAPI.ElementalDefenseConfig defenseConfig = BabelAPI.getElementalDefenseConfig(target);
+        EPManager.ElementalDefenseConfig defenseConfig = EPManager.getElementalDefenseConfig(target);
         if (epType == AbstractEPCapability.EPType.NERVOUS && defenseConfig.type() == epType) {
             rate *= defenseConfig.baseModifier() * defenseConfig.totalModifier();
             injuryDamage *= defenseConfig.baseModifier() * defenseConfig.totalModifier();
         }
         double elementalDamage = injuryDamage + event.getNewDamage() * rate;
 
-        if (elementalDamage > 0 && !BabelAPI.hurtElemental(target, epType, attacker, Mth.floor(elementalDamage))) return;
+        if (elementalDamage > 0 && !EPManager.hurtElemental(target, epType, attacker, Mth.floor(elementalDamage))) return;
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -133,7 +133,7 @@ public class BabelLivingEvents {
     }
 
     @SubscribeEvent
-    public static void onNumbnessCancel(LivingIncomingDamageEvent event) {
+    public static void onPalsyingCancel(LivingIncomingDamageEvent event) {
         if (event.isCanceled()) return;
         LivingEntity target = event.getEntity();
         if (target.level().isClientSide()) return;

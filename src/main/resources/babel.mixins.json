@@ -4,7 +4,7 @@
   "package": "com.susen36.babel.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "BabelLivingEntityMixin"
+    "LivingEntityMixin"
   ],
   "client": [],
   "injectors": {

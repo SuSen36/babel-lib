@@ -14,6 +14,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 
 import java.util.HashMap;
@@ -35,7 +36,17 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
         this.EP_TYPES.put(AbstractEPCapability.EPType.NECROSIS, new NecrosisInjury(living));
     }
 
+    private boolean isEntityProtected() {
+        if (entity instanceof Player player) {
+            if (player.isCreative() || player.isSpectator()) {
+                return true;
+            }
+        }
+        return entity != null && entity.isInvulnerable();
+    }
+
     public void setUnderBreak(int ticks) {
+        if (isEntityProtected()) return;
         if (ticks < 0) ticks = 0;
         if (this.underBreakTick != ticks) {
             this.underBreakTick = ticks;
@@ -62,6 +73,7 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
 
     public boolean hurt(AbstractEPCapability.EPType pType, ElementalInjurySource<?> pSource, int pAmount, ElementEvent.HurtType hurtType, LivingEntity attacker) {
         if (pType.isEmpty()) return false;
+        if (isEntityProtected()) return false;
         AbstractEPCapability ep = EP_TYPES.get(pType);
         if (ep != null) {
             pAmount = ElementEvent.onElementalHurt(entity, pType, pSource, pAmount, hurtType, attacker);

@@ -1,4 +1,4 @@
-package com.susen36.babel.api;
+package com.susen36.babel.manager;
 
 import com.susen36.babel.api.entity.ElementalAttackModifier;
 import com.susen36.babel.api.entity.ElementalAttacker;
@@ -22,10 +22,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-public class BabelAPI {
+public class EPManager {
     private static final Map<LivingEntity, Double> ELEMENTAL_DEFENSE_BASE_MODIFIERS = new WeakHashMap<>();
 
-    private BabelAPI() {
+    private EPManager() {
         throw new UnsupportedOperationException("Utility class");
     }
 
@@ -165,5 +165,37 @@ public class BabelAPI {
     public static boolean isUnderBreak(LivingEntity entity) {
         if (entity == null) return false;
         return BabelCapability.getEP(entity).isUnderBreak();
+    }
+
+    public static boolean isImmune(LivingEntity entity, AbstractEPCapability.EPType type) {
+        if (entity == null || type.isEmpty()) return false;
+        EPCapability ep = BabelCapability.getEP(entity);
+        AbstractEPCapability cap = ep.getEP(type);
+        return cap != null && cap.isImmune(ElementalInjurySource.fromNothing());
+    }
+
+    public static void setImmune(LivingEntity entity, AbstractEPCapability.EPType type, int ticks) {
+        if (entity == null || type.isEmpty() || ticks < 0) return;
+        EPCapability ep = BabelCapability.getEP(entity);
+        AbstractEPCapability cap = ep.getEP(type);
+        if (cap != null) cap.setImmune(ticks);
+    }
+
+    public static void setAllImmune(LivingEntity entity, int ticks) {
+        if (entity == null || ticks < 0) return;
+        EPCapability ep = BabelCapability.getEP(entity);
+        for (AbstractEPCapability.EPType type : AbstractEPCapability.EPType.values()) {
+            if (!type.isEmpty()) {
+                AbstractEPCapability cap = ep.getEP(type);
+                if (cap != null) cap.setImmune(ticks);
+            }
+        }
+    }
+
+    public static void setPermanentImmunity(LivingEntity entity, AbstractEPCapability.EPType type) {
+        if (entity == null || type.isEmpty()) return;
+        EPCapability ep = BabelCapability.getEP(entity);
+        AbstractEPCapability cap = ep.getEP(type);
+        if (cap != null) cap.setPermanentImmunity();
     }
 }
