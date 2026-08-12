@@ -14,7 +14,7 @@ import net.minecraft.util.Mth;
 public final class NDifficultyLevel {
     private static final NDifficultyLevel EASY = new NDifficultyLevel(0);
 
-    private int value;
+    private final int value;
 
     private NDifficultyLevel(int value) {
         this.value = value;
@@ -42,10 +42,6 @@ public final class NDifficultyLevel {
     /** 难度等级值[0, 21]。 */
     public int value() {
         return Mth.clamp(this.value, 0, 21);
-    }
-
-    public void setLevel(int level) {
-        value = level;
     }
 
     @Override

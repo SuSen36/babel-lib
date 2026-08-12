@@ -61,33 +61,4 @@ public final class NDifficulty {
         double n = 1 + 0.01 * dl.value() * 2;
         return Math.pow(n, progressCoefficient(world));
     }
-
-    /**
-     * 扩展模式过滤（{@code extend_surging_waves}）：判断难度是否应作用于该实体。
-     * 支持 off / on / monster_only / animal_only / exclude_animal / exclude_monster。
-     */
-    public static boolean shouldExtend(Entity entity) {
-        String mode = BabelConfig.extendSurgingWaves;
-        if ("off".equals(mode)) {
-            return false;
-        }
-        if ("on".equals(mode)) {
-            return true;
-        }
-        boolean animal = entity instanceof Animal;
-        boolean monster = entity instanceof Monster;
-        if ("animal_only".equals(mode)) {
-            return animal;
-        }
-        if ("exclude_monster".equals(mode)) {
-            return !monster;
-        }
-        if ("monster_only".equals(mode)) {
-            return monster;
-        }
-        if ("exclude_animal".equals(mode)) {
-            return !animal;
-        }
-        return false;
-    }
 }

@@ -1,6 +1,5 @@
 package com.susen36.babel.network;
 
-import com.susen36.babel.BabelMod;
 import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.network.receive.EPSyncMessage;
 import net.minecraft.world.entity.Entity;
