@@ -9,6 +9,7 @@ import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,9 +66,9 @@ public class BabelConfig {
 
     private static boolean validateItemName(final Object obj) {
         return obj instanceof final String itemName
-                && BuiltInRegistries.ITEM.containsKey(ResourceLocation.tryBuild(itemName.indexOf(':') >= 0
-                        ? itemName.substring(0, itemName.indexOf(':'))
-                        : "minecraft", itemName.contains(":") ? itemName.substring(itemName.indexOf(':') + 1) : itemName));
+                && BuiltInRegistries.ITEM.containsKey(Objects.requireNonNull(ResourceLocation.tryBuild(itemName.indexOf(':') >= 0
+                ? itemName.substring(0, itemName.indexOf(':'))
+                : "minecraft", itemName.contains(":") ? itemName.substring(itemName.indexOf(':') + 1) : itemName)));
     }
 
     @SubscribeEvent

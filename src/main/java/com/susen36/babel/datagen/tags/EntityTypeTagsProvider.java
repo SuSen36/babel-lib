@@ -32,6 +32,9 @@ public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
+        // forge:bosses 非 NeoForge 内置标签，需在此声明才能被 applies_difficulty 引用
+        tag(FORGE_BOSSES);
+
         tag(APPLIES_DIFFICULTY)
                 .add(ResourceKey.create(Registries.ENTITY_TYPE, EntityType.getKey(EntityType.ENDER_DRAGON)))
                 .addTag(FORGE_BOSSES);
@@ -42,5 +45,10 @@ public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
     private static TagKey<EntityType<?>> babelEntityTypeTag(String path) {
         return TagKey.create(Registries.ENTITY_TYPE,
                 ResourceLocation.fromNamespaceAndPath(BabelMod.MODID, path));
+    }
+
+    private static TagKey<EntityType<?>> forgeEntityTypeTag(String path) {
+        return TagKey.create(Registries.ENTITY_TYPE,
+                ResourceLocation.fromNamespaceAndPath("forge", path));
     }
 }
