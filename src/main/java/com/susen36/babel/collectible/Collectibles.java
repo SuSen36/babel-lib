@@ -11,6 +11,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.Item;
+import net.minecraft.util.Mth;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -136,19 +137,45 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
 
         public int getLayer(@NotNull Holder<Item> item) {
-            return Objects.requireNonNull(Layer.get(getIdByItem(item)));
+            Integer layer = Layer.get(getIdByItem(item));
+            if (layer != null) {
+                return layer;
+            }
+            if (item.value() instanceof CollectibleLike collectible) {
+                return collectible.defaultLevel();
+            }
+            return 0;
         }
 
         public int getLayer(@NotNull Item item) {
-            return Objects.requireNonNull(Layer.get(getIdByItem(item)));
+            Integer layer = Layer.get(getIdByItem(item));
+            if (layer != null) {
+                return layer;
+            }
+            if (item instanceof CollectibleLike collectible) {
+                return collectible.defaultLevel();
+            }
+            return 0;
         }
 
         public void setLayer(@NotNull Holder<Item> item, @NotNull Integer layer) {
-            Layer.put(getIdByItem(item), layer);
+            int minLevel = 0;
+            int maxLevel = 1;
+            if (item.value() instanceof CollectibleLike collectible) {
+                minLevel = collectible.minLevel();
+                maxLevel = collectible.maxLevel();
+            }
+            Layer.put(getIdByItem(item), Mth.clamp(layer, minLevel, maxLevel));
         }
 
         public void setLayer(@NotNull Item item, @NotNull Integer layer) {
-            Layer.put(getIdByItem(item), layer);
+            int minLevel = 0;
+            int maxLevel = 1;
+            if (item instanceof CollectibleLike collectible) {
+                minLevel = collectible.minLevel();
+                maxLevel = collectible.maxLevel();
+            }
+            Layer.put(getIdByItem(item), Mth.clamp(layer, minLevel, maxLevel));
         }
 
         @Override

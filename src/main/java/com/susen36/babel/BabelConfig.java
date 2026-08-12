@@ -31,6 +31,10 @@ public class BabelConfig {
             .comment("元素损伤显示采用条状，若关闭则为圆环（仅神经损伤有效）。")
             .define("ep_bar_style", false);
 
+    public static final ModConfigSpec.BooleanValue BAN_ADVANCED_COLLECTIBLES = BUILDER
+            .comment("禁用高级（ADVANCED）收藏品：无法持有且无法激活。")
+            .define("ban_advanced_collectibles", false);
+
     public static final ModConfigSpec.DoubleValue EP_X_OFFSET = BUILDER
             .comment("元素损伤渲染x轴偏移。正数值为向右偏移")
             .defineInRange("ep_x_offset", 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
@@ -50,6 +54,7 @@ public class BabelConfig {
     public static String magicNumberIntroduction;
     public static Set<Item> items;
     public static boolean epBarStyle;
+    public static boolean banAdvancedCollectibles;
     public static double epXOffset;
     public static double epYOffset;
     public static List<? extends String> surgingWavesEntry;
@@ -70,6 +75,7 @@ public class BabelConfig {
                 .<Item>map(itemName -> BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(itemName)))
                 .collect(Collectors.toSet());
         epBarStyle = EP_BAR_STYLE.get();
+        banAdvancedCollectibles = BAN_ADVANCED_COLLECTIBLES.get();
         epXOffset = EP_X_OFFSET.get();
         epYOffset = EP_Y_OFFSET.get();
         surgingWavesEntry = SURGING_WAVES_ENTRY.get();
@@ -79,6 +85,7 @@ public class BabelConfig {
         magicNumber = MAGIC_NUMBER.get();
         magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
         epBarStyle = EP_BAR_STYLE.get();
+        banAdvancedCollectibles = BAN_ADVANCED_COLLECTIBLES.get();
         epXOffset = EP_X_OFFSET.get();
         epYOffset = EP_Y_OFFSET.get();
         surgingWavesEntry = SURGING_WAVES_ENTRY.get();

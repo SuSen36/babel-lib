@@ -29,6 +29,18 @@ public class CollectibleBuilder {
         return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, useTicks)));
     }
 
+    public DeferredHolder<Item, Item> registerCollectible(String name, CollectibleItem.CollectibleEffect effect, boolean consumeSelf, int useTicks, CollectibleTiers tier) {
+        return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, useTicks, tier)));
+    }
+
+    public DeferredHolder<Item, Item> registerCollectible(String name, CollectibleItem.CollectibleEffect effect, boolean consumeSelf, int useTicks, CollectibleTiers tier, int minLevel, int maxLevel, int defaultLevel) {
+        return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, useTicks, tier, minLevel, maxLevel, defaultLevel)));
+    }
+
+    public DeferredHolder<Item, Item> registerCollectible(String name, CollectibleItem.CollectibleEffect effect, boolean consumeSelf, int useTicks, CollectibleTiers tier, int minLevel, int maxLevel, int defaultLevel, CollectibleActivation activation) {
+        return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, useTicks, tier, minLevel, maxLevel, defaultLevel, activation)));
+    }
+
     public <T extends CollectibleItem.CustomCollectibleItem> DeferredHolder<Item, Item> registerCollectible(String name, Supplier<T> item) {
         return save(name, ITEMS.register(name, item));
     }
