@@ -1,5 +1,10 @@
 package com.susen36.babel.collectible;
 
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
@@ -92,8 +97,25 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                 @NotNull InteractionHand usedHand
         ) {
             var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
-            data.markUsed(player.getItemInHand(usedHand).getItem());
-            player.startUsingItem(usedHand);
+            if (!data.isUsed(player.getItemInHand(usedHand).getItem())) {
+                data.markUsed(player.getItemInHand(usedHand).getItem());
+                player.startUsingItem(usedHand);
+            } else if (level instanceof ClientLevel clientLevel) {
+                double x = player.getX();
+                double y = player.getY();
+                double z = player.getZ();
+                SoundEvent failSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("minecraft:block.spawner.break"));
+                if (failSound != null) {
+                    clientLevel.playLocalSound(
+                            x, y, z,
+                            failSound,
+                            SoundSource.PLAYERS,
+                            1.0f,
+                            1.0f,
+                            false
+                    );
+                }
+            }
             return InteractionResultHolder.consume(player.getItemInHand(usedHand));
         }
 
