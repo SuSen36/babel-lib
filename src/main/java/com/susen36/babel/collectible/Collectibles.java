@@ -65,8 +65,20 @@ public class Collectibles implements INBTSerializable<ListTag> {
         return UsedCollectibles.contains(item);
     }
 
+    public boolean isUsed(@NotNull Item item) {
+        return UsedCollectibles.contains(BuiltInRegistries.ITEM.createIntrusiveHolder(item));
+    }
+
     public void markUsed(@NotNull Holder<Item> item) {
         UsedCollectibles.add(item);
+    }
+
+    public void unmarkUsed(@NotNull Holder<Item> item) {
+        UsedCollectibles.remove(item);
+    }
+
+    public void unmarkUsed(@NotNull Item item) {
+        UsedCollectibles.remove(BuiltInRegistries.ITEM.createIntrusiveHolder(item));
     }
 
     public void markUsed(@NotNull Item item) {
