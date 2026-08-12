@@ -73,6 +73,10 @@ public class Collectibles implements INBTSerializable<ListTag> {
         UsedCollectibles.add(item);
     }
 
+    public void markUsed(@NotNull Item item) {
+        UsedCollectibles.add(BuiltInRegistries.ITEM.createIntrusiveHolder(item));
+    }
+
     public void unmarkUsed(@NotNull Holder<Item> item) {
         UsedCollectibles.remove(item);
     }
@@ -81,9 +85,6 @@ public class Collectibles implements INBTSerializable<ListTag> {
         UsedCollectibles.remove(BuiltInRegistries.ITEM.createIntrusiveHolder(item));
     }
 
-    public void markUsed(@NotNull Item item) {
-        UsedCollectibles.add(BuiltInRegistries.ITEM.createIntrusiveHolder(item));
-    }
 
     public @NotNull HashSet<Holder<Item>> getUsed() {
         return UsedCollectibles;
@@ -140,10 +141,6 @@ public class Collectibles implements INBTSerializable<ListTag> {
 
         public int getLayer(@NotNull Item item) {
             return Objects.requireNonNull(Layer.get(getIdByItem(item)));
-        }
-
-        private int getLayer(@NotNull String id) {
-            return Objects.requireNonNull(Layer.get(id));
         }
 
         public void setLayer(@NotNull Holder<Item> item, @NotNull Integer layer) {
