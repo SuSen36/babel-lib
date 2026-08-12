@@ -16,13 +16,13 @@ import java.util.List;
  * <p>
  * 仅提供难度等级读取、难度倍率计算、玩家进度检测与扩展模式过滤等通用能力，
  */
-public final class Difficulty {
-    private Difficulty() {
+public final class NDifficulty {
+    private NDifficulty() {
     }
 
     /** 当前世界的难度等级。 */
-    public static DifficultyLevel difficultyLevel(LevelAccessor world) {
-        return DifficultyLevel.of(world.getLevelData().getGameRules().getInt(BabelGameRules.DIFFICULTY_LEVEL));
+    public static NDifficultyLevel difficultyLevel(LevelAccessor world) {
+        return NDifficultyLevel.of(world.getLevelData().getGameRules().getInt(BabelGameRules.DIFFICULTY_LEVEL));
     }
 
     /**
@@ -54,7 +54,7 @@ public final class Difficulty {
      * {@code (1 + 0.01 * clampedLevel * 2) ^ progressCoefficient}。
      */
     public static double multiplier(LevelAccessor world) {
-        DifficultyLevel dl = difficultyLevel(world);
+        NDifficultyLevel dl = difficultyLevel(world);
         if (dl.isEasy()) {
             return 0.0;
         }

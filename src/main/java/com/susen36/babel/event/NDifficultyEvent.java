@@ -1,7 +1,7 @@
 package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
-import com.susen36.babel.difficulty.Difficulty;
+import com.susen36.babel.difficulty.NDifficulty;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -19,11 +19,11 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 /**
  * 难度（探索等级）通用实体应用逻辑。
  * <p>
- * 仅复制 N18 相关通用部分：实体生成时按 {@link Difficulty#multiplier} 提升
+ * 仅复制 N18 相关通用部分：实体生成时按 {@link NDifficulty#multiplier} 提升
  * 生命、攻击、盔甲值与盔甲韧性，并保持当前血量百分比。不包含任何海嗣专属依赖。
  */
 @EventBusSubscriber(modid = BabelMod.MODID)
-public class DifficultyEvent {
+public class NDifficultyEvent {
 
     /** 强制应用标签：加入该标签的实体即使不属于默认敌对目标也会应用难度倍率。 */
     public static final TagKey<EntityType<?>> APPLIES_DIFFICULTY = TagKey.create(
@@ -40,7 +40,7 @@ public class DifficultyEvent {
         if (!shouldApply(entity)) return;
 
         LevelAccessor world = event.getLevel();
-        double n = Difficulty.multiplier(world);
+        double n = NDifficulty.multiplier(world);
         if (n <= 1.0) return;
 
         double percentage = living.getHealth() / living.getMaxHealth();

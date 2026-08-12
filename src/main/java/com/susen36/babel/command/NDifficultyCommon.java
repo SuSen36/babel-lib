@@ -3,7 +3,7 @@ package com.susen36.babel.command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.context.ParsedCommandNode;
-import com.susen36.babel.difficulty.Difficulty;
+import com.susen36.babel.difficulty.NDifficulty;
 import com.susen36.babel.init.BabelGameRules;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -15,7 +15,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.CommandEvent;
 
 @EventBusSubscriber
-public class DifficultyCommon {
+public class NDifficultyCommon {
 	@SubscribeEvent
 	public static void onCommand(CommandEvent event) {
 		CommandContext<CommandSourceStack> commandContext = event.getParseResults().getContext().build(event.getParseResults().getReader().getString());
@@ -40,7 +40,7 @@ public class DifficultyCommon {
             }
 
             int targetSurgingWavesLevel = IntegerArgumentType.getInteger(commandContext, "value");
-            int currentSurgingWavesLevel = Difficulty.difficultyLevel(player.level()).getLevel();
+            int currentSurgingWavesLevel = NDifficulty.difficultyLevel(player.level()).getLevel();
             if (targetSurgingWavesLevel <= currentSurgingWavesLevel) {
                 return;
             }

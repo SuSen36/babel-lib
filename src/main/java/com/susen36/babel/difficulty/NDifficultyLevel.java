@@ -10,17 +10,18 @@ import net.minecraft.util.Mth;
  *     <li>hard：游戏规则值为 19，困难模式，等级最高 19，多出来的1级不参与倍率计算。</li>
  * </ul>
  */
-public final class DifficultyLevel {
-    private static final DifficultyLevel EASY = new DifficultyLevel(0);
+//java小知识:类声明为final意味着该类不能被继承
+public final class NDifficultyLevel {
+    private static final NDifficultyLevel EASY = new NDifficultyLevel(0);
 
     private int value;
 
-    private DifficultyLevel(int value) {
+    private NDifficultyLevel(int value) {
         this.value = value;
     }
 
-    public static DifficultyLevel of(int value) {
-        return value <= 0 ? EASY : new DifficultyLevel(value);
+    public static NDifficultyLevel of(int value) {
+        return value <= 0 ? EASY : new NDifficultyLevel(value);
     }
 
     /** 是否为 normal 难度（值 1-18）。 */
@@ -42,9 +43,10 @@ public final class DifficultyLevel {
     private int value() {
         return Mth.clamp(this.value, 0, 21);
     }
+
     /** 难度等级值[0, 21]。 */
     public int getLevel() {
-        return value;
+        return value();
     }
 
     public void setLevel(int level) {
