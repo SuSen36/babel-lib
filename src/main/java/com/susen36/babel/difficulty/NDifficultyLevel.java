@@ -40,13 +40,8 @@ public final class NDifficultyLevel {
     }
 
     /** 难度等级值[0, 21]。 */
-    private int value() {
+    public int value() {
         return Mth.clamp(this.value, 0, 21);
-    }
-
-    /** 难度等级值[0, 21]。 */
-    public int getLevel() {
-        return value();
     }
 
     public void setLevel(int level) {

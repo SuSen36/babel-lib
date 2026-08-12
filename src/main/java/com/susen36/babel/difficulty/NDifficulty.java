@@ -58,7 +58,7 @@ public final class NDifficulty {
         if (dl.isEasy()) {
             return 0.0;
         }
-        double n = 1 + 0.01 * dl.getLevel() * 2;
+        double n = 1 + 0.01 * dl.value() * 2;
         return Math.pow(n, progressCoefficient(world));
     }
 

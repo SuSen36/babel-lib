@@ -40,7 +40,7 @@ public class NDifficultyCommon {
             }
 
             int targetSurgingWavesLevel = IntegerArgumentType.getInteger(commandContext, "value");
-            int currentSurgingWavesLevel = NDifficulty.difficultyLevel(player.level()).getLevel();
+            int currentSurgingWavesLevel = NDifficulty.difficultyLevel(player.level()).value();
             if (targetSurgingWavesLevel <= currentSurgingWavesLevel) {
                 return;
             }
