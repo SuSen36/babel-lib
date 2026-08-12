@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 @EventBusSubscriber(modid = BabelMod.MODID)
-public class LivingEvents {
+public class EPEvents {
 
     private static final Map<LivingEntity, CacheEntry> EP_CACHE = new WeakHashMap<>();
     private static final int CACHE_TTL = 60;

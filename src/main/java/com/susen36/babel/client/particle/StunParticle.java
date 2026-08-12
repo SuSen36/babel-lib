@@ -28,8 +28,8 @@ public class StunParticle extends TextureSheetParticle {
         this.pickSprite(spriteSet);
     }
 
-    public static DizzinessParticleProvider provider(SpriteSet spriteSet) {
-        return new DizzinessParticleProvider(spriteSet);
+    public static StunParticleProvider provider(SpriteSet spriteSet) {
+        return new StunParticleProvider(spriteSet);
     }
 
     @Override
@@ -37,10 +37,10 @@ public class StunParticle extends TextureSheetParticle {
         return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
     }
 
-    public static class DizzinessParticleProvider implements ParticleProvider<SimpleParticleType> {
+    public static class StunParticleProvider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet spriteSet;
 
-        public DizzinessParticleProvider(SpriteSet spriteSet) {
+        public StunParticleProvider(SpriteSet spriteSet) {
             this.spriteSet = spriteSet;
         }
 

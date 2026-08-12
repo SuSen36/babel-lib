@@ -3,6 +3,7 @@ package com.susen36.babel;
 import com.mojang.logging.LogUtils;
 import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.init.BabelAttributes;
+import com.susen36.babel.init.BabelGameRules;
 import com.susen36.babel.init.BabelMobEffects;
 import com.susen36.babel.init.BabelParticles;
 import com.susen36.babel.network.BabelNetwork;
@@ -26,6 +27,7 @@ public class BabelMod {
         BabelParticles.REGISTRY.register(modEventBus);
         BabelCapability.register(modEventBus);
         modEventBus.addListener(BabelNetwork::register);
+        BabelGameRules.init();
         modContainer.registerConfig(ModConfig.Type.COMMON, BabelConfig.SPEC);
     }
 }

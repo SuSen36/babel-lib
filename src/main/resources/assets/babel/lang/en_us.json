@@ -35,5 +35,7 @@
   "death.attack.corrosion_break": "%1$s was corroded away",
   "death.attack.burn_break": "%1$s was burned to ashes",
   "death.attack.element_break": "%1$s was consumed by elemental damage",
-  "config.jade.plugin_babel.ep_provider": "Elemental Injury Display"
+  "config.jade.plugin_babel.ep_provider": "Elemental Injury Display",
+  "gameplay.babel.n_6": "Attention: §eYou've switched to a high difficulty for Caerula Arbor, please take care.",
+  "gameplay.babel.n_12": "Warn: §cYou've switched to a very high difficulty for Caerula Arbor, it isn't for normal survival games."
 }

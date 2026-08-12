@@ -43,6 +43,14 @@ public class BabelConfig {
             .comment("元素损伤渲染y轴偏移。正数值为向下偏移")
             .defineInRange("ep_y_offset", 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> SURGING_WAVES_ENTRY = BUILDER
+            .comment("难度检测的玩家进度，其顺序推荐从前往后。仅前四个有效。")
+            .defineList("surging_waves_entry", List.of("empty"), entry -> true);
+
+    public static final ModConfigSpec.ConfigValue<String> EXTEND_SURGING_WAVES = BUILDER
+            .comment("难度应用于非原生生物。可填入：off（默认）, monster_only, animal_only, exclude_animal, exclude_monster和on")
+            .define("extend_surging_waves", "off");
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     public static boolean logDirtBlock;
@@ -52,6 +60,8 @@ public class BabelConfig {
     public static boolean epBarStyle;
     public static double epXOffset;
     public static double epYOffset;
+    public static List<? extends String> surgingWavesEntry;
+    public static String extendSurgingWaves;
 
     private static boolean validateItemName(final Object obj) {
         return obj instanceof final String itemName
@@ -71,6 +81,8 @@ public class BabelConfig {
         epBarStyle = EP_BAR_STYLE.get();
         epXOffset = EP_X_OFFSET.get();
         epYOffset = EP_Y_OFFSET.get();
+        surgingWavesEntry = SURGING_WAVES_ENTRY.get();
+        extendSurgingWaves = EXTEND_SURGING_WAVES.get();
     }
 
     public static void onReloading(final ModConfigEvent.Reloading event) {
@@ -80,5 +92,7 @@ public class BabelConfig {
         epBarStyle = EP_BAR_STYLE.get();
         epXOffset = EP_X_OFFSET.get();
         epYOffset = EP_Y_OFFSET.get();
+        surgingWavesEntry = SURGING_WAVES_ENTRY.get();
+        extendSurgingWaves = EXTEND_SURGING_WAVES.get();
     }
 }
