@@ -58,7 +58,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
     }
 
     public static @NotNull String getIdByItem(@NotNull Item item) {
-        return Objects.requireNonNull(Collectibles.inverse().get(BuiltInRegistries.ITEM.createIntrusiveHolder(item)));
+        return Objects.requireNonNull(Collectibles.inverse().get(BuiltInRegistries.ITEM.wrapAsHolder(item)));
     }
 
     public boolean isUsed(@NotNull Holder<Item> item) {
@@ -66,7 +66,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
     }
 
     public boolean isUsed(@NotNull Item item) {
-        return UsedCollectibles.contains(BuiltInRegistries.ITEM.createIntrusiveHolder(item));
+        return UsedCollectibles.contains(BuiltInRegistries.ITEM.wrapAsHolder(item));
     }
 
     public void markUsed(@NotNull Holder<Item> item) {
@@ -74,7 +74,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
     }
 
     public void markUsed(@NotNull Item item) {
-        UsedCollectibles.add(BuiltInRegistries.ITEM.createIntrusiveHolder(item));
+        UsedCollectibles.add(BuiltInRegistries.ITEM.wrapAsHolder(item));
     }
 
     public void unmarkUsed(@NotNull Holder<Item> item) {
@@ -82,7 +82,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
     }
 
     public void unmarkUsed(@NotNull Item item) {
-        UsedCollectibles.remove(BuiltInRegistries.ITEM.createIntrusiveHolder(item));
+        UsedCollectibles.remove(BuiltInRegistries.ITEM.wrapAsHolder(item));
     }
 
 

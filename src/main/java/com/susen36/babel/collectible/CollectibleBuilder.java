@@ -2,6 +2,7 @@ package com.susen36.babel.collectible;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
@@ -9,14 +10,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Supplier;
 
 public class CollectibleBuilder {
-    private DeferredRegister<Item> ITEMS;
+    private final DeferredRegister<Item> ITEMS;
 
-    private CollectibleBuilder(@NotNull String modid) {
-        DeferredRegister.create(BuiltInRegistries.ITEM, modid);
+    private CollectibleBuilder(@NotNull String modid, IEventBus bus) {
+        this.ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, modid);
+        ITEMS.register(bus);
     }
 
-    public static CollectibleBuilder create(@NotNull String modid) {
-        return new CollectibleBuilder(modid);
+    public static CollectibleBuilder create(@NotNull String modid, IEventBus bus) {
+        return new CollectibleBuilder(modid, bus);
     }
 
     public DeferredHolder<Item, Item> registerCollectible(String name, CollectibleItem.CollectibleEffect effect, boolean consumeSelf) {

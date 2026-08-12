@@ -18,6 +18,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     private final CollectibleEffect effect;
     private final boolean consumeSelf;
     private final int useTicks;
+    private InteractionHand hand;
 
     public CollectibleItem(CollectibleEffect effect, boolean consumeSelf) {
         this(effect, consumeSelf, 25);
@@ -36,6 +37,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             @NotNull Player player,
             @NotNull InteractionHand usedHand
     ) {
+        this.hand = usedHand;
         player.startUsingItem(usedHand);
         return InteractionResultHolder.consume(player.getItemInHand(usedHand));
     }
@@ -47,9 +49,28 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             @NotNull LivingEntity livingEntity
     ) {
         if (livingEntity instanceof Player player) {
-            effect.onUse(stack, level, player);
-            if (consumeSelf) {
-                return consumeSelf(stack);
+            var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
+            if (!data.isUsed(player.getItemInHand(hand).getItem())) {
+                data.markUsed(player.getItemInHand(hand).getItem());
+                effect.onUse(stack, level, player);
+                if (consumeSelf) {
+                    return consumeSelf(stack);
+                }
+            } else if (level instanceof ClientLevel clientLevel) {
+                double x = player.getX();
+                double y = player.getY();
+                double z = player.getZ();
+                SoundEvent failSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("minecraft:block.spawner.break"));
+                if (failSound != null) {
+                    clientLevel.playLocalSound(
+                            x, y, z,
+                            failSound,
+                            SoundSource.PLAYERS,
+                            1.0f,
+                            1.0f,
+                            false
+                    );
+                }
             }
         }
         return stack;
@@ -78,6 +99,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     public abstract static class CustomCollectibleItem extends Item implements CollectibleLike {
         private final boolean consumeSelf;
         private final int useTicks;
+        private InteractionHand hand;
 
         public CustomCollectibleItem(Properties properties, boolean consumeSelf, int useTicks) {
             super(properties);
@@ -96,26 +118,8 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                 @NotNull Player player,
                 @NotNull InteractionHand usedHand
         ) {
-            var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
-            if (!data.isUsed(player.getItemInHand(usedHand).getItem())) {
-                data.markUsed(player.getItemInHand(usedHand).getItem());
-                player.startUsingItem(usedHand);
-            } else if (level instanceof ClientLevel clientLevel) {
-                double x = player.getX();
-                double y = player.getY();
-                double z = player.getZ();
-                SoundEvent failSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("minecraft:block.spawner.break"));
-                if (failSound != null) {
-                    clientLevel.playLocalSound(
-                            x, y, z,
-                            failSound,
-                            SoundSource.PLAYERS,
-                            1.0f,
-                            1.0f,
-                            false
-                    );
-                }
-            }
+            this.hand = usedHand;
+            player.startUsingItem(usedHand);
             return InteractionResultHolder.consume(player.getItemInHand(usedHand));
         }
 
@@ -126,10 +130,29 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                 @NotNull LivingEntity livingEntity
         ) {
             if (livingEntity instanceof Player player) {
-                this.onUse(stack, level, player);
-                if (consumeSelf) {
-                    stack.shrink(1);
-                    return stack;
+                var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
+                if (!data.isUsed(player.getItemInHand(hand).getItem())) {
+                    data.markUsed(player.getItemInHand(hand).getItem());
+                    this.onUse(stack, level, player);
+                    if (consumeSelf) {
+                        stack.shrink(1);
+                        return stack;
+                    }
+                } else if (level instanceof ClientLevel clientLevel) {
+                    double x = player.getX();
+                    double y = player.getY();
+                    double z = player.getZ();
+                    SoundEvent failSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.withDefaultNamespace("block.chest.locked"));
+                    if (failSound != null) {
+                        clientLevel.playLocalSound(
+                                x, y, z,
+                                failSound,
+                                SoundSource.PLAYERS,
+                                15.0f,
+                                1.0f,
+                                false
+                        );
+                    }
                 }
             }
             return stack;
