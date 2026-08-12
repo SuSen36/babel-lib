@@ -9,12 +9,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Supplier;
 
 public class CollectibleBuilder {
-    @NotNull
-    private String MODID = "fuck idea, how could this var be null?";
-    private final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, MODID);
+    private DeferredRegister<Item> ITEMS;
 
     private CollectibleBuilder(@NotNull String modid) {
-        this.MODID = modid;
+        DeferredRegister.create(BuiltInRegistries.ITEM, modid);
     }
 
     public static CollectibleBuilder create(@NotNull String modid) {
