@@ -15,7 +15,7 @@ jobs:
           java-version: '21'
           
       - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v4
+        uses: gradle/actions/wrapper-validation@v6
         
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
