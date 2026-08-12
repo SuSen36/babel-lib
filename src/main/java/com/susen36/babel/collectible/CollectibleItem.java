@@ -10,15 +10,6 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 public final class CollectibleItem extends Item implements CollectibleLike {
-    @FunctionalInterface
-    public interface CollectibleEffect {
-        void onUse(
-                @NotNull ItemStack stack,
-                @NotNull Level level,
-                @NotNull Player player
-        );
-    }
-
     private final CollectibleEffect effect;
     private final boolean consumeSelf;
     private final int useTicks;
@@ -70,6 +61,15 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         return stackCopy;
     }
 
+    @FunctionalInterface
+    public interface CollectibleEffect {
+        void onUse(
+                @NotNull ItemStack stack,
+                @NotNull Level level,
+                @NotNull Player player
+        );
+    }
+
     public abstract static class CustomCollectibleItem extends Item implements CollectibleLike {
         private final boolean consumeSelf;
         private final int useTicks;
@@ -81,22 +81,24 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         }
 
         @Override
-        public int getUseDuration(@NotNull ItemStack stack, @NotNull LivingEntity entity) {
+        final public int getUseDuration(@NotNull ItemStack stack, @NotNull LivingEntity entity) {
             return this.useTicks;
         }
 
         @Override
-        public @NotNull InteractionResultHolder<ItemStack> use(
+        final public @NotNull InteractionResultHolder<ItemStack> use(
                 @NotNull Level level,
                 @NotNull Player player,
                 @NotNull InteractionHand usedHand
         ) {
+            var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
+            data.markUsed(player.getItemInHand(usedHand).getItem());
             player.startUsingItem(usedHand);
             return InteractionResultHolder.consume(player.getItemInHand(usedHand));
         }
 
         @Override
-        public @NotNull ItemStack finishUsingItem(
+        final public @NotNull ItemStack finishUsingItem(
                 @NotNull ItemStack stack,
                 @NotNull Level level,
                 @NotNull LivingEntity livingEntity

@@ -2,6 +2,7 @@ package com.susen36.babel;
 
 import com.mojang.logging.LogUtils;
 import com.susen36.babel.capability.BabelCapability;
+import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.init.BabelAttributes;
 import com.susen36.babel.init.BabelGameRules;
 import com.susen36.babel.init.BabelMobEffects;
@@ -22,11 +23,12 @@ public class BabelMod {
     public BabelMod(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(BabelConfig::onLoad);
         modEventBus.addListener(BabelConfig::onReloading);
+        modEventBus.addListener(BabelNetwork::register);
         BabelAttributes.REGISTER.register(modEventBus);
         BabelMobEffects.REGISTRY.register(modEventBus);
         BabelParticles.REGISTRY.register(modEventBus);
         BabelCapability.register(modEventBus);
-        modEventBus.addListener(BabelNetwork::register);
+        Collectibles.register(modEventBus);
         BabelGameRules.init();
         modContainer.registerConfig(ModConfig.Type.COMMON, BabelConfig.SPEC);
     }
