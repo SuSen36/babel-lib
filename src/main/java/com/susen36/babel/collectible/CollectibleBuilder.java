@@ -13,14 +13,12 @@ public class CollectibleBuilder {
     private String MODID = "fuck idea, how could this var be null?";
     private final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, MODID);
 
-    private CollectibleBuilder() {
-    }
-    public CollectibleBuilder(@NotNull String modid) {
+    private CollectibleBuilder(@NotNull String modid) {
         this.MODID = modid;
     }
 
-    public static CollectibleBuilder create() {
-        return new CollectibleBuilder();
+    public static CollectibleBuilder create(@NotNull String modid) {
+        return new CollectibleBuilder(modid);
     }
 
     public DeferredHolder<Item, Item> registerCollectible(String name, CollectibleItem.CollectibleEffect effect, boolean consumeSelf) {
