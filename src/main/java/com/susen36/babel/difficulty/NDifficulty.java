@@ -2,6 +2,7 @@ package com.susen36.babel.difficulty;
 
 import com.susen36.babel.BabelConfig;
 import com.susen36.babel.init.BabelGameRules;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -26,30 +27,6 @@ public final class NDifficulty {
     }
 
     /**
-     * 玩家进度系数。对每个在线玩家，取 {@code surging_waves_entry} 前四个进度中最后一个已完成的序号 +2
-     * 作为该玩家系数（默认 1），最终取所有玩家的最大值。
-     */
-    public static int progressCoefficient(LevelAccessor world) {
-        int coef = 1;
-        List<? extends String> entries = BabelConfig.surgingWavesEntry;
-        for (Entity player : world.players()) {
-            if (player instanceof ServerPlayer plr) {
-                int cur = 1;
-                for (int i = 0; i < Math.min(entries.size(), 4); i++) {
-                    ResourceLocation entryAdvancement = ResourceLocation.parse(entries.get(i));
-                    if (plr.getAdvancements().getOrStartProgress(plr.getServer().getAdvancements().get(entryAdvancement)).isDone()) {
-                        cur = i + 2;
-                    }
-                }
-                if (cur > coef) {
-                    coef = cur;
-                }
-            }
-        }
-        return coef;
-    }
-
-    /**
      * 难度倍率。easy 模式返回 0；normal 模式返回
      * {@code (1 + 0.01 * clampedLevel * 2) ^ progressCoefficient}。
      */
@@ -59,35 +36,6 @@ public final class NDifficulty {
             return 0.0;
         }
         double n = 1 + 0.01 * dl.value() * 2;
-        return Math.pow(n, progressCoefficient(world));
-    }
-
-    /**
-     * 扩展模式过滤（{@code extend_surging_waves}）：判断难度是否应作用于该实体。
-     * 支持 off / on / monster_only / animal_only / exclude_animal / exclude_monster。
-     */
-    public static boolean shouldExtend(Entity entity) {
-        String mode = BabelConfig.extendSurgingWaves;
-        if ("off".equals(mode)) {
-            return false;
-        }
-        if ("on".equals(mode)) {
-            return true;
-        }
-        boolean animal = entity instanceof Animal;
-        boolean monster = entity instanceof Monster;
-        if ("animal_only".equals(mode)) {
-            return animal;
-        }
-        if ("exclude_monster".equals(mode)) {
-            return !monster;
-        }
-        if ("monster_only".equals(mode)) {
-            return monster;
-        }
-        if ("exclude_animal".equals(mode)) {
-            return !animal;
-        }
-        return false;
+        return Math.pow(n, 1);
     }
 }

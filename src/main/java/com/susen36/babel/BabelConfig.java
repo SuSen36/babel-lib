@@ -4,7 +4,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
@@ -15,10 +14,6 @@ import java.util.stream.Collectors;
 
 public class BabelConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
-
-    private static final ModConfigSpec.BooleanValue LOG_DIRT_BLOCK = BUILDER
-            .comment("Whether to log the dirt block on common setup")
-            .define("logDirtBlock", false);
 
     private static final ModConfigSpec.IntValue MAGIC_NUMBER = BUILDER
             .comment("A magic number")
@@ -36,6 +31,10 @@ public class BabelConfig {
             .comment("元素损伤显示采用条状，若关闭则为圆环（仅神经损伤有效）。")
             .define("ep_bar_style", false);
 
+    public static final ModConfigSpec.BooleanValue BAN_ADVANCED_COLLECTIBLES = BUILDER
+            .comment("禁用高级（ADVANCED）收藏品：无法持有且无法激活。")
+            .define("ban_advanced_collectibles", false);
+
     public static final ModConfigSpec.DoubleValue EP_X_OFFSET = BUILDER
             .comment("元素损伤渲染x轴偏移。正数值为向右偏移")
             .defineInRange("ep_x_offset", 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
@@ -48,10 +47,6 @@ public class BabelConfig {
             .comment("难度检测的玩家进度，其顺序推荐从前往后。仅前四个有效。")
             .defineList("surging_waves_entry", List.of("empty"), entry -> true);
 
-    public static final ModConfigSpec.ConfigValue<String> EXTEND_SURGING_WAVES = BUILDER
-            .comment("难度应用于非原生生物。可填入：off（默认）, monster_only, animal_only, exclude_animal, exclude_monster和on")
-            .define("extend_surging_waves", "off");
-
     static final ModConfigSpec SPEC = BUILDER.build();
 
     public static boolean logDirtBlock;
@@ -59,6 +54,7 @@ public class BabelConfig {
     public static String magicNumberIntroduction;
     public static Set<Item> items;
     public static boolean epBarStyle;
+    public static boolean banAdvancedCollectibles;
     public static double epXOffset;
     public static double epYOffset;
     public static List<? extends String> surgingWavesEntry;
@@ -73,27 +69,25 @@ public class BabelConfig {
 
     @SubscribeEvent
     public static void onLoad(final ModConfigEvent.Loading event) {
-        logDirtBlock = LOG_DIRT_BLOCK.get();
         magicNumber = MAGIC_NUMBER.get();
         magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
         items = ITEM_STRINGS.get().stream()
                 .<Item>map(itemName -> BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(itemName)))
                 .collect(Collectors.toSet());
         epBarStyle = EP_BAR_STYLE.get();
+        banAdvancedCollectibles = BAN_ADVANCED_COLLECTIBLES.get();
         epXOffset = EP_X_OFFSET.get();
         epYOffset = EP_Y_OFFSET.get();
         surgingWavesEntry = SURGING_WAVES_ENTRY.get();
-        extendSurgingWaves = EXTEND_SURGING_WAVES.get();
     }
 
     public static void onReloading(final ModConfigEvent.Reloading event) {
-        logDirtBlock = LOG_DIRT_BLOCK.get();
         magicNumber = MAGIC_NUMBER.get();
         magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
         epBarStyle = EP_BAR_STYLE.get();
+        banAdvancedCollectibles = BAN_ADVANCED_COLLECTIBLES.get();
         epXOffset = EP_X_OFFSET.get();
         epYOffset = EP_Y_OFFSET.get();
         surgingWavesEntry = SURGING_WAVES_ENTRY.get();
-        extendSurgingWaves = EXTEND_SURGING_WAVES.get();
     }
 }

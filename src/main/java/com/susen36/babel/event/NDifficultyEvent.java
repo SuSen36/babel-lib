@@ -11,6 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -36,42 +37,37 @@ public class NDifficultyEvent {
     @SubscribeEvent
     public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
         Entity entity = event.getEntity();
-        if (!(entity instanceof LivingEntity living)) return;
-        if (!shouldApply(entity)) return;
+        if (entity instanceof LivingEntity living) {
+            EntityType<?> type = entity.getType();
+            if (!type.is(BYPASSES_DIFFICULTY) && (type.is(APPLIES_DIFFICULTY) || entity instanceof Monster)) {
+                Level world = event.getLevel();
+                double n = NDifficulty.multiplier(world);
+                if (n > 1.0) {
+                    double percentage = living.getHealth() / living.getMaxHealth();
 
-        LevelAccessor world = event.getLevel();
-        double n = NDifficulty.multiplier(world);
-        if (n <= 1.0) return;
+                    AttributeInstance maxHealth = living.getAttribute(Attributes.MAX_HEALTH);
+                    if (maxHealth != null) {
+                        maxHealth.setBaseValue(maxHealth.getBaseValue() * n);
+                    }
+                    AttributeInstance armor = living.getAttribute(Attributes.ARMOR);
+                    if (armor != null) {
+                        armor.setBaseValue(armor.getBaseValue() * n);
+                    }
+                    AttributeInstance armorToughness = living.getAttribute(Attributes.ARMOR_TOUGHNESS);
+                    if (armorToughness != null) {
+                        armorToughness.setBaseValue(armorToughness.getBaseValue() * n);
+                    }
+                    AttributeInstance attackDamage = living.getAttribute(Attributes.ATTACK_DAMAGE);
+                    if (attackDamage != null) {
+                        attackDamage.setBaseValue(attackDamage.getBaseValue() * n);
+                    }
 
-        double percentage = living.getHealth() / living.getMaxHealth();
-
-        AttributeInstance maxHealth = living.getAttribute(Attributes.MAX_HEALTH);
-        if (maxHealth != null) {
-            maxHealth.setBaseValue(maxHealth.getBaseValue() * n);
+                    AttributeInstance newMaxHealth = living.getAttribute(Attributes.MAX_HEALTH);
+                    if (newMaxHealth != null) {
+                        living.setHealth((float) (newMaxHealth.getValue() * percentage));
+                    }
+                }
+            }
         }
-        AttributeInstance armor = living.getAttribute(Attributes.ARMOR);
-        if (armor != null) {
-            armor.setBaseValue(armor.getBaseValue() * n);
-        }
-        AttributeInstance armorToughness = living.getAttribute(Attributes.ARMOR_TOUGHNESS);
-        if (armorToughness != null) {
-            armorToughness.setBaseValue(armorToughness.getBaseValue() * n);
-        }
-        AttributeInstance attackDamage = living.getAttribute(Attributes.ATTACK_DAMAGE);
-        if (attackDamage != null) {
-            attackDamage.setBaseValue(attackDamage.getBaseValue() * n);
-        }
-
-        AttributeInstance newMaxHealth = living.getAttribute(Attributes.MAX_HEALTH);
-        if (newMaxHealth != null) {
-            living.setHealth((float) (newMaxHealth.getValue() * percentage));
-        }
-    }
-
-    private static boolean shouldApply(Entity entity) {
-        EntityType<?> type = entity.getType();
-        if (type.is(BYPASSES_DIFFICULTY)) return false;
-        if (type.is(APPLIES_DIFFICULTY)) return true;
-        return entity instanceof Monster;
     }
 }
