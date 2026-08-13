@@ -69,11 +69,11 @@ public class Collectibles implements INBTSerializable<ListTag> {
     }
 
     public static @NotNull String getIdByItem(@NotNull Holder<Item> item) {
-        return Objects.requireNonNull(Collectibles.inverse().get(item));
+        return Objects.requireNonNullElse(Collectibles.inverse().get(item), "null");
     }
 
     public static @NotNull String getIdByItem(@NotNull Item item) {
-        return Objects.requireNonNull(Collectibles.inverse().get(BuiltInRegistries.ITEM.wrapAsHolder(item)));
+        return Objects.requireNonNullElse(Collectibles.inverse().get(BuiltInRegistries.ITEM.wrapAsHolder(item)), "null");
     }
 
     public boolean isUsed(@NotNull Holder<Item> item) {
@@ -267,6 +267,14 @@ public class Collectibles implements INBTSerializable<ListTag> {
         public void setCooldown(@NotNull net.minecraft.core.Holder<Item> item, int durationSeconds, long currentTick) {
             long expireTick = currentTick + (long) durationSeconds * 20L;
             cooldown.put(getIdByItem(item), expireTick);
+        }
+
+        public Set<Holder<Item>> getCooldowns(){
+            var items = new HashSet<Holder<Item>>();
+            for(var id : cooldown.keySet()){
+                items.add(Collectibles.get(id));
+            }
+            return items;
         }
 
         public int getCooldown(@NotNull Item item) {
