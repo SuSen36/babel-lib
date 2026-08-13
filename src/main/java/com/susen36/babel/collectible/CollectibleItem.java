@@ -21,8 +21,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class CollectibleItem extends Item implements CollectibleLike {
     private final CollectibleEffect effect;
@@ -95,6 +98,23 @@ public class CollectibleItem extends Item implements CollectibleLike {
             return Component.translatable(this.getDescriptionId(stack)).withStyle(ChatFormatting.RED);
         }
         return super.getName(stack);
+    }
+
+    /** 所有收藏品通用两行描述：键名按注册名生成，颜色由本地化值内嵌的 § 代码控制。 */
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltip, flag);
+        String descKey = this.getDescriptionId() + ".description";
+        String key0 = descKey + "_0";
+        String key1 = descKey + "_1";
+        Component line0 = Component.translatable(key0).withStyle(ChatFormatting.AQUA, ChatFormatting.ITALIC);
+        if (!line0.getString().equals(key0)) {
+            tooltip.add(line0);
+        }
+        Component line1 = Component.translatable(key1).withStyle(ChatFormatting.GRAY);
+        if (!line1.getString().equals(key1)) {
+            tooltip.add(line1);
+        }
     }
 
     @Override
