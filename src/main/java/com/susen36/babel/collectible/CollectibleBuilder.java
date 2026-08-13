@@ -1,5 +1,6 @@
 package com.susen36.babel.collectible;
 
+import com.susen36.babel.api.event.CollectibleRegisterEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
@@ -15,6 +16,7 @@ public class CollectibleBuilder {
     private CollectibleBuilder(@NotNull String modid, IEventBus bus) {
         this.ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, modid);
         ITEMS.register(bus);
+        bus.post(new CollectibleRegisterEvent(this));
     }
 
     public static CollectibleBuilder create(@NotNull String modid, IEventBus bus) {
@@ -35,6 +37,10 @@ public class CollectibleBuilder {
 
     public DeferredHolder<Item, Item> registerCollectible(String name, boolean consumeSelf, int useTicks, boolean canAlwaysUse, CollectibleItem.CollectibleEffect effect) {
         return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, useTicks, canAlwaysUse)));
+    }
+
+    public DeferredHolder<Item, Item> registerCollectible(String name, boolean consumeSelf, int useTicks, boolean canAlwaysUse, CollectibleItem.CollectibleEffect effect, CollectibleTiers tiers, CollectibleItem.Levels levels, CollectibleActivation activation) {
+        return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, useTicks, canAlwaysUse, tiers, levels, activation)));
     }
 
     public <T extends CollectibleItem.CustomCollectibleItem> DeferredHolder<Item, Item> registerCollectible(String name, Supplier<T> item) {

@@ -26,12 +26,15 @@ public class BabelNetwork {
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, new EPSyncMessage(ep));
     }
 
-    /** 同步某玩家的收藏品状态（已使用集合 + 数值层）到客户端。 */
+    /**
+     * 同步某玩家的收藏品状态（已使用集合 + 数值层）到客户端。
+     */
     public static void syncCollectibles(Player player) {
         var access = player.registryAccess();
         CompoundTag data = new CompoundTag();
         data.put("used", player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get()).serializeNBT(access));
         data.put("layer", player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_LAYER.get()).serializeNBT(access));
+        data.put("cooldown", player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get()).serializeNBT(access));
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new CollectibleSyncMessage(player.getId(), data));
     }
 }

@@ -24,10 +24,12 @@ public final class CollectibleActivation {
     private final boolean showActivationOverlay;
     private final boolean autoUseOnGain;
 
-    private CollectibleActivation(SoundEvent soundEvent, float volume, float pitch,
-                                  ParticleOptions particle, int particleCount,
-                                  double particleYOffset, double particleSpeed,
-                                  boolean showActivationOverlay, boolean autoUseOnGain) {
+    private CollectibleActivation(
+            SoundEvent soundEvent, float volume, float pitch,
+            ParticleOptions particle, int particleCount,
+            double particleYOffset, double particleSpeed,
+            boolean showActivationOverlay, boolean autoUseOnGain
+    ) {
         this.soundEvent = soundEvent;
         this.volume = volume;
         this.pitch = pitch;
@@ -39,17 +41,9 @@ public final class CollectibleActivation {
         this.autoUseOnGain = autoUseOnGain;
     }
 
-    public SoundEvent soundEvent() { return soundEvent; }
-    public float volume() { return volume; }
-    public float pitch() { return pitch; }
-    public ParticleOptions particle() { return particle; }
-    public int paticleCount() { return particleCount; }
-    public double particleYOffset() { return particleYOffset; }
-    public double particleSpeed() { return particleSpeed; }
-    public boolean showActivationOverlay() { return showActivationOverlay; }
-    public boolean autoUseOnGain() { return autoUseOnGain; }
-
-    /** 按等级返回默认表现：诅咒级用专属声音/粒子并自动使用，其余用通用成功表现。 */
+    /**
+     * 按等级返回默认表现：诅咒级用专属声音/粒子并自动使用，其余用通用成功表现。
+     */
     public static CollectibleActivation forTier(CollectibleTiers tier) {
         if (tier == CollectibleTiers.CURSED) {
             return cursed();
@@ -57,12 +51,16 @@ public final class CollectibleActivation {
         return standard();
     }
 
-    /** 通用成功表现：原版物品使用成功音效 + 幸福村民粒子 + 激活动画，不自动使用。 */
+    /**
+     * 通用成功表现：原版物品使用成功音效 + 幸福村民粒子 + 激活动画，不自动使用。
+     */
     public static CollectibleActivation standard() {
         return builder().build();
     }
 
-    /** 诅咒级表现：灵魂沙谷氛围音效 + 绯红孢粒 + 激活动画，获得时自动使用。 */
+    /**
+     * 诅咒级表现：灵魂沙谷氛围音效 + 绯红孢粒 + 激活动画，获得时自动使用。
+     */
     public static CollectibleActivation cursed() {
         return builder()
                 .sound(SoundEvents.AMBIENT_SOUL_SAND_VALLEY_MOOD.value(), 2F, 1F)
@@ -73,6 +71,43 @@ public final class CollectibleActivation {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public SoundEvent soundEvent() {
+        return soundEvent;
+    }
+
+    public float volume() {
+        return volume;
+    }
+
+    public float pitch() {
+        return pitch;
+    }
+
+    public ParticleOptions particle() {
+        return particle;
+    }
+
+    public int paticleCount() {
+        return particleCount;
+    }
+
+    public double particleYOffset() {
+        return particleYOffset;
+    }
+
+    public double particleSpeed() {
+        return particleSpeed;
+    }
+
+    public boolean showActivationOverlay() {
+        return showActivationOverlay;
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean autoUseOnGain() {
+        return autoUseOnGain;
     }
 
     public static final class Builder {
@@ -86,12 +121,38 @@ public final class CollectibleActivation {
         private boolean showActivationOverlay = true;
         private boolean autoUseOnGain = false;
 
-        public Builder sound(SoundEvent e, float v, float p) { this.soundEvent = e; this.volume = v; this.pitch = p; return this; }
-        public Builder particle(ParticleOptions p, int count) { this.particle = p; this.particleCount = count; return this; }
-        public Builder particleYOffset(double offset) { this.particleYOffset = offset; return this; }
-        public Builder particleSpeed(double s) { this.particleSpeed = s; return this; }
-        public Builder showOverlay(boolean b) { this.showActivationOverlay = b; return this; }
-        public Builder autoUseOnGain(boolean b) { this.autoUseOnGain = b; return this; }
+        public Builder sound(SoundEvent e, float v, float p) {
+            this.soundEvent = e;
+            this.volume = v;
+            this.pitch = p;
+            return this;
+        }
+
+        public Builder particle(ParticleOptions p, int count) {
+            this.particle = p;
+            this.particleCount = count;
+            return this;
+        }
+
+        public Builder particleYOffset(double offset) {
+            this.particleYOffset = offset;
+            return this;
+        }
+
+        public Builder particleSpeed(double s) {
+            this.particleSpeed = s;
+            return this;
+        }
+
+        public Builder showOverlay(boolean b) {
+            this.showActivationOverlay = b;
+            return this;
+        }
+
+        public Builder autoUseOnGain(boolean b) {
+            this.autoUseOnGain = b;
+            return this;
+        }
 
         public CollectibleActivation build() {
             return new CollectibleActivation(soundEvent, volume, pitch, particle,

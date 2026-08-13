@@ -38,6 +38,8 @@ public class ClientPacketHandler {
                         .deserializeNBT(access, message.data().getList("used", Tag.TAG_STRING));
                 player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_LAYER.get())
                         .deserializeNBT(access, message.data().getCompound("layer"));
+                player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get())
+                        .deserializeNBT(access, message.data().getCompound("cooldown"));
             }
         }
     }

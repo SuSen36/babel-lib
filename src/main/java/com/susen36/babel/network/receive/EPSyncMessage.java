@@ -9,8 +9,9 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.jetbrains.annotations.NotNull;
 
-public record   EPSyncMessage(int entityId, CompoundTag nbt) implements CustomPacketPayload {
+public record EPSyncMessage(int entityId, CompoundTag nbt) implements CustomPacketPayload {
 
     public static final Type<EPSyncMessage> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(BabelMod.MODID, "ep_sync"));
 
@@ -43,7 +44,7 @@ public record   EPSyncMessage(int entityId, CompoundTag nbt) implements CustomPa
     }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NotNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 }
