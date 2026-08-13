@@ -21,12 +21,20 @@ public class CollectibleBuilder {
         return new CollectibleBuilder(modid, bus);
     }
 
-    public DeferredHolder<Item, Item> registerCollectible(String name, CollectibleItem.CollectibleEffect effect, boolean consumeSelf) {
+    public DeferredHolder<Item, Item> registerCollectible(String name, boolean consumeSelf, CollectibleItem.CollectibleEffect effect) {
         return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf)));
     }
 
-    public DeferredHolder<Item, Item> registerCollectible(String name, CollectibleItem.CollectibleEffect effect, boolean consumeSelf, int useTicks) {
+    public DeferredHolder<Item, Item> registerCollectible(String name, boolean consumeSelf, boolean canAlwaysUse, CollectibleItem.CollectibleEffect effect) {
+        return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, canAlwaysUse)));
+    }
+
+    public DeferredHolder<Item, Item> registerCollectible(String name, boolean consumeSelf, int useTicks, CollectibleItem.CollectibleEffect effect) {
         return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, useTicks)));
+    }
+
+    public DeferredHolder<Item, Item> registerCollectible(String name, boolean consumeSelf, int useTicks, boolean canAlwaysUse, CollectibleItem.CollectibleEffect effect) {
+        return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, useTicks, canAlwaysUse)));
     }
 
     public <T extends CollectibleItem.CustomCollectibleItem> DeferredHolder<Item, Item> registerCollectible(String name, Supplier<T> item) {

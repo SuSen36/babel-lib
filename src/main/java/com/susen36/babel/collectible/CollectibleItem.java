@@ -1,5 +1,6 @@
 package com.susen36.babel.collectible;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -18,17 +19,28 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     private final CollectibleEffect effect;
     private final boolean consumeSelf;
     private final int useTicks;
+    private final boolean canAlwaysUse;
+    private Level clientLevel;
     private InteractionHand hand;
 
     public CollectibleItem(CollectibleEffect effect, boolean consumeSelf) {
-        this(effect, consumeSelf, 25);
+        this(effect, consumeSelf, 25, false);
+    }
+
+    public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, boolean canAlwaysUse) {
+        this(effect, consumeSelf, 25, canAlwaysUse);
     }
 
     public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, int useTicks) {
+        this(effect, consumeSelf, useTicks, false);
+    }
+
+    public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, int useTicks, boolean canAlwaysUse) {
         super(new Item.Properties());
         this.effect = effect;
         this.consumeSelf = consumeSelf;
         this.useTicks = useTicks;
+        this.canAlwaysUse = canAlwaysUse;
     }
 
     @Override
@@ -37,6 +49,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             @NotNull Player player,
             @NotNull InteractionHand usedHand
     ) {
+        if (level instanceof ClientLevel) this.clientLevel = level;
         this.hand = usedHand;
         player.startUsingItem(usedHand);
         return InteractionResultHolder.consume(player.getItemInHand(usedHand));
@@ -52,16 +65,16 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
             if (!data.isUsed(player.getItemInHand(hand).getItem())) {
                 data.markUsed(player.getItemInHand(hand).getItem());
-                effect.onUse(stack, level, player);
+                effect.onUse(stack, level, player, this);
                 if (consumeSelf) {
                     return consumeSelf(stack);
                 }
-            } else if (level instanceof ClientLevel clientLevel) {
+            } else if (!canAlwaysUse) {
                 double x = player.getX();
                 double y = player.getY();
                 double z = player.getZ();
-                SoundEvent failSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse("minecraft:block.spawner.break"));
-                if (failSound != null) {
+                SoundEvent failSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.withDefaultNamespace("block.chest.locked"));
+                if (failSound != null && clientLevel != null) {
                     clientLevel.playLocalSound(
                             x, y, z,
                             failSound,
@@ -70,7 +83,8 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                             1.0f,
                             false
                     );
-                }
+                } else
+                    LogUtils.getLogger().error("failSound or clientLevel in {} is null: failSound={}, clientLevel={}", this, failSound, clientLevel);
             }
         }
         return stack;
@@ -92,19 +106,23 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         void onUse(
                 @NotNull ItemStack stack,
                 @NotNull Level level,
-                @NotNull Player player
+                @NotNull Player player,
+                @NotNull CollectibleItem self
         );
     }
 
     public abstract static class CustomCollectibleItem extends Item implements CollectibleLike {
         private final boolean consumeSelf;
         private final int useTicks;
+        private final boolean canAlwaysUse;
+        private Level clientLevel;
         private InteractionHand hand;
 
-        public CustomCollectibleItem(Properties properties, boolean consumeSelf, int useTicks) {
+        public CustomCollectibleItem(Properties properties, boolean consumeSelf, int useTicks, boolean canAlwaysUse) {
             super(properties);
             this.consumeSelf = consumeSelf;
             this.useTicks = useTicks;
+            this.canAlwaysUse = canAlwaysUse;
         }
 
         @Override
@@ -118,6 +136,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                 @NotNull Player player,
                 @NotNull InteractionHand usedHand
         ) {
+            if (level instanceof ClientLevel) this.clientLevel = level;
             this.hand = usedHand;
             player.startUsingItem(usedHand);
             return InteractionResultHolder.consume(player.getItemInHand(usedHand));
@@ -133,17 +152,17 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                 var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
                 if (!data.isUsed(player.getItemInHand(hand).getItem())) {
                     data.markUsed(player.getItemInHand(hand).getItem());
-                    this.onUse(stack, level, player);
+                    this.onUse(stack, level, player, this);
                     if (consumeSelf) {
                         stack.shrink(1);
                         return stack;
                     }
-                } else if (level instanceof ClientLevel clientLevel) {
+                } else if (!canAlwaysUse) {
                     double x = player.getX();
                     double y = player.getY();
                     double z = player.getZ();
                     SoundEvent failSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.withDefaultNamespace("block.chest.locked"));
-                    if (failSound != null) {
+                    if (failSound != null && clientLevel != null) {
                         clientLevel.playLocalSound(
                                 x, y, z,
                                 failSound,
@@ -152,7 +171,8 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                                 1.0f,
                                 false
                         );
-                    }
+                    } else
+                        LogUtils.getLogger().error("failSound or clientLevel in {} is null: failSound={}, clientLevel={}", this, failSound, clientLevel);
                 }
             }
             return stack;
@@ -161,7 +181,8 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         public abstract void onUse(
                 @NotNull ItemStack stack,
                 @NotNull Level level,
-                @NotNull Player player
+                @NotNull Player player,
+                @NotNull CustomCollectibleItem self
         );
     }
 }

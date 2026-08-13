@@ -49,6 +49,13 @@ public class Collectibles implements INBTSerializable<ListTag> {
     @NotNull
     private final HashSet<Holder<Item>> UsedCollectibles = new HashSet<>();
 
+    private Collectibles() {
+    }
+
+    public static Collectibles getInstance() {
+        return new Collectibles();
+    }
+
     public static void register(IEventBus bus) {
         ATTACHMENTS.register(bus);
     }
@@ -128,10 +135,16 @@ public class Collectibles implements INBTSerializable<ListTag> {
     public static class Layer implements INBTSerializable<CompoundTag> {
         private static final String KEY = "key";
         private static final String VALUE = "vaule";
-
         public final HashBiMap<String, Integer> Layer = HashBiMap.create();
 
-        public HashBiMap<String, Integer> getLayer() {
+        private Layer() {
+        }
+
+        public static Layer getInstance() {
+            return new Layer();
+        }
+
+        private HashBiMap<String, Integer> getLayer() {
             return Layer;
         }
 
