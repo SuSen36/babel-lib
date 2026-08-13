@@ -9,7 +9,7 @@ version="${mod_version}"
 displayName="${mod_name}"
 authors="susen36"
 description='''
-Babel (巴别塔) — Arknight Common Lib.
+Babel (巴别塔) — Arknight Common Library.
 '''
 
 [[mixins]]

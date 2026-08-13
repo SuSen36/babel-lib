@@ -23,15 +23,14 @@ public class BabelAttributes {
     public static final DeferredRegister<Attribute> REGISTER = DeferredRegister.create(BuiltInRegistries.ATTRIBUTE, BabelMod.MODID);
 
     public static final DeferredHolder<Attribute, Attribute> MAX_ELEMENTAL_VALUE = simpleRangedAttr("elemental_max_value", 0.0, Double.MAX_VALUE, 1000.0);
-    public static final DeferredHolder<Attribute, Attribute> IMPAIRMENT_RESISTANCE = simpleRangedAttr("elemental_resistance", 0.0, 100.0, 0.0);
-
+    public static final DeferredHolder<Attribute, Attribute> ELEMENTAL_RESISTANCE = simpleRangedAttr("elemental_resistance", 0.0, 100.0, 0.0);
     public static final DeferredHolder<Attribute, Attribute> DEFENSE = simpleRangedAttr("defense", 0.0, Double.MAX_VALUE, 0.0);
     public static final DeferredHolder<Attribute, Attribute> MAGIC_RESISTANCE = simpleRangedAttr("magic_resistance", 0.0, 100.0, 0.0);
     public static final DeferredHolder<Attribute, Attribute> ELEMENTAL_MODIFIER = REGISTER.register("elemental_modifier", () -> new RangedAttribute(descrId("elemental_modifier"), 1, 0, 999).setSyncable(true));
 
     private static final List<DeferredHolder<Attribute, Attribute>> LIVING_ATTRIBUTES = List.of(
             MAX_ELEMENTAL_VALUE,
-            IMPAIRMENT_RESISTANCE,
+            ELEMENTAL_RESISTANCE,
             DEFENSE,
             MAGIC_RESISTANCE,
             ELEMENTAL_MODIFIER

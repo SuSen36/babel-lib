@@ -3,7 +3,6 @@ package com.susen36.babel.elemental;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
 import com.susen36.babel.init.BabelDamageTypes;
 import com.susen36.babel.effect.LessArmorMobEffect;
-import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;

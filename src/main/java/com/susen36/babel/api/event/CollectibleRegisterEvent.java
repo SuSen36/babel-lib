@@ -11,12 +11,13 @@ import java.util.function.Supplier;
 /**
  * 收藏品注册事件：在收藏品注册表就绪后触发，供各 Mod（含本模组与第三方）注入收藏品。
  * <p>
- * 参考 Forge 的 {@code RegisterEvent} 设计，在 {@link CollectibleBuilder#register(IEventBus)} )} 时
+ * 参考 Forge 的 {@code RegisterEvent} 设计，在 {@link CollectibleBuilder#register(IEventBus)} 时
  * 于 mod 事件总线上同步触发。监听方在事件回调内通过 {@link #builder()} 调用
- * {@link CollectibleBuilder#registerCollectible(String, Supplier)} 完成注册。
+ * {@link CollectibleBuilder#registerCollectible(String, java.util.function.Supplier)} 完成注册。
  * <p>
- * 相比在静态初始化阶段直接创建 builder 并绑定总线，该事件将注册延迟到 mod 总线可用之后，
- * 从而规避静态初始化顺序冲突（DeferredRegister 需要 IEventBus，而静态字段初始化时尚未获得）。
+ * 相比在静态初始化阶段直接绑定总线，该事件将总线绑定与事件触发延后到 {@code init} 阶段，
+ * 使各 Mod 的收藏品注册字段可保持 {@code public static final} 并直接在静态初始化期注册，
+ * 同时保留事件机制供第三方扩展注入收藏品。
  */
 public class CollectibleRegisterEvent extends Event implements IModBusEvent {
 

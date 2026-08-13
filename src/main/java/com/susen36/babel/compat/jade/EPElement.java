@@ -30,7 +30,7 @@ public class EPElement extends Element {
     private static final ResourceLocation DARK_BAR = rl("dark_bar");
 
     private static ResourceLocation rl(String name) {
-        return ResourceLocation.fromNamespaceAndPath(BabelMod.MODID, "textures/overlay/ep/" + name + ".png");
+        return ResourceLocation.fromNamespaceAndPath(BabelMod.MODID, "textures/gui/ep/" + name + ".png");
     }
 
     public EPElement(AbstractEPCapability.EPType type, float value, float max) {

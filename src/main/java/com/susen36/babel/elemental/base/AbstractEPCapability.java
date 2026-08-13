@@ -178,7 +178,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
             return HurtResult.fail(amount, source);
         }
         AttributeInstance thresholdAttr = livingEntity.getAttribute(BabelAttributes.MAX_ELEMENTAL_VALUE);
-        AttributeInstance resistanceAttr = livingEntity.getAttribute(BabelAttributes.IMPAIRMENT_RESISTANCE);
+        AttributeInstance resistanceAttr = livingEntity.getAttribute(BabelAttributes.ELEMENTAL_RESISTANCE);
         float threshold = thresholdAttr == null ? 1000.0F : (float) thresholdAttr.getValue();
         float resistance = resistanceAttr == null ? 0.0F : (float) resistanceAttr.getValue();
 
