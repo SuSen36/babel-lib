@@ -27,32 +27,6 @@ public final class NDifficulty {
     }
 
     /**
-     * 玩家进度系数。对每个在线玩家，取 {@code surging_waves_entry} 前四个进度中最后一个已完成的序号 +2
-     * 作为该玩家系数（默认 1），最终取所有玩家的最大值。
-     */
-    public static int progressCoefficient(LevelAccessor world) {
-        int coef = 1;
-        List<? extends String> entries = BabelConfig.surgingWavesEntry;
-        for (Entity player : world.players()) {
-            if (player instanceof ServerPlayer plr) {
-                int cur = 1;
-                for (int i = 0; i < Math.min(entries.size(), 4); i++) {
-                    ResourceLocation entryAdvancement = ResourceLocation.parse(entries.get(i));
-                    AdvancementHolder advancement = plr.getServer().getAdvancements().get(entryAdvancement);
-
-                    if (advancement != null && plr.getAdvancements().getOrStartProgress(advancement).isDone()) {
-                        cur = i + 2;
-                    }
-                }
-                if (cur > coef) {
-                    coef = cur;
-                }
-            }
-        }
-        return coef;
-    }
-
-    /**
      * 难度倍率。easy 模式返回 0；normal 模式返回
      * {@code (1 + 0.01 * clampedLevel * 2) ^ progressCoefficient}。
      */
@@ -62,6 +36,6 @@ public final class NDifficulty {
             return 0.0;
         }
         double n = 1 + 0.01 * dl.value() * 2;
-        return Math.pow(n, progressCoefficient(world));
+        return Math.pow(n, 1);
     }
 }
