@@ -269,14 +269,14 @@ public class Collectibles implements INBTSerializable<ListTag> {
             return getRemainingSeconds(item, Long.MAX_VALUE);
         }
 
-        public void addCooldown(@NotNull Item item, @NotNull int durationSeconds, long currentTick) {
+        public void addCooldown(@NotNull Item item, int durationSeconds, long currentTick) {
             String id = getIdByItem(item);
             Long existing = cooldown.get(id);
             long baseTick = (existing != null && currentTick < existing) ? existing : currentTick;
             cooldown.put(id, baseTick + (long) durationSeconds * 20L);
         }
 
-        public void addCooldown(@NotNull net.minecraft.core.Holder<Item> item, @NotNull int durationSeconds, long currentTick) {
+        public void addCooldown(@NotNull net.minecraft.core.Holder<Item> item, int durationSeconds, long currentTick) {
             String id = getIdByItem(item);
             Long existing = cooldown.get(id);
             long baseTick = (existing != null && currentTick < existing) ? existing : currentTick;
@@ -395,7 +395,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
                     }
                 }
             } else {
-                BabelMod.LOGGER.error("wanted ListTag, matched: {}", tempKeys.getClass().getName());
+                BabelMod.LOGGER.error("wanted ListTag, matched: {}", tempKeys);
             }
         }
     }
