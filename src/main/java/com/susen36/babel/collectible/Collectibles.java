@@ -40,10 +40,10 @@ public class Collectibles implements INBTSerializable<ListTag> {
                                     .build()
                     );
     @NotNull
-    public static final Supplier<AttachmentType<Collectibles>> ATTACHMENT_COLLECTIBLE_LAYER =
+    public static final Supplier<AttachmentType<Layer>> ATTACHMENT_COLLECTIBLE_LAYER =
             ATTACHMENTS
                     .register(
-                            "collectible_layer", () -> AttachmentType.serializable(Collectibles::new)
+                            "collectible_layer", () -> AttachmentType.serializable(Layer::new)
                                     .copyOnDeath()
                                     .build()
                     );

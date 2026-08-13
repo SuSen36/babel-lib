@@ -2,6 +2,7 @@ package com.susen36.babel.difficulty;
 
 import com.susen36.babel.BabelConfig;
 import com.susen36.babel.init.BabelGameRules;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -37,7 +38,9 @@ public final class NDifficulty {
                 int cur = 1;
                 for (int i = 0; i < Math.min(entries.size(), 4); i++) {
                     ResourceLocation entryAdvancement = ResourceLocation.parse(entries.get(i));
-                    if (plr.getAdvancements().getOrStartProgress(plr.getServer().getAdvancements().get(entryAdvancement)).isDone()) {
+                    AdvancementHolder advancement = plr.getServer().getAdvancements().get(entryAdvancement);
+
+                    if (advancement != null && plr.getAdvancements().getOrStartProgress(advancement).isDone()) {
                         cur = i + 2;
                     }
                 }

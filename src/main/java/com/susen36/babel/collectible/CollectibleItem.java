@@ -2,6 +2,8 @@ package com.susen36.babel.collectible;
 
 import com.susen36.babel.BabelConfig;
 import com.susen36.babel.api.event.CollectibleEvent;
+import com.susen36.babel.network.BabelNetwork;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -11,12 +13,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,23 +36,39 @@ public class CollectibleItem extends Item implements CollectibleLike {
     private InteractionHand hand;
 
     public CollectibleItem(CollectibleEffect effect, boolean consumeSelf) {
-        this(new Item.Properties(), effect, consumeSelf, 25, CollectibleTiers.NORMAL, 0, 1, 0, CollectibleActivation.forTier(CollectibleTiers.NORMAL));
+        this(collectibleProperties(CollectibleTiers.NORMAL), effect, consumeSelf, 25, CollectibleTiers.NORMAL, 0, 1, 0, CollectibleActivation.forTier(CollectibleTiers.NORMAL));
     }
 
     public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, int useTicks) {
-        this(new Item.Properties(), effect, consumeSelf, useTicks, CollectibleTiers.NORMAL, 0, 1, 0, CollectibleActivation.forTier(CollectibleTiers.NORMAL));
+        this(collectibleProperties(CollectibleTiers.NORMAL), effect, consumeSelf, useTicks, CollectibleTiers.NORMAL, 0, 1, 0, CollectibleActivation.forTier(CollectibleTiers.NORMAL));
     }
 
     public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, int useTicks, CollectibleTiers tier) {
-        this(new Item.Properties(), effect, consumeSelf, useTicks, tier, 0, 1, 0, CollectibleActivation.forTier(tier));
+        this(collectibleProperties(tier), effect, consumeSelf, useTicks, tier, 0, 1, 0, CollectibleActivation.forTier(tier));
     }
 
     public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, int useTicks, CollectibleTiers tier, int minLevel, int maxLevel, int defaultLevel) {
-        this(new Item.Properties(), effect, consumeSelf, useTicks, tier, minLevel, maxLevel, defaultLevel, CollectibleActivation.forTier(tier));
+        this(collectibleProperties(tier), effect, consumeSelf, useTicks, tier, minLevel, maxLevel, defaultLevel, CollectibleActivation.forTier(tier));
     }
 
     public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, int useTicks, CollectibleTiers tier, int minLevel, int maxLevel, int defaultLevel, CollectibleActivation activation) {
-        this(new Item.Properties(), effect, consumeSelf, useTicks, tier, minLevel, maxLevel, defaultLevel, activation);
+        this(collectibleProperties(tier), effect, consumeSelf, useTicks, tier, minLevel, maxLevel, defaultLevel, activation);
+    }
+
+    /** 收藏品统一物品属性：堆叠 1，稀有度按等级映射。 */
+    private static Item.Properties collectibleProperties(CollectibleTiers tier) {
+        return new Item.Properties().stacksTo(1).rarity(rarityForTier(tier));
+    }
+
+    /** 等级 → 基础稀有度；高级为 EPIC，稀有为 RARE，其余为 COMMON（诅咒另染红）。 */
+    private static Rarity rarityForTier(CollectibleTiers tier) {
+        if (tier == CollectibleTiers.RARE) {
+            return Rarity.RARE;
+        }
+        if (tier == CollectibleTiers.ADVANCED) {
+            return Rarity.EPIC;
+        }
+        return Rarity.COMMON;
     }
 
     /** 供自定义子类传入物品属性；effect 为 null 时由子类重写 {@link #onUse} 提供效果。 */
@@ -66,6 +86,15 @@ public class CollectibleItem extends Item implements CollectibleLike {
 
     public CollectibleTiers getTier() {
         return tier;
+    }
+
+    /** 诅咒级收藏品物品名染红（同原版负面附魔），其余沿用等级稀有度颜色。 */
+    @Override
+    public @NotNull Component getName(@NotNull ItemStack stack) {
+        if (tier == CollectibleTiers.CURSED) {
+            return Component.translatable(this.getDescriptionId(stack)).withStyle(ChatFormatting.RED);
+        }
+        return super.getName(stack);
     }
 
     @Override
@@ -170,6 +199,9 @@ public class CollectibleItem extends Item implements CollectibleLike {
         CollectibleEvent.onUsed(player, item);
         playSuccess(level, player, stack);
         onUse(stack, level, player);
+        if (level instanceof ServerLevel) {
+            BabelNetwork.syncCollectibles(player);
+        }
     }
 
     /** 诅咒级收藏品：获得（进入背包）时自动激活一次。 */
