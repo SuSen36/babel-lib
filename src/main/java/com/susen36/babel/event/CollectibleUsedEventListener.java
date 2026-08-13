@@ -10,7 +10,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 @EventBusSubscriber
-public class CollectibleUsedEventLinstener {
+public class CollectibleUsedEventListener {
     @SubscribeEvent
     public static void onCollectibleUsedEvent(CollectibleEvent.Used event) {
         var player = event.getEntity();
