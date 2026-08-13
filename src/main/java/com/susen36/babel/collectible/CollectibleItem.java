@@ -138,6 +138,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     /**
      * 高级收藏品被游戏规则禁用时，视为不可使用。
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean isBanned() {
         return tier == CollectibleTiers.ADVANCED && BabelConfig.banAdvancedCollectibles;
     }
@@ -159,9 +160,10 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             @NotNull Level level,
             @NotNull LivingEntity livingEntity
     ) {
-        if (livingEntity instanceof Player player) {
+        if (livingEntity instanceof Player player && level instanceof ServerLevel serverLevel) {
             var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
-            if (!data.isUsed(this)) {
+            var cd = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get());
+            if (!data.isUsed(this) && !isBanned() && cd.isReady(this, serverLevel.getServer().getTickCount())) {
                 activate(level, player, stack, this);
                 if (consumeSelf) {
                     return consumeSelf(stack);
@@ -405,9 +407,10 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                 @NotNull Level level,
                 @NotNull LivingEntity livingEntity
         ) {
-            if (livingEntity instanceof Player player) {
+            if (livingEntity instanceof Player player && level instanceof ServerLevel serverLevel) {
                 var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
-                if (!data.isUsed(this) && !isBanned()) {
+                var cd = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get());
+                if (!data.isUsed(this) && !isBanned() && cd.isReady(this, serverLevel.getServer().getTickCount())) {
                     activate(level, player, stack, this);
                     if (consumeSelf) {
                         return consumeSelf(stack);
