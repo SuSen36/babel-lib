@@ -22,10 +22,12 @@ public class EPShowOverlay {
     private static final ResourceLocation CORROSION_BAR = rl("water_player_bar");
     private static final ResourceLocation FIRE_BAR = rl("fire_player_bar");
     private static final ResourceLocation DARK_BAR = rl("dark_player_bar");
+    private static final ResourceLocation FRENZY_BAR = rl("anger_player_bar");
     private static final ResourceLocation SANITY_RING = rl("sanity");
     private static final ResourceLocation WATER_RING = rl("water");
     private static final ResourceLocation FIRE_RING = rl("fire");
     private static final ResourceLocation DARK_RING = rl("dark");
+    private static final ResourceLocation FRENZY_RING = rl("anger");
 
     private static ResourceLocation rl(String name) {
         return ResourceLocation.fromNamespaceAndPath(BabelMod.MODID, "textures/overlay/ep/" + name + ".png");
@@ -73,6 +75,7 @@ public class EPShowOverlay {
             case CORROSION -> CORROSION_BAR;
             case BURN -> FIRE_BAR;
             case NECROSIS -> DARK_BAR;
+            case FRENZY -> FRENZY_BAR;
             default -> SANITY_BAR;
         };
     }
@@ -83,6 +86,7 @@ public class EPShowOverlay {
             case CORROSION -> WATER_RING;
             case BURN -> FIRE_RING;
             case NECROSIS -> DARK_RING;
+            case FRENZY -> FRENZY_RING;
             default -> SANITY_RING;
         };
     }

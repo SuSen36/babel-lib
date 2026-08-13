@@ -5,6 +5,7 @@ import com.susen36.babel.BabelMod;
 import com.susen36.babel.api.event.ElementEvent;
 import com.susen36.babel.elemental.BurnInjury;
 import com.susen36.babel.elemental.CorrosionInjury;
+import com.susen36.babel.elemental.FrenzyInjury;
 import com.susen36.babel.elemental.NecrosisInjury;
 import com.susen36.babel.elemental.NervousInjury;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
@@ -34,6 +35,7 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
         this.EP_TYPES.put(AbstractEPCapability.EPType.CORROSION, new CorrosionInjury(living));
         this.EP_TYPES.put(AbstractEPCapability.EPType.BURN, new BurnInjury(living));
         this.EP_TYPES.put(AbstractEPCapability.EPType.NECROSIS, new NecrosisInjury(living));
+        this.EP_TYPES.put(AbstractEPCapability.EPType.FRENZY, new FrenzyInjury(living));
     }
 
     private boolean isEntityProtected() {

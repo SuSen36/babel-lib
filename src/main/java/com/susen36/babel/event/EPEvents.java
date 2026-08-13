@@ -6,6 +6,7 @@ import com.susen36.babel.api.event.ResistDamageEvent;
 import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
+import com.susen36.babel.elemental.FrenzyInjury;
 import com.susen36.babel.effect.PalsyMobEffect;
 import com.susen36.babel.init.BabelAttributes;
 import com.susen36.babel.init.BabelMobEffects;
@@ -44,22 +45,25 @@ public class EPEvents {
     private static EPCapability cachedEP(LivingEntity living) {
         long tick = living.level().getGameTime();
         CacheEntry entry = EP_CACHE.get(living);
-        if (entry != null && tick < entry.expireAt) return entry.ep;
-        EPCapability ep = BabelCapability.getEP(living);
-        EP_CACHE.put(living, new CacheEntry(ep, tick + CACHE_TTL));
+        EPCapability ep;
+        if (entry != null && tick < entry.expireAt) {
+            ep = entry.ep;
+        } else {
+            ep = BabelCapability.getEP(living);
+            EP_CACHE.put(living, new CacheEntry(ep, tick + CACHE_TTL));
+        }
         return ep;
     }
 
     @SubscribeEvent
     public static void onEntityTick(EntityTickEvent.Post event) {
-        Entity entity = event.getEntity();
-        if (!(entity instanceof LivingEntity living)) return;
-        if (living.level().isClientSide()) return;
-        EPCapability ep = cachedEP(living);
-        boolean burstJustEnded = ep.tick();
-        int syncInterval = living instanceof Player ? 10 : 20;
-        if (burstJustEnded || living.tickCount % syncInterval == 0) {
-            BabelNetwork.syncEP(living, ep);
+        if (event.getEntity() instanceof LivingEntity living && !living.level().isClientSide()) {
+            EPCapability ep = cachedEP(living);
+            boolean burstJustEnded = ep.tick();
+            int syncInterval = living instanceof Player ? 10 : 20;
+            if (burstJustEnded || living.tickCount % syncInterval == 0) {
+                BabelNetwork.syncEP(living, ep);
+            }
         }
     }
 
@@ -104,44 +108,70 @@ public class EPEvents {
                 ? owner
                 : sourceEntity instanceof LivingEntity living ? living : null;
 
-        if (attacker == null) return;
-
-        EPManager.ElementalAttackConfig attackConfig = EPManager.getElementalAttackConfig(attacker);
-        AbstractEPCapability.EPType epType = attackConfig.type();
-        double rate = attackConfig.rate();
-        double injuryDamage = attackConfig.injuryDamage();
-        EPManager.ElementalDefenseConfig defenseConfig = EPManager.getElementalDefenseConfig(target);
-        if (epType == AbstractEPCapability.EPType.NERVOUS && defenseConfig.type() == epType) {
-            rate *= defenseConfig.baseModifier() * defenseConfig.totalModifier();
-            injuryDamage *= defenseConfig.baseModifier() * defenseConfig.totalModifier();
+        if (attacker != null) {
+            EPManager.ElementalAttackConfig attackConfig = EPManager.getElementalAttackConfig(attacker);
+            AbstractEPCapability.EPType epType = attackConfig.type();
+            double rate = attackConfig.rate();
+            double injuryDamage = attackConfig.injuryDamage();
+            EPManager.ElementalDefenseConfig defenseConfig = EPManager.getElementalDefenseConfig(target);
+            if (epType == AbstractEPCapability.EPType.NERVOUS && defenseConfig.type() == epType) {
+                rate *= defenseConfig.baseModifier() * defenseConfig.totalModifier();
+                injuryDamage *= defenseConfig.baseModifier() * defenseConfig.totalModifier();
+            }
+            double elementalDamage = injuryDamage + event.getNewDamage() * rate;
+            if (elementalDamage > 0) {
+                EPManager.hurtElemental(target, epType, attacker, Mth.floor(elementalDamage));
+            }
         }
-        double elementalDamage = injuryDamage + event.getNewDamage() * rate;
-
-        if (elementalDamage > 0 && !EPManager.hurtElemental(target, epType, attacker, Mth.floor(elementalDamage))) return;
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public static void onBurnDamageCancel(LivingDamageEvent.Pre event) {
+        LivingEntity entity = event.getEntity();
+        DamageSource source = event.getSource();
+        float damage = event.getNewDamage();
+        if (!entity.level().isClientSide() && entity instanceof Player && source.is(DamageTypeTags.IS_FIRE)) {
+            AbstractEPCapability burn = cachedEP(entity).getEP(AbstractEPCapability.EPType.BURN);
+            if (burn != null && burn.underBurst()) {
+                event.setNewDamage(damage * 1.2F);
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
     public static void onWitherDamageCancel(LivingDamageEvent.Pre event) {
         LivingEntity entity = event.getEntity();
         DamageSource source = event.getSource();
-        if (!source.is(DamageTypes.WITHER)) return;
-        if (entity.level().isClientSide()) return;
-        EPCapability ep = cachedEP(entity);
-        AbstractEPCapability necrosis = ep.getEP(AbstractEPCapability.EPType.NECROSIS);
-        if (necrosis == null || !necrosis.underBurst()) return;
-        event.setNewDamage(0);
+        float damage = event.getNewDamage();
+        if (!entity.level().isClientSide() && entity instanceof Player && source.is(DamageTypes.WITHER)) {
+            AbstractEPCapability necrosis = cachedEP(entity).getEP(AbstractEPCapability.EPType.NECROSIS);
+            if (necrosis != null && necrosis.underBurst()) {
+                event.setNewDamage(damage * 1.1F);
+            }
+        }
     }
 
     @SubscribeEvent
     public static void onPalsyingCancel(LivingIncomingDamageEvent event) {
-        if (event.isCanceled()) return;
         LivingEntity target = event.getEntity();
-        if (target.level().isClientSide()) return;
-        Entity sourceEntity = event.getSource().getEntity();
-        if (!(sourceEntity instanceof LivingEntity attacker)) return;
-        if (!attacker.hasEffect(BabelMobEffects.PALSY)) return;
-        PalsyMobEffect.onAttackBlocked(attacker, target);
-        event.setCanceled(true);
+        if (!event.isCanceled() && !target.level().isClientSide()
+                && event.getSource().getEntity() instanceof LivingEntity attacker
+                && attacker.hasEffect(BabelMobEffects.PALSY)) {
+            PalsyMobEffect.onAttackBlocked(attacker, target);
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onFrenzyMeleeHit(LivingIncomingDamageEvent event) {
+        if (!event.isCanceled() && !event.getEntity().level().isClientSide()
+                && event.getSource().getDirectEntity() == event.getSource().getEntity()
+                && event.getSource().getEntity() instanceof LivingEntity attacker) {
+            AbstractEPCapability frenzy = cachedEP(attacker).getEP(AbstractEPCapability.EPType.FRENZY);
+            if (frenzy instanceof FrenzyInjury fi && fi.underBurst()) {
+                fi.addFrenzyStack();
+            }
+        }
     }
 
     public static final TagKey<DamageType> FORGE_MAGIC = TagKey.create(
