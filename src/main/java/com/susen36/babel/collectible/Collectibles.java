@@ -195,6 +195,14 @@ public class Collectibles implements INBTSerializable<ListTag> {
             Layer.put(getIdByItem(item), Mth.clamp(layer, minLevel, maxLevel));
         }
 
+        public void addLayer(@NotNull Item item, @NotNull Integer layer) {
+            setLayer(item, getLayer(item) + layer);
+        }
+
+        public void addLayer(@NotNull Holder<Item> item, @NotNull Integer layer) {
+            setLayer(item, getLayer(item) + layer);
+        }
+
         @Override
         public CompoundTag serializeNBT(HolderLookup.@NotNull Provider provider) {
             var root = new CompoundTag();

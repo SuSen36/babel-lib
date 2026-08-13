@@ -39,7 +39,19 @@ public class CollectibleBuilder {
         return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, useTicks, canAlwaysUse)));
     }
 
-    public DeferredHolder<Item, Item> registerCollectible(String name, boolean consumeSelf, int useTicks, boolean canAlwaysUse, CollectibleItem.CollectibleEffect effect, CollectibleTiers tiers, CollectibleItem.Levels levels, CollectibleActivation activation) {
+    public DeferredHolder<Item, Item> registerCollectible(String name, boolean consumeSelf, boolean canAlwaysUse, CollectibleItem.Levels levels, CollectibleItem.CollectibleEffect effect) {
+        return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, canAlwaysUse, levels)));
+    }
+
+    public DeferredHolder<Item, Item> registerCollectible(String name, boolean consumeSelf, int useTicks, CollectibleItem.Levels levels, CollectibleItem.CollectibleEffect effect) {
+        return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, useTicks, levels)));
+    }
+
+    public DeferredHolder<Item, Item> registerCollectible(String name, boolean consumeSelf, int useTicks, boolean canAlwaysUse, CollectibleItem.Levels levels, CollectibleItem.CollectibleEffect effect) {
+        return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, useTicks, canAlwaysUse, levels)));
+    }
+
+    public DeferredHolder<Item, Item> registerCollectible(String name, boolean consumeSelf, int useTicks, boolean canAlwaysUse, CollectibleTiers tiers, CollectibleItem.Levels levels, CollectibleActivation activation, CollectibleItem.CollectibleEffect effect) {
         return save(name, ITEMS.register(name, () -> new CollectibleItem(effect, consumeSelf, useTicks, canAlwaysUse, tiers, levels, activation)));
     }
 
