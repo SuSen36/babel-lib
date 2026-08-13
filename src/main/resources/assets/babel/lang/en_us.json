@@ -32,6 +32,7 @@
   "ep_type.babel.burn": "Burn",
   "ep_type.babel.dark": "Necrosis",
   "ep_type.babel.gun_mu": "Empty",
+  "ep_type.babel.frenzy": "Frenzy",
   "death.attack.corrosion_break": "%1$s was corroded away",
   "death.attack.burn_break": "%1$s was burned to ashes",
   "death.attack.element_break": "%1$s was consumed by elemental damage",

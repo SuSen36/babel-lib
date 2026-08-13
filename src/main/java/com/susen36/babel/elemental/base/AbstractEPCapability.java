@@ -3,6 +3,7 @@ package com.susen36.babel.elemental.base;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.elemental.BurnInjury;
 import com.susen36.babel.elemental.CorrosionInjury;
+import com.susen36.babel.elemental.FrenzyInjury;
 import com.susen36.babel.elemental.NecrosisInjury;
 import com.susen36.babel.elemental.NervousInjury;
 import com.susen36.babel.init.BabelAttributes;
@@ -25,6 +26,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
         CORROSION("water", "water", CorrosionInjury::new),
         BURN("fire", "fire", BurnInjury::new),
         NECROSIS("dark", "dark", NecrosisInjury::new),
+        FRENZY("FRENZY", "frenzy", FrenzyInjury::new),
         EMPTY("empty", "gun_mu", null);
 
         private final String nickName;
@@ -113,9 +115,16 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
 
     public abstract void doNonPlayerBurst();
 
-    public abstract void burstTick();
+    public abstract void doPlayerBurstTick();
 
-    public void doBurst() {
+    public abstract void doNonPlayerBurstTick();
+
+    public final void burstTick(){
+        if (livingEntity instanceof Player) doPlayerBurstTick();
+        else doNonPlayerBurstTick();
+    };
+
+    public final void doBurst() {
         if (livingEntity instanceof Player) doPlayerBurst();
         else doNonPlayerBurst();
     }

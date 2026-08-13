@@ -31,6 +31,7 @@
   "ep_type.babel.burn": "烧伤",
   "ep_type.babel.dark": "坏死损伤",
   "ep_type.babel.gun_mu": "空",
+  "ep_type.babel.frenzy": "狂躁损伤",
   "death.attack.corrosion_break": "%1$s被侵蚀殆尽",
   "death.attack.burn_break": "%1$s被灼燃成灰",
   "death.attack.element_break": "%1$s被元素伤害吞噬",

@@ -12,7 +12,6 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 
 public class NervousInjury extends AbstractEPCapability {
-    // TODO: migrate to BabelConfig if configurable damage is needed
     private static final float SANITY_BREAK_BASE_DAMAGE = 12.0F;
 
     public NervousInjury(LivingEntity livingEntity) {
@@ -49,6 +48,10 @@ public class NervousInjury extends AbstractEPCapability {
     }
 
     @Override
-    public void burstTick() {
+    public void doPlayerBurstTick() {
+    }
+
+    @Override
+    public void doNonPlayerBurstTick() {
     }
 }
