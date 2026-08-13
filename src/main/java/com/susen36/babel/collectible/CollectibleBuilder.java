@@ -1,5 +1,6 @@
 package com.susen36.babel.collectible;
 
+import com.susen36.babel.api.event.CollectibleRegisterEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
@@ -12,13 +13,22 @@ import java.util.function.Supplier;
 public class CollectibleBuilder {
     private final DeferredRegister<Item> ITEMS;
 
-    private CollectibleBuilder(@NotNull String modid, IEventBus bus) {
+    private CollectibleBuilder(@NotNull String modid) {
         this.ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, modid);
-        ITEMS.register(bus);
     }
 
-    public static CollectibleBuilder create(@NotNull String modid, IEventBus bus) {
-        return new CollectibleBuilder(modid, bus);
+    /** 创建收藏品构建器。无需事件总线，可在静态字段初始化阶段安全调用。 */
+    public static CollectibleBuilder create(@NotNull String modid) {
+        return new CollectibleBuilder(modid);
+    }
+
+    /**
+     * 将物品注册表绑定到 mod 事件总线，并触发 {@link CollectibleRegisterEvent} 供各方注册收藏品。
+     * 应在 mod 构造器中调用。
+     */
+    public void register(@NotNull IEventBus bus) {
+        ITEMS.register(bus);
+        bus.post(new CollectibleRegisterEvent(this));
     }
 
     public DeferredHolder<Item, Item> registerCollectible(String name, CollectibleItem.CollectibleEffect effect, boolean consumeSelf) {

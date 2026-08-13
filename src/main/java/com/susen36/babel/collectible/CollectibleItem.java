@@ -179,8 +179,8 @@ public class CollectibleItem extends Item implements CollectibleLike {
         if (!activation.autoUseOnGain() || !(entity instanceof Player player)) {
             return;
         }
-        // 每0.1秒尝试一次自动使用
-        if (entity.tickCount % 2 == 0) {
+        // 每0.5秒尝试一次自动使用
+        if (entity.tickCount % 10 == 0) {
             var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
             Item item = stack.getItem();
             if (!data.isUsed(item) && !isBanned()) {
