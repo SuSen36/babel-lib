@@ -13,23 +13,14 @@ import java.util.function.Supplier;
 public class CollectibleBuilder {
     private final DeferredRegister<Item> ITEMS;
 
-    private CollectibleBuilder(@NotNull String modid) {
+    private CollectibleBuilder(@NotNull String modid, @NotNull IEventBus bus) {
         this.ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, modid);
-    }
-
-    public static CollectibleBuilder create(@NotNull String modid) {
-        return new CollectibleBuilder(modid);
-    }
-
-    /**
-     * 将收藏品注册表绑定到 mod 事件总线，并同步触发 {@link CollectibleRegisterEvent}。
-     * <p>
-     * 与 DeferredRegister 的用法一致：builder 与注册字段可在静态初始化期直接创建，
-     * 总线绑定与事件触发延后到 {@code init} 阶段统一执行。
-     */
-    public void register(@NotNull IEventBus bus) {
         ITEMS.register(bus);
         bus.post(new CollectibleRegisterEvent(this));
+    }
+
+    public static CollectibleBuilder create(@NotNull String modid, @NotNull IEventBus bus) {
+        return new CollectibleBuilder(modid, bus);
     }
 
     public DeferredHolder<Item, Item> registerCollectible(String name, boolean consumeSelf, CollectibleItem.CollectibleEffect effect) {
