@@ -60,7 +60,7 @@ public class EPEvents {
         if (event.getEntity() instanceof LivingEntity living && !living.level().isClientSide()) {
             EPCapability ep = cachedEP(living);
             boolean burstJustEnded = ep.tick();
-            int syncInterval = living instanceof Player ? 10 : 20;
+            int syncInterval = living instanceof Player ? 5 : 20;
             if (burstJustEnded || living.tickCount % syncInterval == 0) {
                 BabelNetwork.syncEP(living, ep);
             }
