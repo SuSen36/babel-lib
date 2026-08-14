@@ -154,12 +154,12 @@ public class Collectibles implements INBTSerializable<ListTag> {
     public static class Layer implements INBTSerializable<CompoundTag> {
         private static final String KEY = "key";
         private static final String VALUE = "value";
-        public final HashBiMap<String, Integer> layer = HashBiMap.create();
+        public final HashMap<String, Integer> layer = new HashMap<>();
 
         private Layer() {
         }
 
-        private HashBiMap<String, Integer> getLayer() {
+        private HashMap<String, Integer> getLayer() {
             return layer;
         }
 
