@@ -15,10 +15,9 @@ public class CollectibleUsedEventListener {
     public static void onCollectibleUsedEvent(CollectibleEvent.Used event) {
         var player = event.getEntity();
         var level = player.level();
-        if (level instanceof ServerLevel serverLevel) {
-            long currentTick = serverLevel.getServer().getTickCount();
+        if (level instanceof ServerLevel) {
             var cd = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get());
-            cd.setCooldown(event.getItem(), 600, currentTick);
+            cd.setCooldown(event.getItem(), 600);
         }
     }
 
@@ -26,19 +25,18 @@ public class CollectibleUsedEventListener {
     public static void onServerTickEvent(ServerTickEvent.Post event) {
         var server = event.getServer();
         var players = server.getPlayerList().getPlayers();
-        long currentTick = server.getTickCount();
         for (var player : players) {
-            player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get()).clearAllExpired(currentTick);
+            player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get()).clearAllExpired();
         }
     }
 
     @SubscribeEvent
-    public static void onClientTickEvent(ClientTickEvent.Post event){
+    public static void onClientTickEvent(ClientTickEvent.Post event) {
         var player = Minecraft.getInstance().player;
         if (player != null) {
             var cd = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get());
-            for (var item : cd.getCooldowns()){
-                player.getCooldowns().addCooldown(item.value(),cd.getCooldown(item));
+            for (var item : cd.getCooldowns()) {
+                player.getCooldowns().addCooldown(item.value(), cd.getCooldown(item));
             }
         }
     }

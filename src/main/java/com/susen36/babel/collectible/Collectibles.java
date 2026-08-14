@@ -1,8 +1,10 @@
 package com.susen36.babel.collectible;
 
-import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.mojang.logging.LogUtils;
 import com.susen36.babel.BabelMod;
+
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -69,11 +71,17 @@ public class Collectibles implements INBTSerializable<ListTag> {
     }
 
     public static @NotNull String getIdByItem(@NotNull Holder<Item> item) {
-        return Objects.requireNonNullElse(Collectibles.inverse().get(item), "null");
+        return Objects.requireNonNullElseGet(Collectibles.inverse().get(item), () -> {
+            LogUtils.getLogger().error("try to query {} in Collectibles, but not matched.", item);
+            return "null";
+        });
     }
 
     public static @NotNull String getIdByItem(@NotNull Item item) {
-        return Objects.requireNonNullElse(Collectibles.inverse().get(BuiltInRegistries.ITEM.wrapAsHolder(item)), "null");
+        return Objects.requireNonNullElseGet(Collectibles.inverse().get(BuiltInRegistries.ITEM.wrapAsHolder(item)), () -> {
+            LogUtils.getLogger().error("try to query {} in Collectibles, but not matched.", item);
+            return "null";
+        });
     }
 
     public boolean isUsed(@NotNull Holder<Item> item) {
@@ -254,109 +262,104 @@ public class Collectibles implements INBTSerializable<ListTag> {
          * value = 到期 Tick（Long），即 server.getTickCount() + 延迟秒数 * 20
          * 当 currentTick >= value 时，表示冷却已结束
          */
-        public final BiMap<String, Long> cooldown = HashBiMap.create();
+        public final HashBiMap<String, Long> cooldown = HashBiMap.create();
 
         private Cooldown() {
         }
 
-        public void setCooldown(@NotNull Item item, int durationSeconds, long currentTick) {
-            long expireTick = currentTick + (long) durationSeconds * 20L;
-            cooldown.put(getIdByItem(item), expireTick);
+        public void setCooldown(@NotNull Item item, long durationSeconds) {
+            long lastTick = durationSeconds * 20L;
+            cooldown.put(getIdByItem(item), lastTick);
         }
 
-        public void setCooldown(@NotNull net.minecraft.core.Holder<Item> item, int durationSeconds, long currentTick) {
-            long expireTick = currentTick + (long) durationSeconds * 20L;
-            cooldown.put(getIdByItem(item), expireTick);
+        public void setCooldown(@NotNull Holder<Item> item, long durationSeconds) {
+            long lastTick = durationSeconds * 20L;
+            cooldown.put(getIdByItem(item), lastTick);
         }
 
-        public Set<Holder<Item>> getCooldowns(){
+        public long getRemainingTicks(@NotNull Item item) {
+            Long lastTick = cooldown.get(getIdByItem(item));
+            if (lastTick == null) return 0;
+            return lastTick;
+        }
+
+        public long getRemainingTicks(@NotNull Holder<Item> item) {
+            Long lastTick = cooldown.get(getIdByItem(item));
+            if (lastTick == null) return 0;
+            return lastTick;
+        }
+
+        public Set<net.minecraft.core.Holder<Item>> getCooldowns() {
             var items = new HashSet<Holder<Item>>();
-            for(var id : cooldown.keySet()){
+            for (var id : cooldown.keySet()) {
                 items.add(Collectibles.get(id));
             }
             return items;
         }
 
         public int getCooldown(@NotNull Item item) {
-            return getRemainingSeconds(item, Long.MAX_VALUE);
+            return Math.toIntExact(getRemainingTicks(item) / 20);
         }
 
-        public int getCooldown(@NotNull net.minecraft.core.Holder<Item> item) {
-            return getRemainingSeconds(item, Long.MAX_VALUE);
+        public int getCooldown(@NotNull Holder<Item> item) {
+            return Math.toIntExact(getRemainingTicks(item) / 20);
         }
 
-        public void addCooldown(@NotNull Item item, int durationSeconds, long currentTick) {
-            String id = getIdByItem(item);
-            Long existing = cooldown.get(id);
-            long baseTick = (existing != null && currentTick < existing) ? existing : currentTick;
-            cooldown.put(id, baseTick + (long) durationSeconds * 20L);
+        public void addCooldown(@NotNull Item item, int durationSeconds) {
+            long lastTick = getCooldown(item);
+            setCooldown(item, lastTick + durationSeconds);
         }
 
-        public void addCooldown(@NotNull net.minecraft.core.Holder<Item> item, int durationSeconds, long currentTick) {
-            String id = getIdByItem(item);
-            Long existing = cooldown.get(id);
-            long baseTick = (existing != null && currentTick < existing) ? existing : currentTick;
-            cooldown.put(id, baseTick + (long) durationSeconds * 20L);
+        public void addCooldown(@NotNull Holder<Item> item, int durationSeconds) {
+            long lastTick = getCooldown(item);
+            setCooldown(item, lastTick + durationSeconds);
         }
 
-        public boolean isReady(@NotNull Item item, long currentTick) {
-            Long expireTick = cooldown.get(getIdByItem(item));
-            return expireTick == null || currentTick >= expireTick;
+        public boolean isReady(@NotNull Item item) {
+            return getRemainingTicks(item) <= 0;
         }
 
-        public boolean isReady(@NotNull net.minecraft.core.Holder<Item> item, long currentTick) {
-            Long expireTick = cooldown.get(getIdByItem(item));
-            return expireTick == null || currentTick >= expireTick;
-        }
-
-        public int getRemainingSeconds(@NotNull Item item, long currentTick) {
-            Long expireTick = cooldown.get(getIdByItem(item));
-            if (expireTick == null) return 0;
-            return (int) Math.max(0, (expireTick - currentTick) / 20L);
-        }
-
-        public int getRemainingSeconds(@NotNull net.minecraft.core.Holder<Item> item, long currentTick) {
-            Long expireTick = cooldown.get(getIdByItem(item));
-            if (expireTick == null) return 0;
-            return (int) Math.max(0, (expireTick - currentTick) / 20L);
-        }
-
-        public void clearIfExpired(@NotNull Item item, long currentTick) {
-            Long expireTick = cooldown.get(getIdByItem(item));
-            if (expireTick != null && currentTick >= expireTick) {
-                cooldown.remove(getIdByItem(item));
-            }
-        }
-
-        public void clearIfExpired(@NotNull net.minecraft.core.Holder<Item> item, long currentTick) {
-            Long expireTick = cooldown.get(getIdByItem(item));
-            if (expireTick != null && currentTick >= expireTick) {
-                cooldown.remove(getIdByItem(item));
-            }
+        public boolean isReady(@NotNull Holder<Item> item) {
+            return getRemainingTicks(item) <= 0;
         }
 
         public void removeCooldown(@NotNull Item item) {
             cooldown.remove(getIdByItem(item));
         }
 
-        public void removeCooldown(@NotNull net.minecraft.core.Holder<Item> item) {
+        public void removeCooldown(@NotNull Holder<Item> item) {
             cooldown.remove(getIdByItem(item));
         }
 
-        public void clearAllExpired(long currentTick) {
-            Set<String> toRemove = new HashSet<>();
-            for (var entry : cooldown.entrySet()) {
-                if (currentTick >= entry.getValue()) {
-                    toRemove.add(entry.getKey());
-                }
+        public void updateCooldown(@NotNull Item item) {
+            addCooldown(item, -1 / 20);
+        }
+
+        public void updateCooldown(@NotNull Holder<Item> item) {
+            addCooldown(item, -1 / 20);
+        }
+
+        public void clearIfExpired(@NotNull Item item) {
+            if (getRemainingTicks(item) <= 0) {
+                removeCooldown(item);
             }
-            for (String key : toRemove) {
-                cooldown.remove(key);
+        }
+
+        public void clearIfExpired(@NotNull Holder<Item> item) {
+            if (getRemainingTicks(item) <= 0) {
+                removeCooldown(item);
+                updateCooldown(item);
+            }
+        }
+
+        public void clearAllExpired() {
+            for (var item : getCooldowns()) {
+                clearIfExpired(item);
             }
         }
 
         @Override
-        public CompoundTag serializeNBT(@NotNull net.minecraft.core.HolderLookup.Provider provider) {
+        public CompoundTag serializeNBT(@NotNull HolderLookup.Provider provider) {
             var root = new CompoundTag();
             var keys = new ListTag();
             var values = new ListTag();
@@ -372,7 +375,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
 
         @Override
-        public void deserializeNBT(@NotNull net.minecraft.core.HolderLookup.Provider provider, @NotNull CompoundTag root) {
+        public void deserializeNBT(@NotNull HolderLookup.Provider provider, @NotNull CompoundTag root) {
             cooldown.clear();
 
             if (!root.contains(KEY, Tag.TAG_LIST) || !root.contains(VALUE, Tag.TAG_LIST)) {
