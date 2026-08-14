@@ -1,18 +1,15 @@
 package com.susen36.babel.collectible;
 
-import com.mojang.logging.LogUtils;
 import com.susen36.babel.BabelConfig;
 import com.susen36.babel.api.event.CollectibleEvent;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -36,8 +33,6 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     private final CollectibleTiers tier;
     private final Levels levels;
     private final CollectibleActivation activation;
-
-    private Level clientLevel;
 
     public CollectibleItem(CollectibleEffect effect, boolean consumeSelf) {
         this(effect, consumeSelf, 25, false, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
@@ -161,7 +156,6 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             @NotNull Player player,
             @NotNull InteractionHand usedHand
     ) {
-        if (level instanceof ClientLevel) this.clientLevel = level;
         player.startUsingItem(usedHand);
         return InteractionResultHolder.consume(player.getItemInHand(usedHand));
     }
@@ -181,21 +175,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                     return consumeSelf(stack);
                 }
             } else {
-                double x = player.getX();
-                double y = player.getY();
-                double z = player.getZ();
-                SoundEvent failSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.withDefaultNamespace("block.chest.locked"));
-                if (failSound != null && clientLevel != null) {
-                    clientLevel.playLocalSound(
-                            x, y, z,
-                            failSound,
-                            SoundSource.PLAYERS,
-                            1.0f,
-                            1.0f,
-                            false
-                    );
-                } else
-                    LogUtils.getLogger().error("failSound or clientLevel in {} is null: failSound={}, clientLevel={}", this, failSound, clientLevel);
+                playFailure(level, player, stack);
             }
         }
         return stack;
@@ -211,14 +191,34 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         double y = player.getY();
         double z = player.getZ();
         if (level instanceof ServerLevel serverLevel) {
-            serverLevel.sendParticles(activation.particle(), x, y + activation.particleYOffset(), z,
-                    activation.paticleCount(), 1, 1, 1, activation.particleSpeed());
+            serverLevel.sendParticles(
+                    activation.particle(),
+                    x, y + activation.particleYOffset(), z,
+                    activation.paticleCount(),
+                    1, 1, 1,
+                    activation.particleSpeed()
+            );
         }
         level.playSound(null, BlockPos.containing(x, y, z), activation.soundEvent(), SoundSource.NEUTRAL,
                 activation.volume(), activation.pitch());
-        if (level.isClientSide()) {
-            Minecraft.getInstance().gameRenderer.displayItemActivation(stack);
-        }
+        if (player instanceof ServerPlayer serverPlayer) BabelNetwork.syncCollectibleUse(serverPlayer, stack);
+    }
+
+    private void playFailure(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack) {
+        double x = player.getX();
+        double y = player.getY();
+        double z = player.getZ();
+        var sound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.withDefaultNamespace("block.chest.locked"));
+        if (sound == null)
+            throw new RuntimeException("cannot found sound event: " + ResourceLocation.withDefaultNamespace("block.chest.locked"));
+        level.playSound(
+                null,
+                BlockPos.containing(x, y, z),
+                sound,
+                SoundSource.NEUTRAL,
+                activation.volume(),
+                activation.pitch()
+        );
     }
 
     private void activate(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack, @NotNull Item item) {
@@ -277,8 +277,6 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         private final CollectibleTiers tier;
         private final Levels levels;
         private final CollectibleActivation activation;
-
-        private Level clientLevel;
 
         public CustomCollectibleItem(Properties properties, boolean consumeSelf, int useTicks, boolean canAlwaysUse, CollectibleTiers tier, Levels levels, CollectibleActivation activation) {
             super(properties);
@@ -367,9 +365,26 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             }
             level.playSound(null, BlockPos.containing(x, y, z), activation.soundEvent(), SoundSource.NEUTRAL,
                     activation.volume(), activation.pitch());
-            if (level.isClientSide()) {
-                Minecraft.getInstance().gameRenderer.displayItemActivation(stack);
+            if (player instanceof ServerPlayer serverPlayer) {
+                BabelNetwork.syncCollectibleUse(serverPlayer, stack);
             }
+        }
+
+        private void playFailure(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack) {
+            double x = player.getX();
+            double y = player.getY();
+            double z = player.getZ();
+            var sound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.withDefaultNamespace("block.chest.locked"));
+            if (sound == null)
+                throw new RuntimeException("cannot found sound event: " + ResourceLocation.withDefaultNamespace("block.chest.locked"));
+            level.playSound(
+                    null,
+                    BlockPos.containing(x, y, z),
+                    sound,
+                    SoundSource.NEUTRAL,
+                    activation.volume(),
+                    activation.pitch()
+            );
         }
 
         private void activate(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack, @NotNull Item item) {
@@ -408,7 +423,6 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                 @NotNull Player player,
                 @NotNull InteractionHand usedHand
         ) {
-            if (level instanceof ClientLevel) this.clientLevel = level;
             player.startUsingItem(usedHand);
             return InteractionResultHolder.consume(player.getItemInHand(usedHand));
         }
@@ -428,21 +442,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                         return consumeSelf(stack);
                     }
                 } else {
-                    double x = player.getX();
-                    double y = player.getY();
-                    double z = player.getZ();
-                    SoundEvent failSound = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.withDefaultNamespace("block.chest.locked"));
-                    if (failSound != null && clientLevel != null) {
-                        clientLevel.playLocalSound(
-                                x, y, z,
-                                failSound,
-                                SoundSource.PLAYERS,
-                                15.0f,
-                                1.0f,
-                                false
-                        );
-                    } else
-                        LogUtils.getLogger().error("failSound or clientLevel in {} is null: failSound={}, clientLevel={}", this, failSound, clientLevel);
+                    playFailure(level, player, stack);
                 }
             }
             return stack;

@@ -2,11 +2,15 @@ package com.susen36.babel.network;
 
 import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.collectible.Collectibles;
+import com.susen36.babel.network.receive.CollectibleItemUseMessage;
 import com.susen36.babel.network.receive.CollectibleSyncMessage;
 import com.susen36.babel.network.receive.EPSyncMessage;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -20,6 +24,7 @@ public class BabelNetwork {
         PayloadRegistrar registrar = event.registrar("1");
         registrar.playToClient(EPSyncMessage.TYPE, EPSyncMessage.STREAM_CODEC, EPSyncMessage::handle);
         registrar.playToClient(CollectibleSyncMessage.TYPE, CollectibleSyncMessage.STREAM_CODEC, CollectibleSyncMessage::handle);
+        registrar.playToClient(CollectibleItemUseMessage.TYPE, CollectibleItemUseMessage.STREAM_CODEC, CollectibleItemUseMessage::handle);
     }
 
     public static void syncEP(Entity entity, EPCapability ep) {
@@ -36,5 +41,9 @@ public class BabelNetwork {
         data.put("layer", player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_LAYER.get()).serializeNBT(access));
         data.put("cooldown", player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get()).serializeNBT(access));
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new CollectibleSyncMessage(player.getId(), data));
+    }
+
+    public static void syncCollectibleUse(ServerPlayer player, ItemStack stack) {
+        PacketDistributor.sendToPlayer(player, new CollectibleItemUseMessage(BuiltInRegistries.ITEM.getKey(stack.getItem())));
     }
 }

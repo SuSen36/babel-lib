@@ -3,9 +3,11 @@ package com.susen36.babel.network;
 import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.collectible.Collectibles;
+import com.susen36.babel.network.receive.CollectibleItemUseMessage;
 import com.susen36.babel.network.receive.CollectibleSyncMessage;
 import com.susen36.babel.network.receive.EPSyncMessage;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -42,5 +44,9 @@ public class ClientPacketHandler {
                         .deserializeNBT(access, message.data().getCompound("cooldown"));
             }
         }
+    }
+
+    public static void handle(CollectibleItemUseMessage message, IPayloadContext context) {
+        Minecraft.getInstance().gameRenderer.displayItemActivation(BuiltInRegistries.ITEM.get(message.id()).getDefaultInstance());
     }
 }
