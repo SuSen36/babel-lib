@@ -169,7 +169,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         if (livingEntity instanceof Player player && level instanceof ServerLevel serverLevel) {
             var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
             var cd = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get());
-            if (canAlwaysUse || (!data.isUsed(this) && !isBanned() && cd.isReady(this))) {
+            if (canAlwaysUse || (!isBanned() && cd.isReady(this, serverLevel.getServer()))) {
                 activate(level, player, stack, this);
                 if (consumeSelf) {
                     return consumeSelf(stack);
@@ -436,7 +436,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             if (livingEntity instanceof Player player && level instanceof ServerLevel serverLevel) {
                 var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
                 var cd = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get());
-                if (canAlwaysUse || (!data.isUsed(this) && !isBanned() && cd.isReady(this))) {
+                if (canAlwaysUse || (!isBanned() && cd.isReady(this, serverLevel.getServer()))) {
                     activate(level, player, stack, this);
                     if (consumeSelf) {
                         return consumeSelf(stack);

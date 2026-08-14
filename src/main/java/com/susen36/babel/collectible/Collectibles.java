@@ -3,6 +3,7 @@ package com.susen36.babel.collectible;
 import com.google.common.collect.HashBiMap;
 import com.mojang.logging.LogUtils;
 import com.susen36.babel.BabelMod;
+import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,10 +15,13 @@ import net.minecraft.nbt.LongArrayTag;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -27,7 +31,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import static com.susen36.babel.BabelMod.MODID;
@@ -159,7 +162,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
         private Layer() {
         }
 
-        private HashMap<String, Integer> getLayer() {
+        public HashMap<String, Integer> getLayer() {
             return layer;
         }
 
@@ -254,7 +257,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
                             continue;
                         }
 
-                        if (!layer.containsKey(key) && !layer.containsValue(value)) {
+                        if (!layer.containsKey(key)) {
                             layer.put(key, value);
                         } else {
                             layer.put(key, value);
@@ -273,116 +276,101 @@ public class Collectibles implements INBTSerializable<ListTag> {
         private static final String KEY = "key";
         private static final String VALUE = "value";
 
-        public final HashMap<String, Long> cooldown = new HashMap<>();
+        private final HashMap<String, Long> cooldown = new HashMap<>();
+        private ServerPlayer player;
 
-        private Cooldown() {
+        private Cooldown(IAttachmentHolder holder) {
+            if (holder instanceof ServerPlayer holderPlayer) this.player = holderPlayer;
         }
 
-        public void setCooldown(@NotNull Item item, long durationSeconds) {
-            long lastTick = durationSeconds * 20L;
-            cooldown.put(getIdByItem(item), lastTick);
+        private ServerPlayer getPlayer() {
+            return this.player;
         }
 
-        public void setCooldown(@NotNull Holder<Item> item, long durationSeconds) {
-            long lastTick = durationSeconds * 20L;
-            cooldown.put(getIdByItem(item), lastTick);
+        private void setCooldownEndTick(Item item, Long endTick) {
+            cooldown.put(getIdByItem(item), endTick);
         }
 
-        public long getRemainingTicks(@NotNull Item item) {
-            Long lastTick = cooldown.get(getIdByItem(item));
-            if (lastTick == null) return 0;
-            return lastTick;
+        private void setCooldownEndTick(Holder<Item> item, Long endTick) {
+            cooldown.put(getIdByItem(item), endTick);
         }
 
-        public long getRemainingTicks(@NotNull Holder<Item> item) {
-            Long lastTick = cooldown.get(getIdByItem(item));
-            if (lastTick == null) return 0;
-            return lastTick;
+        public void setCooldownEndTick(Item item, MinecraftServer server, Long offsetTicks) {
+            setCooldownEndTick(item, server.overworld().getGameTime() + offsetTicks);
+            BabelNetwork.syncCollectibles(getPlayer());
+            BabelNetwork.syncCooldown(getPlayer(), item, offsetTicks, server.overworld().getGameTime());
         }
 
-        public Set<net.minecraft.core.Holder<Item>> getCooldowns() {
-            var items = new HashSet<Holder<Item>>();
-            for (var id : cooldown.keySet()) {
-                items.add(Collectibles.get(id));
-            }
-            return items;
+        public void setCooldownEndTick(Holder<Item> item, MinecraftServer server, Long offsetTicks) {
+            setCooldownEndTick(item, server.overworld().getGameTime() + offsetTicks);
+            BabelNetwork.syncCollectibles(getPlayer());
+            BabelNetwork.syncCooldown(getPlayer(), item.value(), offsetTicks, server.overworld().getGameTime());
         }
 
-        public int getCooldown(@NotNull Item item) {
-            return Math.toIntExact(getRemainingTicks(item) / 20);
-        }
-
-        public int getCooldown(@NotNull Holder<Item> item) {
-            return Math.toIntExact(getRemainingTicks(item) / 20);
-        }
-
-        public void addCooldown(@NotNull Item item, float durationSeconds) {
-            long lastTick = getCooldown(item);
-            long processd;
-            if (durationSeconds < 0) {
-                processd = Math.round(Math.floor(durationSeconds));
+        private void addCooldownEndTick(Item item, Long currentTick, Long addToEndTick) {
+            var lastTick = getCooldownEndTick(item);
+            if (lastTick == 0) {
+                setCooldownEndTick(item, currentTick + addToEndTick);
             } else {
-                processd = Math.round(durationSeconds);
+                setCooldownEndTick(item, lastTick + addToEndTick);
             }
-            setCooldown(item, lastTick + processd * 20L);
         }
 
-        public void addCooldown(@NotNull Holder<Item> item, float durationSeconds) {
-            long lastTick = getCooldown(item);
-            long processd;
-            if (durationSeconds < 0) {
-                processd = Math.round(Math.floor(durationSeconds));
+        private void addCooldownEndTick(Holder<Item> item, Long currentTick, Long addToEndTick) {
+            var lastTick = getCooldownEndTick(item);
+            if (lastTick == 0) {
+                setCooldownEndTick(item, currentTick + addToEndTick);
             } else {
-                processd = Math.round(durationSeconds);
-            }
-            setCooldown(item, lastTick + processd * 20L);
-        }
-
-        public boolean isReady(@NotNull Item item) {
-            return getRemainingTicks(item) <= 0;
-        }
-
-        public boolean isReady(@NotNull Holder<Item> item) {
-            return getRemainingTicks(item) <= 0;
-        }
-
-        public void removeCooldown(@NotNull Item item) {
-            cooldown.remove(getIdByItem(item));
-        }
-
-        public void removeCooldown(@NotNull Holder<Item> item) {
-            cooldown.remove(getIdByItem(item));
-        }
-
-        public void updateCooldown(@NotNull Item item) {
-            if (getIdByItem(item).equals("null"))
-                LogUtils.getLogger().error("try to update a not existly collectible: {}", item);
-            cooldown.merge(getIdByItem(item), -1L, Long::sum);
-        }
-
-        public void updateCooldown(@NotNull Holder<Item> item) {
-            if (getIdByItem(item).equals("null"))
-                LogUtils.getLogger().error("try to update a not existly collectible: {}", item);
-            cooldown.merge(getIdByItem(item), -1L, Long::sum);
-        }
-
-        public void clearIfExpired(@NotNull Item item) {
-            if (getRemainingTicks(item) <= 0) {
-                removeCooldown(item);
+                setCooldownEndTick(item, lastTick + addToEndTick);
             }
         }
 
-        public void clearIfExpired(@NotNull Holder<Item> item) {
-            if (getRemainingTicks(item) <= 0) {
-                removeCooldown(item);
-            }
+        public void addCooldownEndTick(Item item, MinecraftServer server, Long addToEndTick) {
+            addCooldownEndTick(item, server.overworld().getGameTime(), addToEndTick);
         }
 
-        public void clearAllExpired() {
-            for (var item : getCooldowns()) {
-                clearIfExpired(item);
-                updateCooldown(item);
-            }
+        public void addCooldownEndTick(Holder<Item> item, MinecraftServer server, Long addToEndTick) {
+            addCooldownEndTick(item, server.overworld().getGameTime(), addToEndTick);
+        }
+
+        public long getCooldownEndTick(Item item) {
+            return cooldown.getOrDefault(getIdByItem(item), 0L);
+        }
+
+        public long getCooldownEndTick(Holder<Item> item) {
+            return cooldown.getOrDefault(getIdByItem(item), 0L);
+        }
+
+        private long getLastTicks(Item item, Long currentTick) {
+            return Math.max(currentTick - getCooldownEndTick(item), 0L);
+        }
+
+        private long getLastTicks(Holder<Item> item, Long currentTick) {
+            return Math.max(currentTick - getCooldownEndTick(item), 0L);
+        }
+
+        public long getLastTicks(Item item, MinecraftServer server) {
+            return getLastTicks(item, server.overworld().getGameTime());
+        }
+
+        public long getLastTicks(Holder<Item> item, MinecraftServer server) {
+            return getLastTicks(item, server.overworld().getGameTime());
+        }
+
+        private boolean isReady(Item item, long currentTick) {
+            return currentTick > getCooldownEndTick(item);
+        }
+
+        private boolean isReady(Holder<Item> item, long currentTick) {
+            return currentTick > getCooldownEndTick(item);
+        }
+
+        public boolean isReady(Item item, MinecraftServer server) {
+            return isReady(item, server.overworld().getGameTime());
+        }
+
+        public boolean isReady(Holder<Item> item, MinecraftServer server) {
+            return isReady(item, server.overworld().getGameTime());
         }
 
         @Override
@@ -434,7 +422,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
                         continue;
                     }
 
-                    if (!cooldown.containsKey(key) && !cooldown.containsValue(value)) {
+                    if (!cooldown.containsKey(key)) {
                         cooldown.put(key, value);
                     } else {
                         cooldown.put(key, value);
