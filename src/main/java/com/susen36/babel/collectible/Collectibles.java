@@ -3,14 +3,14 @@ package com.susen36.babel.collectible;
 import com.google.common.collect.HashBiMap;
 import com.mojang.logging.LogUtils;
 import com.susen36.babel.BabelMod;
-
-
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.LongArrayTag;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
@@ -23,6 +23,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -151,18 +153,18 @@ public class Collectibles implements INBTSerializable<ListTag> {
 
     public static class Layer implements INBTSerializable<CompoundTag> {
         private static final String KEY = "key";
-        private static final String VALUE = "vaule";
-        public final HashBiMap<String, Integer> Layer = HashBiMap.create();
+        private static final String VALUE = "value";
+        public final HashBiMap<String, Integer> layer = HashBiMap.create();
 
         private Layer() {
         }
 
         private HashBiMap<String, Integer> getLayer() {
-            return Layer;
+            return layer;
         }
 
         public int getLayer(@NotNull Holder<Item> item) {
-            Integer layer = Layer.get(getIdByItem(item));
+            Integer layer = this.layer.get(getIdByItem(item));
             if (layer != null) {
                 return layer;
             }
@@ -173,7 +175,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
 
         public int getLayer(@NotNull Item item) {
-            Integer layer = Layer.get(getIdByItem(item));
+            Integer layer = this.layer.get(getIdByItem(item));
             if (layer != null) {
                 return layer;
             }
@@ -190,7 +192,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
                 minLevel = collectible.minLevel();
                 maxLevel = collectible.maxLevel();
             }
-            Layer.put(getIdByItem(item), Mth.clamp(layer, minLevel, maxLevel));
+            this.layer.put(getIdByItem(item), Mth.clamp(layer, minLevel, maxLevel));
         }
 
         public void setLayer(@NotNull Item item, @NotNull Integer layer) {
@@ -200,7 +202,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
                 minLevel = collectible.minLevel();
                 maxLevel = collectible.maxLevel();
             }
-            Layer.put(getIdByItem(item), Mth.clamp(layer, minLevel, maxLevel));
+            this.layer.put(getIdByItem(item), Mth.clamp(layer, minLevel, maxLevel));
         }
 
         public void addLayer(@NotNull Item item, @NotNull Integer layer) {
@@ -215,10 +217,9 @@ public class Collectibles implements INBTSerializable<ListTag> {
         public CompoundTag serializeNBT(HolderLookup.@NotNull Provider provider) {
             var root = new CompoundTag();
             var keys = new ListTag();
-            var values = new ListTag();
-            for (var entry : Layer.entrySet()) {
+            var values = new IntArrayTag(new ArrayList<>(layer.values()));
+            for (var entry : layer.entrySet()) {
                 keys.add(StringTag.valueOf(entry.getKey()));
-                values.add(IntTag.valueOf(entry.getValue()));
             }
             root.put(KEY, keys);
             root.put(VALUE, values);
@@ -227,29 +228,44 @@ public class Collectibles implements INBTSerializable<ListTag> {
 
         @Override
         public void deserializeNBT(HolderLookup.@NotNull Provider provider, @NotNull CompoundTag root) {
-            Layer.clear();
-            if (!root.contains(KEY, Tag.TAG_LIST) || !root.contains(VALUE, Tag.TAG_LIST)) {
+            if (!root.contains(KEY) || !root.contains(VALUE)) {
                 BabelMod.LOGGER.error("Missing keys or values in Layer NBT");
                 return;
             }
             var tempKeys = root.get(KEY);
             var tempValues = root.get(VALUE);
-            if (tempKeys instanceof ListTag keys && tempValues instanceof ListTag values) {
-                if (keys.size() == values.size())
+            if (tempKeys instanceof ListTag keys && tempValues instanceof IntArrayTag values) {
+                if (keys.size() == values.size()) {
+                    layer.clear();
+
                     for (int i = 0; i < keys.size(); i++) {
-                        var key = keys.getString(i);
-                        var value = values.getInt(i);
-                        if (!Layer.containsKey(key) && !Layer.containsValue(value)) {
-                            Layer.put(key, value);
+                        String key = keys.getString(i);
+
+                        int value;
+                        var tag = values.get(i);
+                        if (tag == null) {
+                            BabelMod.LOGGER.error("found a null in values{}.", values);
+                            continue;
+                        }
+                        if (tag instanceof IntTag intTag) {
+                            value = intTag.getAsInt();
                         } else {
-                            BabelMod.LOGGER.error("Duplicate keypair found in Layer NBT: {} -> {}", key, value);
+                            BabelMod.LOGGER.error("Unexpected tag type in Layer values: {}", tag.getClass().getCanonicalName());
+                            continue;
+                        }
+
+                        if (!layer.containsKey(key) && !layer.containsValue(value)) {
+                            layer.put(key, value);
+                        } else {
+                            layer.put(key, value);
+                            BabelMod.LOGGER.error("Duplicate keypair found in Layer NBT: ({}, {}), Overrided old.", key, value);
                         }
                     }
-                else
+                } else
                     BabelMod.LOGGER.error("the size of keys and values are not equals : keys: {}, values: {}", keys.size(), values.size());
-            } else if (tempKeys != null) {
-                BabelMod.LOGGER.error("wanted ListTag, matched: {}", tempKeys.getClass().getName());
-            } else BabelMod.LOGGER.error("Missing 'keys' or 'values' tag in Layer NBT");
+            } else {
+                BabelMod.LOGGER.error("wanted (ListTag, IntArrayTag), matched: ({}, {})", tempKeys == null ? "null" : tempKeys.getClass().getCanonicalName(), tempValues == null ? "null" : tempValues.getClass().getCanonicalName());
+            }
         }
     }
 
@@ -257,12 +273,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
         private static final String KEY = "key";
         private static final String VALUE = "value";
 
-        /**
-         * key   = item id (String)
-         * value = 到期 Tick（Long），即 server.getTickCount() + 延迟秒数 * 20
-         * 当 currentTick >= value 时，表示冷却已结束
-         */
-        public final HashBiMap<String, Long> cooldown = HashBiMap.create();
+        public final HashMap<String, Long> cooldown = new HashMap<>();
 
         private Cooldown() {
         }
@@ -305,14 +316,26 @@ public class Collectibles implements INBTSerializable<ListTag> {
             return Math.toIntExact(getRemainingTicks(item) / 20);
         }
 
-        public void addCooldown(@NotNull Item item, int durationSeconds) {
+        public void addCooldown(@NotNull Item item, float durationSeconds) {
             long lastTick = getCooldown(item);
-            setCooldown(item, lastTick + durationSeconds);
+            long processd;
+            if (durationSeconds < 0) {
+                processd = Math.round(Math.floor(durationSeconds));
+            } else {
+                processd = Math.round(durationSeconds);
+            }
+            setCooldown(item, lastTick + processd * 20L);
         }
 
-        public void addCooldown(@NotNull Holder<Item> item, int durationSeconds) {
+        public void addCooldown(@NotNull Holder<Item> item, float durationSeconds) {
             long lastTick = getCooldown(item);
-            setCooldown(item, lastTick + durationSeconds);
+            long processd;
+            if (durationSeconds < 0) {
+                processd = Math.round(Math.floor(durationSeconds));
+            } else {
+                processd = Math.round(durationSeconds);
+            }
+            setCooldown(item, lastTick + processd * 20L);
         }
 
         public boolean isReady(@NotNull Item item) {
@@ -332,11 +355,15 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
 
         public void updateCooldown(@NotNull Item item) {
-            addCooldown(item, -1 / 20);
+            if (getIdByItem(item).equals("null"))
+                LogUtils.getLogger().error("try to update a not existly collectible: {}", item);
+            cooldown.merge(getIdByItem(item), -1L, Long::sum);
         }
 
         public void updateCooldown(@NotNull Holder<Item> item) {
-            addCooldown(item, -1 / 20);
+            if (getIdByItem(item).equals("null"))
+                LogUtils.getLogger().error("try to update a not existly collectible: {}", item);
+            cooldown.merge(getIdByItem(item), -1L, Long::sum);
         }
 
         public void clearIfExpired(@NotNull Item item) {
@@ -348,13 +375,13 @@ public class Collectibles implements INBTSerializable<ListTag> {
         public void clearIfExpired(@NotNull Holder<Item> item) {
             if (getRemainingTicks(item) <= 0) {
                 removeCooldown(item);
-                updateCooldown(item);
             }
         }
 
         public void clearAllExpired() {
             for (var item : getCooldowns()) {
                 clearIfExpired(item);
+                updateCooldown(item);
             }
         }
 
@@ -362,11 +389,10 @@ public class Collectibles implements INBTSerializable<ListTag> {
         public CompoundTag serializeNBT(@NotNull HolderLookup.Provider provider) {
             var root = new CompoundTag();
             var keys = new ListTag();
-            var values = new ListTag();
+            var values = new LongArrayTag(new ArrayList<>(cooldown.values()));
 
             for (var entry : cooldown.entrySet()) {
                 keys.add(StringTag.valueOf(entry.getKey()));
-                values.add(LongTag.valueOf(entry.getValue()));
             }
 
             root.put(KEY, keys);
@@ -376,9 +402,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
 
         @Override
         public void deserializeNBT(@NotNull HolderLookup.Provider provider, @NotNull CompoundTag root) {
-            cooldown.clear();
-
-            if (!root.contains(KEY, Tag.TAG_LIST) || !root.contains(VALUE, Tag.TAG_LIST)) {
+            if (!root.contains(KEY) || !root.contains(VALUE)) {
                 BabelMod.LOGGER.error("Missing keys or values in Cooldown NBT");
                 return;
             }
@@ -386,35 +410,39 @@ public class Collectibles implements INBTSerializable<ListTag> {
             var tempKeys = root.get(KEY);
             var tempValues = root.get(VALUE);
 
-            if (tempKeys instanceof ListTag keys && tempValues instanceof ListTag values) {
+            if (tempKeys instanceof ListTag keys && tempValues instanceof LongArrayTag values) {
                 if (keys.size() != values.size()) {
                     BabelMod.LOGGER.error("the size of keys and values are not equals : keys: {}, values: {}", keys.size(), values.size());
                     return;
                 }
 
+                cooldown.clear();
+
                 for (int i = 0; i < keys.size(); i++) {
                     String key = keys.getString(i);
 
-                    // 兼容旧版 Integer 数据
                     long value;
                     Tag tag = values.get(i);
+                    if (tag == null) {
+                        BabelMod.LOGGER.error("found a null in values{}.", values);
+                        continue;
+                    }
                     if (tag instanceof LongTag longTag) {
                         value = longTag.getAsLong();
-                    } else if (tag instanceof IntTag intTag) {
-                        value = intTag.getAsLong();
                     } else {
-                        BabelMod.LOGGER.error("Unexpected tag type in Cooldown values: {}", tag.getClass().getName());
+                        BabelMod.LOGGER.error("Unexpected tag type in Cooldown values: {}", tag.getClass().getCanonicalName());
                         continue;
                     }
 
                     if (!cooldown.containsKey(key) && !cooldown.containsValue(value)) {
                         cooldown.put(key, value);
                     } else {
-                        BabelMod.LOGGER.error("Duplicate keypair found in Cooldown NBT: {} -> {}", key, value);
+                        cooldown.put(key, value);
+                        BabelMod.LOGGER.error("Duplicate keypair found in Cooldown NBT: ({}, {}), Overrided old.", key, value);
                     }
                 }
             } else {
-                BabelMod.LOGGER.error("wanted ListTag, matched: {}", tempKeys);
+                BabelMod.LOGGER.error("wanted (ListTag, LongArrayTag), matched: ({}, {})", tempKeys == null ? "null" : tempKeys.getClass().getCanonicalName(), tempValues == null ? "null" : tempValues.getClass().getCanonicalName());
             }
         }
     }

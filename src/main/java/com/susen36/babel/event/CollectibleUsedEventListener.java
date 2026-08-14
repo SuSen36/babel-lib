@@ -2,6 +2,7 @@ package com.susen36.babel.event;
 
 import com.susen36.babel.api.event.CollectibleEvent;
 import com.susen36.babel.collectible.Collectibles;
+import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -27,6 +28,7 @@ public class CollectibleUsedEventListener {
         var players = server.getPlayerList().getPlayers();
         for (var player : players) {
             player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get()).clearAllExpired();
+            BabelNetwork.syncCollectibles(player);
         }
     }
 
