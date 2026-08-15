@@ -25,17 +25,7 @@ import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 @EventBusSubscriber(value = {Dist.CLIENT}, modid = BabelMod.MODID)
 public class EPShowOverlay {
     private static final ResourceLocation EMPTY_ICON = rl("empty_icon");
-    private static final ResourceLocation SANITY_ICON = rl("sanity_icon");
-    private static final ResourceLocation WATER_ICON = rl("water_icon");
-    private static final ResourceLocation FIRE_ICON = rl("fire_icon");
-    private static final ResourceLocation DARK_ICON = rl("dark_icon");
-    private static final ResourceLocation FRENZY_ICON = rl("anger_icon");
     private static final ResourceLocation WHITE_ICON = rl("whiter_icon");
-    private static final ResourceLocation SANITY_RING = rl("sanity");
-    private static final ResourceLocation WATER_RING = rl("water");
-    private static final ResourceLocation FIRE_RING = rl("fire");
-    private static final ResourceLocation DARK_RING = rl("dark");
-    private static final ResourceLocation FRENZY_RING = rl("anger");
 
     private static final RandomSource RANDOM = RandomSource.create();
     private static float bufferProgress = 0.0F;
@@ -149,24 +139,10 @@ public class EPShowOverlay {
     }
 
     private static ResourceLocation getIcon(AbstractEPCapability.EPType type) {
-        return switch (type) {
-            case NERVOUS -> SANITY_ICON;
-            case CORROSION -> WATER_ICON;
-            case BURN -> FIRE_ICON;
-            case NECROSIS -> DARK_ICON;
-            case FRENZY -> FRENZY_ICON;
-            default -> SANITY_ICON;
-        };
+        return rl(type.getTextureName() + "_icon");
     }
 
     private static ResourceLocation getRing(AbstractEPCapability.EPType type) {
-        return switch (type) {
-            case NERVOUS -> SANITY_RING;
-            case CORROSION -> WATER_RING;
-            case BURN -> FIRE_RING;
-            case NECROSIS -> DARK_RING;
-            case FRENZY -> FRENZY_RING;
-            default -> SANITY_RING;
-        };
+        return rl(type.getTextureName());
     }
 }
