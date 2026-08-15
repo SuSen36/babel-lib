@@ -31,12 +31,28 @@ public class CollectiblesEventListener {
     }
 
     @SubscribeEvent
-    public static void onServerTick(ServerTickEvent.Post event) {
+    public static void onLivingDeathEvent(@NotNull PlayerEvent.PlayerRespawnEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player && player.level() instanceof ServerLevel serverLevel) {
+            BabelNetwork.syncCollectibles(player);
+            BabelNetwork.syncServerCurrentTick(player, serverLevel.getServer().overworld().getGameTime());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerChangedDimensionEvent(@NotNull PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player && player.level() instanceof ServerLevel serverLevel) {
+            BabelNetwork.syncCollectibles(player);
+            BabelNetwork.syncServerCurrentTick(player, serverLevel.getServer().overworld().getGameTime());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onServerTick(@NotNull ServerTickEvent.Post event) {
         event.getServer().getPlayerList().getPlayers().forEach(player -> BabelNetwork.syncServerCurrentTick(player, event.getServer().overworld().getGameTime()));
     }
 
     @SubscribeEvent
-    public static void onRegisterItemDecorationsEvent(RegisterItemDecorationsEvent event) {
+    public static void onRegisterItemDecorationsEvent(@NotNull RegisterItemDecorationsEvent event) {
         var items = Collectibles.Collectibles.values();
         for (var item : items) {
             event.register(item.value(), new CollectiblesDecorator());

@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.IItemDecorator;
 import org.jetbrains.annotations.NotNull;
@@ -13,8 +12,8 @@ import org.jetbrains.annotations.NotNull;
 public class CollectiblesDecorator implements IItemDecorator {
     @Override
     public boolean render(@NotNull GuiGraphics guiGraphics, @NotNull Font font, @NotNull ItemStack stack, int x, int y) {
-        Minecraft mc = Minecraft.getInstance();
-        Player player = mc.player;
+        var mc = Minecraft.getInstance();
+        var player = mc.player;
         if (player == null) return false;
 
         var cd = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get());
