@@ -22,25 +22,31 @@ import java.util.function.Function;
 public abstract class AbstractEPCapability implements INBTSerializable<CompoundTag> {
 
     public enum EPType {
-        NERVOUS("nervous", "nervous", NervousInjury::new),
-        CORROSION("corrosion", "corrosion", CorrosionInjury::new),
-        BURN("burn", "burn", BurnInjury::new),
-        NECROSIS("necrosis", "necrosis", NecrosisInjury::new),
-        FRENZY("frenzy", "frenzy", FrenzyInjury::new),
-        EMPTY("empty", "empty", null);
+        NERVOUS("nervous", "nervous", "sanity", NervousInjury::new),
+        CORROSION("corrosion", "corrosion", "water", CorrosionInjury::new),
+        BURN("burn", "burn", "fire", BurnInjury::new),
+        NECROSIS("necrosis", "necrosis", "dark", NecrosisInjury::new),
+        FRENZY("frenzy", "frenzy", "anger", FrenzyInjury::new),
+        EMPTY("empty", "empty", "empty", null);
 
         private final String nickName;
         private final String descriptionID;
+        private final String textureName;
         private final Function<LivingEntity, AbstractEPCapability> factory;
 
-        EPType(String nickName, String descriptionID, Function<LivingEntity, AbstractEPCapability> factory) {
+        EPType(String nickName, String descriptionID, String textureName, Function<LivingEntity, AbstractEPCapability> factory) {
             this.nickName = nickName;
             this.descriptionID = "ep_type." + BabelMod.MODID + "." + descriptionID;
+            this.textureName = textureName;
             this.factory = factory;
         }
 
         public String getNickName() {
             return nickName;
+        }
+
+        public String getTextureName() {
+            return textureName;
         }
 
         public boolean isEmpty() {
@@ -104,7 +110,6 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
     protected int maxReviveTick = 200;
     protected int reviveTick = 0;
     protected int immunityTick = 0;
-    // 脏标记：值变化置位，网络按脏数据增量同步
     protected boolean dirty = true;
 
     protected AbstractEPCapability(EPType pType, LivingEntity living) {
