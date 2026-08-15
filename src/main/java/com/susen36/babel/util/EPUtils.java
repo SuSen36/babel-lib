@@ -64,6 +64,38 @@ public class EPUtils {
         EPManager.healElemental(target, type, Mth.floor(value));
     }
 
+    public static void healElementals(LivingEntity target, double value, AbstractEPCapability.EPType... types) {
+        if (types.length == 0) {
+            healAllElemental(target, value);
+        } else {
+            for (AbstractEPCapability.EPType type : types) {
+                if (!type.isEmpty()) {
+                    healElemental(target, type, value);
+                }
+            }
+        }
+    }
+
+    public static void healSanity(LivingEntity target, double value) {
+        healElemental(target, AbstractEPCapability.EPType.NERVOUS, value);
+    }
+
+    public static void healBurn(LivingEntity target, double value) {
+        healElemental(target, AbstractEPCapability.EPType.BURN, value);
+    }
+
+    public static void healCorrosion(LivingEntity target, double value) {
+        healElemental(target, AbstractEPCapability.EPType.CORROSION, value);
+    }
+
+    public static void healNecrosis(LivingEntity target, double value) {
+        healElemental(target, AbstractEPCapability.EPType.NECROSIS, value);
+    }
+
+    public static void healFrenzy(LivingEntity target, double value) {
+        healElemental(target, AbstractEPCapability.EPType.FRENZY, value);
+    }
+
     public static void healAllElemental(LivingEntity target, double value) {
         for (AbstractEPCapability.EPType type : AbstractEPCapability.EPType.values()) {
             if (!type.isEmpty()) {
