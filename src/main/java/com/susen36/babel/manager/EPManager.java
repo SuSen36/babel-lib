@@ -44,7 +44,7 @@ public class EPManager {
         double injuryDamage = 0;
         if (attackerEntity instanceof ElementalAttacker attacker) {
             type = attacker.getElementalType();
-            rate = attacker.getElementalRate() * 10.0D;
+            rate = attacker.getElementalRate();
             injuryDamage = attacker.getElementalInjuryDamage();
         }
         if (attackerEntity == null) {
@@ -53,7 +53,7 @@ public class EPManager {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             ItemStack stack = attackerEntity.getItemBySlot(slot);
             if (stack.getItem() instanceof ElementalAttacker attacker) {
-                rate += attacker.getElementalRate() * 10.0D;
+                rate += attacker.getElementalRate();
                 injuryDamage += attacker.getElementalInjuryDamage();
                 if (!(attackerEntity instanceof ElementalAttacker)) {
                     type = attacker.getElementalType();

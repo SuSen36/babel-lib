@@ -41,7 +41,7 @@ public class EPShowOverlay {
     private static float bufferProgress = 0.0F;
     private static int blinkTicks = 0;
     private static AbstractEPCapability.EPType lastType = null;
-    private static final float TICK_RETENTION = 0.87F;
+    private static final float TICK_RETENTION = 0.85F;
 
     private static ResourceLocation rl(String name) {
         return ResourceLocation.fromNamespaceAndPath(BabelMod.MODID, "textures/gui/ep/" + name + ".png");

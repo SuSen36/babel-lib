@@ -151,7 +151,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
 
     public int getMaxValue() {
         float threshold = BabelAttributes.getMaxElementalValue(livingEntity);
-        if (threshold <= 0.0F) return 1000;
+        if (threshold <= 0.0F) return 50;
         return Mth.floor(threshold);
     }
 
@@ -188,7 +188,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
         }
         AttributeInstance thresholdAttr = livingEntity.getAttribute(BabelAttributes.MAX_ELEMENTAL_VALUE);
         AttributeInstance resistanceAttr = livingEntity.getAttribute(BabelAttributes.ELEMENTAL_RESISTANCE);
-        float threshold = thresholdAttr == null ? 1000.0F : (float) thresholdAttr.getValue();
+        float threshold = thresholdAttr == null ? 50.0F : (float) thresholdAttr.getValue();
         float resistance = resistanceAttr == null ? 0.0F : (float) resistanceAttr.getValue();
 
         float effectiveAmountF = Mth.clamp((float) amount * (1.0F - resistance * 0.01F), 0.0F, Float.MAX_VALUE);
