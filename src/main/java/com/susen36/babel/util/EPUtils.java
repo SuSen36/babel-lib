@@ -52,6 +52,14 @@ public class EPUtils {
         causeElementalInjury(target, AbstractEPCapability.EPType.NECROSIS, attacker, value);
     }
 
+    public static void causeFrenzyInjury(LivingEntity target, double value) {
+        causeElementalInjury(target, AbstractEPCapability.EPType.FRENZY, value);
+    }
+
+    public static void causeFrenzyInjury(LivingEntity target, LivingEntity attacker, double value) {
+        causeElementalInjury(target, AbstractEPCapability.EPType.FRENZY, attacker, value);
+    }
+
     public static void healElemental(LivingEntity target, AbstractEPCapability.EPType type, double value) {
         EPManager.healElemental(target, type, Mth.floor(value));
     }
@@ -101,6 +109,10 @@ public class EPUtils {
         return isUnderBurst(target, AbstractEPCapability.EPType.NECROSIS);
     }
 
+    public static boolean isFrenzyBursting(LivingEntity target) {
+        return isUnderBurst(target, AbstractEPCapability.EPType.FRENZY);
+    }
+
     public static boolean isImmune(LivingEntity target, AbstractEPCapability.EPType type) {
         return EPManager.isImmune(target, type);
     }
@@ -130,6 +142,10 @@ public class EPUtils {
         return isImmune(target, AbstractEPCapability.EPType.NECROSIS);
     }
 
+    public static boolean isFrenzyImmune(LivingEntity target) {
+        return isImmune(target, AbstractEPCapability.EPType.FRENZY);
+    }
+
     public static void setImmune(LivingEntity target, AbstractEPCapability.EPType type, int ticks) {
         EPManager.setImmune(target, type, ticks);
     }
@@ -152,6 +168,10 @@ public class EPUtils {
 
     public static void setNecrosisImmune(LivingEntity target, int ticks) {
         setImmune(target, AbstractEPCapability.EPType.NECROSIS, ticks);
+    }
+
+    public static void setFrenzyImmune(LivingEntity target, int ticks) {
+        setImmune(target, AbstractEPCapability.EPType.FRENZY, ticks);
     }
 
     public static int getElementValue(LivingEntity target, AbstractEPCapability.EPType type) {
@@ -180,6 +200,10 @@ public class EPUtils {
 
     public static int getNecrosisValue(LivingEntity target) {
         return getElementValue(target, AbstractEPCapability.EPType.NECROSIS);
+    }
+
+    public static int getFrenzyValue(LivingEntity target) {
+        return getElementValue(target, AbstractEPCapability.EPType.FRENZY);
     }
 
     public static AbstractEPCapability.EPType getLowestElementType(LivingEntity target) {

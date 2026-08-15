@@ -1,6 +1,7 @@
 package com.susen36.babel.elemental;
 
 import com.susen36.babel.elemental.base.AbstractEPCapability;
+import com.susen36.babel.init.BabelDamageTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -44,7 +45,7 @@ public class FrenzyInjury extends AbstractEPCapability {
         if (reviveTick <= 0) {
             removeAttackSpeedBonus();
         } else if (livingEntity.tickCount % 20 == 0) {
-            livingEntity.hurt(livingEntity.damageSources().starve(), frenzyStacks*0.5F);
+            livingEntity.hurt(BabelDamageTypes.source(livingEntity.level(), BabelDamageTypes.FRENZY_BREAK), frenzyStacks * 0.5F);
         }
     }
 
@@ -53,7 +54,7 @@ public class FrenzyInjury extends AbstractEPCapability {
         if (reviveTick <= 0) {
             removeAttackSpeedBonus();
         } else if (livingEntity.tickCount % 20 == 0) {
-            livingEntity.hurt(livingEntity.damageSources().starve(), frenzyStacks*0.75F);
+            livingEntity.hurt(BabelDamageTypes.source(livingEntity.level(), BabelDamageTypes.FRENZY_BREAK), frenzyStacks * 0.75F);
         }
     }
 

@@ -22,12 +22,12 @@ import java.util.function.Function;
 public abstract class AbstractEPCapability implements INBTSerializable<CompoundTag> {
 
     public enum EPType {
-        NERVOUS("sanity", "sanity", NervousInjury::new),
-        CORROSION("water", "water", CorrosionInjury::new),
-        BURN("fire", "fire", BurnInjury::new),
-        NECROSIS("dark", "dark", NecrosisInjury::new),
-        FRENZY("FRENZY", "frenzy", FrenzyInjury::new),
-        EMPTY("empty", "gun_mu", null);
+        NERVOUS("nervous", "nervous", NervousInjury::new),
+        CORROSION("corrosion", "corrosion", CorrosionInjury::new),
+        BURN("burn", "burn", BurnInjury::new),
+        NECROSIS("necrosis", "necrosis", NecrosisInjury::new),
+        FRENZY("frenzy", "frenzy", FrenzyInjury::new),
+        EMPTY("empty", "empty", null);
 
         private final String nickName;
         private final String descriptionID;

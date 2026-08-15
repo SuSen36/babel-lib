@@ -16,6 +16,7 @@ public class BabelDamageTypes {
     public static final ResourceKey<DamageType> CORROSION_BREAK = create("corrosion_break");
     public static final ResourceKey<DamageType> BURN_BREAK = create("burn_break");
     public static final ResourceKey<DamageType> ELEMENT_BREAK = create("element_break");
+    public static final ResourceKey<DamageType> FRENZY_BREAK = create("frenzy_break");
 
     private BabelDamageTypes() {
         throw new UnsupportedOperationException("Utility class");
