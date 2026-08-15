@@ -104,6 +104,8 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
     protected int maxReviveTick = 200;
     protected int reviveTick = 0;
     protected int immunityTick = 0;
+    // 脏标记：值变化置位，网络按脏数据增量同步
+    protected boolean dirty = true;
 
     protected AbstractEPCapability(EPType pType, LivingEntity living) {
         this.type = pType;
@@ -141,6 +143,12 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
         return value;
     }
 
+    public boolean consumeDirty() {
+        boolean wasDirty = dirty;
+        dirty = false;
+        return wasDirty;
+    }
+
     public int getMaxValue() {
         float threshold = BabelAttributes.getMaxElementalValue(livingEntity);
         if (threshold <= 0.0F) return 1000;
@@ -157,6 +165,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
 
     public void setMaxReviveTick(int maxReviveT) {
         this.maxReviveTick = Math.max(1, maxReviveT);
+        this.dirty = true;
     }
 
     public int lockTick() {
@@ -189,6 +198,9 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
         }
         int previousValue = value;
         value = Mth.clamp(value - effectiveAmount, 0, getMaxValue());
+        if (value != previousValue) {
+            this.dirty = true;
+        }
 
         if (shouldBurst(source)) {
             float overkill = (float) effectiveAmount - previousValue;
@@ -211,13 +223,18 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
     public void heal(int amount) {
         if (underBurst() || immunityTick != 0) return;
         if (amount <= 0) return;
+        int previous = value;
         value = Mth.clamp(value + amount, 0, getMaxValue());
+        if (value != previous) {
+            this.dirty = true;
+        }
     }
 
     public void onReviveTick() {
         int maxValue = getMaxValue();
         reviveTick--;
         value = Mth.floor(maxValue * (maxReviveTick - reviveTick) / (float) maxReviveTick);
+        this.dirty = true;
         burstTick();
     }
 
@@ -228,6 +245,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
 
     public void restoreValue() {
         value = getMaxValue();
+        this.dirty = true;
     }
 
     public void tick() {
@@ -242,11 +260,16 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
     }
 
     public void setImmune(int immuneDuration) {
+        int previous = this.immunityTick;
         this.immunityTick = Math.max(0, immuneDuration);
+        if (this.immunityTick != previous) {
+            this.dirty = true;
+        }
     }
 
     public void setPermanentImmunity() {
         this.immunityTick = -1;
+        this.dirty = true;
     }
 
     public boolean shouldBurst(ElementalInjurySource<?> source) {

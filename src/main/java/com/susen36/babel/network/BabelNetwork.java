@@ -1,6 +1,5 @@
 package com.susen36.babel.network;
 
-import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.network.receive.CollectibleItemUseMessage;
 import com.susen36.babel.network.receive.CollectibleSyncMessage;
@@ -9,7 +8,6 @@ import com.susen36.babel.network.receive.EPSyncMessage;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -30,13 +28,6 @@ public class BabelNetwork {
         registrar.playToClient(CooldownSyncMessage.TYPE, CooldownSyncMessage.STREAM_CODEC, CooldownSyncMessage::handle);
     }
 
-    public static void syncEP(Entity entity, EPCapability ep) {
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, new EPSyncMessage(ep));
-    }
-
-    /**
-     * 同步某玩家的收藏品状态（已使用集合 + 数值层）到客户端。
-     */
     public static void syncCollectibles(Player player) {
         var access = player.registryAccess();
         CompoundTag data = new CompoundTag();

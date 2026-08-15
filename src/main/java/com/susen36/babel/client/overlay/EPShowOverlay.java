@@ -39,9 +39,9 @@ public class EPShowOverlay {
 
     private static final RandomSource RANDOM = RandomSource.create();
     private static float bufferProgress = 0.0F;
+    private static int blinkTicks = 0;
     private static AbstractEPCapability.EPType lastType = null;
-    private static final float TICK_RETENTION = 0.774F;
-    private static final float BLINK_THRESHOLD = 0.02F;
+    private static final float TICK_RETENTION = 0.87F;
 
     private static ResourceLocation rl(String name) {
         return ResourceLocation.fromNamespaceAndPath(BabelMod.MODID, "textures/gui/ep/" + name + ".png");
@@ -54,7 +54,6 @@ public class EPShowOverlay {
                 EPShowOverlay::renderEpBar);
     }
 
-    // 每游戏 tick 更新一次缓冲值（PVZ 写法），渲染帧只读，使白闪持续稳定
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
@@ -69,9 +68,17 @@ public class EPShowOverlay {
         if (lastType != type) {
             lastType = type;
             bufferProgress = progress;
+            blinkTicks = 0;
         }
         if (type != null) {
             bufferProgress = progress * (1 - TICK_RETENTION) + bufferProgress * TICK_RETENTION;
+            // 上升沿触发脉冲白闪：diff 首次越过阈值时闪 5 tick，之后不再常驻，直到 buffer 追上归零
+            float diff = Math.abs(progress - bufferProgress);
+            if (diff > 0.05F && blinkTicks == 0) {
+                blinkTicks = 5;
+            } else if (blinkTicks > 0) {
+                blinkTicks--;
+            }
         }
     }
 
@@ -112,23 +119,23 @@ public class EPShowOverlay {
                                     AbstractEPCapability.EPType type, float progress, boolean burst, int guiTicks) {
         ResourceLocation icon = getIcon(type);
         int filled = Mth.clamp(Math.round(bufferProgress * 10.0F), 0, 10);
-        boolean blink = Math.abs(progress - bufferProgress) > BLINK_THRESHOLD;
+        boolean blink = blinkTicks > 0;
         boolean depleted = burst || progress <= 0.0F;
         boolean shake = guiTicks % 10 <= 3 && (depleted || player.hasEffect(MobEffects.DARKNESS));
 
         for (int i = 0; i < 10; i++) {
-            int x = left - i * 8 - 10;
+            int x = left - i * 8 - 9;
             int y = top;
             if (shake) {
                 y += RANDOM.nextInt(3) - 1;
             }
             if (i < filled) {
-                guiGraphics.blit(icon, x, y, 10, 10, 0, 0, 9, 9, 9, 9);
+                guiGraphics.blit(icon, x, y, 9, 9, 0, 0, 9, 9, 9, 9);
                 if (blink) {
-                    guiGraphics.blit(WHITE_ICON, x, y, 10, 10, 0, 0, 9, 9, 9, 9);
+                    guiGraphics.blit(WHITE_ICON, x, y, 9, 9, 0, 0, 9, 9, 9, 9);
                 }
             } else {
-                guiGraphics.blit(EMPTY_ICON, x, y, 10, 10, 0, 0, 9, 9, 9, 9);
+                guiGraphics.blit(EMPTY_ICON, x, y, 9, 9, 0, 0, 9, 9, 9, 9);
             }
         }
     }

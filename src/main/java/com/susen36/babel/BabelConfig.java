@@ -18,7 +18,7 @@ public class BabelConfig {
             .define("magicNumberIntroduction", "Babel magic number: ");
 
     public static final ModConfigSpec.BooleanValue EP_BAR_STYLE = BUILDER
-            .comment("元素损伤显示采和饥饿值相似的小图标，若关闭则为圆环")
+            .comment("元素损伤显示采用和饥饿值相似的小图标，若关闭则为圆环")
             .define("ep_icon_style", false);
 
     public static final ModConfigSpec.BooleanValue BAN_ADVANCED_COLLECTIBLES = BUILDER

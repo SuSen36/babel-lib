@@ -2,7 +2,6 @@ package com.susen36.babel.capability;
 
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.capability.ep.EPCapability;
-import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -22,7 +21,7 @@ public class BabelCapabilityEvents {
     public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
         Entity entity = event.getEntity();
         if (!entity.level().isClientSide() && entity instanceof LivingEntity living) {
-            BabelNetwork.syncEP(entity, BabelCapability.getEP(living));
+            BabelCapability.getEP(living).sync();
         }
     }
 
@@ -30,7 +29,7 @@ public class BabelCapabilityEvents {
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         Player player = event.getEntity();
         if (!player.level().isClientSide()) {
-            BabelNetwork.syncEP(player, BabelCapability.getEP(player));
+            BabelCapability.getEP(player).sync();
         }
     }
 
@@ -38,7 +37,7 @@ public class BabelCapabilityEvents {
     public static void onPlayerRespawned(PlayerEvent.PlayerRespawnEvent event) {
         Player player = event.getEntity();
         if (!player.level().isClientSide()) {
-            BabelNetwork.syncEP(player, BabelCapability.getEP(player));
+            BabelCapability.getEP(player).sync();
         }
     }
 
@@ -46,7 +45,7 @@ public class BabelCapabilityEvents {
     public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         Player player = event.getEntity();
         if (!player.level().isClientSide()) {
-            BabelNetwork.syncEP(player, BabelCapability.getEP(player));
+            BabelCapability.getEP(player).sync();
         }
     }
 

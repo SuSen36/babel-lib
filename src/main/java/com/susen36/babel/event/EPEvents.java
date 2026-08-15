@@ -10,7 +10,6 @@ import com.susen36.babel.elemental.FrenzyInjury;
 import com.susen36.babel.effect.PalsyMobEffect;
 import com.susen36.babel.init.BabelAttributes;
 import com.susen36.babel.init.BabelMobEffects;
-import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.DamageTypeTags;
@@ -62,7 +61,7 @@ public class EPEvents {
             boolean burstJustEnded = ep.tick();
             int syncInterval = living instanceof Player ? 5 : 20;
             if (burstJustEnded || living.tickCount % syncInterval == 0) {
-                BabelNetwork.syncEP(living, ep);
+                ep.syncDirty();
             }
         }
     }

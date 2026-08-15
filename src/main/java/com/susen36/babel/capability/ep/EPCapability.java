@@ -10,13 +10,14 @@ import com.susen36.babel.elemental.NecrosisInjury;
 import com.susen36.babel.elemental.NervousInjury;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
 import com.susen36.babel.elemental.base.ElementalInjurySource;
-import com.susen36.babel.network.BabelNetwork;
+import com.susen36.babel.network.receive.EPSyncMessage;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,7 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
     private final LivingEntity entity;
     private final Map<AbstractEPCapability.EPType, AbstractEPCapability> EP_TYPES = new HashMap<>();
     private int underBreakTick;
+    private boolean underBreakDirty;
 
     public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(BabelMod.MODID, "ep_cap");
 
@@ -52,8 +54,9 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
         if (ticks < 0) ticks = 0;
         if (this.underBreakTick != ticks) {
             this.underBreakTick = ticks;
+            this.underBreakDirty = true;
             if (entity != null && !entity.level().isClientSide()) {
-                BabelNetwork.syncEP(entity, this);
+                this.syncDirty();
             }
         }
     }
@@ -89,7 +92,7 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
                     ep.doBurst();
                 }
                 if (!entity.level().isClientSide()) {
-                    BabelNetwork.syncEP(entity, this);
+                    this.syncDirty();
                 }
                 return true;
             }
@@ -113,7 +116,7 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
             if (pAmount > 0) {
                 ep.heal(pAmount);
                 if (!entity.level().isClientSide()) {
-                    BabelNetwork.syncEP(entity, this);
+                    this.syncDirty();
                 }
             }
         }
@@ -133,6 +136,7 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
         }
         if (underBreakTick > 0) {
             underBreakTick--;
+            underBreakDirty = true;
         }
         return burstJustEnded;
     }
@@ -183,6 +187,31 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
         return tag;
     }
 
+    public CompoundTag serializeSyncNBT(HolderLookup.Provider provider) {
+        CompoundTag tag = new CompoundTag();
+        forEachEPType(ep -> {
+            if (ep.consumeDirty()) {
+                tag.put("ep." + ep.getType().getNickName(), ep.serializeNBT(provider));
+            }
+        });
+        if (underBreakDirty) {
+            underBreakDirty = false;
+            tag.putInt("underBreakTick", underBreakTick);
+        }
+        return tag;
+    }
+
+    public void sync() {
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, new EPSyncMessage(this));
+    }
+
+    public void syncDirty() {
+        CompoundTag nbt = serializeSyncNBT(entity.registryAccess());
+        if (!nbt.isEmpty()) {
+            PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, new EPSyncMessage(entity.getId(), nbt));
+        }
+    }
+
     @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         forEachEPType(ep -> {
@@ -191,7 +220,9 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
                 ep.deserializeNBT(provider, tag.getCompound(key));
             }
         });
-        underBreakTick = tag.getInt("underBreakTick");
+        if (tag.contains("underBreakTick")) {
+            underBreakTick = tag.getInt("underBreakTick");
+        }
     }
 
     @Deprecated

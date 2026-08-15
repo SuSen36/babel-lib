@@ -24,14 +24,16 @@ public record CooldownSyncMessage(
     );
 
     public static void encode(FriendlyByteBuf buffer, CooldownSyncMessage message) {
-        buffer.writeResourceLocation(message.id());
+        buffer.writeUtf(message.id() == null ? "" : message.id().toString());
         buffer.writeLong(message.maxTick());
         buffer.writeLong(message.currentTick());
     }
 
     public static CooldownSyncMessage decode(FriendlyByteBuf buffer) {
+        String id = buffer.readUtf();
+        ResourceLocation resourceLocation = id.isEmpty() ? null : ResourceLocation.parse(id);
         return new CooldownSyncMessage(
-                buffer.readResourceLocation(),
+                resourceLocation,
                 buffer.readLong(),
                 buffer.readLong()
         );
