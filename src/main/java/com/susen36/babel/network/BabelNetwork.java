@@ -5,6 +5,7 @@ import com.susen36.babel.network.receive.CollectibleItemUseMessage;
 import com.susen36.babel.network.receive.CollectibleSyncMessage;
 import com.susen36.babel.network.receive.CooldownSyncMessage;
 import com.susen36.babel.network.receive.EPSyncMessage;
+import com.susen36.babel.network.receive.HealthSyncMessage;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,6 +24,7 @@ public class BabelNetwork {
     public static void register(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar("1");
         registrar.playToClient(EPSyncMessage.TYPE, EPSyncMessage.STREAM_CODEC, EPSyncMessage::handle);
+        registrar.playToClient(HealthSyncMessage.TYPE, HealthSyncMessage.STREAM_CODEC, HealthSyncMessage::handle);
         registrar.playToClient(CollectibleSyncMessage.TYPE, CollectibleSyncMessage.STREAM_CODEC, CollectibleSyncMessage::handle);
         registrar.playToClient(CollectibleItemUseMessage.TYPE, CollectibleItemUseMessage.STREAM_CODEC, CollectibleItemUseMessage::handle);
         registrar.playToClient(CooldownSyncMessage.TYPE, CooldownSyncMessage.STREAM_CODEC, CooldownSyncMessage::handle);

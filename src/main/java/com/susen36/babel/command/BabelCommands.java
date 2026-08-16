@@ -15,7 +15,7 @@ public class BabelCommands {
     @SubscribeEvent
     public static void registerCommands(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
-        LiteralArgumentBuilder<CommandSourceStack> root = EPCommand.get();
-        dispatcher.register(root);
+        dispatcher.register(EPCommand.get());
+        dispatcher.register(LifeCommand.get());
     }
 }

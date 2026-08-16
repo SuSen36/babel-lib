@@ -38,5 +38,18 @@
   "death.attack.frenzy_break": "%1$s在癫狂中死去",
   "config.jade.plugin_babel.ep_provider": "实体元素损伤显示",
   "gameplay.babel.n_6": "提示：§e当前探索等级难度较高，请谨慎启用。",
-  "gameplay.babel.n_12": "注意：§c当前探索等级难度极高，不宜在常规生存启用。"
+  "gameplay.babel.n_12": "注意：§c当前探索等级难度极高，不宜在常规生存启用。",
+  "command.set_life": "将 <player> 的目标生命值设置为 <num> 。",
+  "command.set_maxlife": "将 <player> 的最大目标生命值设置为 <num> 。",
+  "command.set_shield": "将 <player> 的护盾值设置为 <num> 。",
+  "gameplay.life_point.revive.0": "酒足饭饱，你恢复了 {num} 目标生命！",
+  "gameplay.life_point.revive.1": "尝得珍馐，你恢复了 {num} 目标生命！",
+  "gameplay.life_point.revive.2": "食中做乐，你恢复了 {num} 目标生命！",
+  "babel.configuration.initial_life_point": "初始目标生命",
+  "babel.configuration.life_point_global_limit": "全局目标生命上限",
+  "babel.configuration.player_shield_global_limit": "全局护盾值上限",
+  "babel.configuration.life_point_x_offset": "目标生命值X轴偏移",
+  "babel.configuration.life_point_y_offset": "目标生命值Y轴偏移",
+  "babel.configuration.shield_x_offset": "护盾值X轴偏移",
+  "babel.configuration.shield_y_offset": "护盾值Y轴偏移"
 }

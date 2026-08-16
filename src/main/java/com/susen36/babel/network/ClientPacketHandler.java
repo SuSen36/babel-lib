@@ -2,11 +2,13 @@ package com.susen36.babel.network;
 
 import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.ep.EPCapability;
+import com.susen36.babel.capability.health.HealthCapability;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.network.receive.CollectibleItemUseMessage;
 import com.susen36.babel.network.receive.CollectibleSyncMessage;
 import com.susen36.babel.network.receive.CooldownSyncMessage;
 import com.susen36.babel.network.receive.EPSyncMessage;
+import com.susen36.babel.network.receive.HealthSyncMessage;
 import com.susen36.babel.util.CooldownUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -28,6 +30,17 @@ public class ClientPacketHandler {
             if (entity instanceof LivingEntity living) {
                 EPCapability ep = BabelCapability.getEP(living);
                 ep.deserializeNBT(mc.level.registryAccess(), message.nbt());
+            }
+        }
+    }
+
+    public static void handle(HealthSyncMessage message, IPayloadContext context) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level != null) {
+            Entity entity = mc.level.getEntity(message.entityId());
+            if (entity instanceof LivingEntity living) {
+                HealthCapability health = BabelCapability.getHealth(living);
+                health.deserializeNBT(mc.level.registryAccess(), message.nbt());
             }
         }
     }

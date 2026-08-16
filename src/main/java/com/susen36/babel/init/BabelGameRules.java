@@ -17,4 +17,7 @@ public final class BabelGameRules {
 
     public static final GameRules.Key<GameRules.IntegerValue> DIFFICULTY_LEVEL =
             GameRules.register("difficultyLevel", GameRules.Category.MISC, GameRules.IntegerValue.create(0));
+
+    public static final GameRules.Key<GameRules.BooleanValue> TARGET_LIFE_FUNCTION =
+            GameRules.register("targetLifeFunction", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true));
 }

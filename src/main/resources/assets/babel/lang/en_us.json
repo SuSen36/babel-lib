@@ -39,5 +39,18 @@
   "death.attack.frenzy_break": "%1$s died in a frenzy",
   "config.jade.plugin_babel.ep_provider": "Elemental Injury Display",
   "gameplay.babel.n_6": "Attention: §eYou've switched to a high difficulty for Caerula Arbor, please take care.",
-  "gameplay.babel.n_12": "Warn: §cYou've switched to a very high difficulty for Caerula Arbor, it isn't for normal survival games."
+  "gameplay.babel.n_12": "Warn: §cYou've switched to a very high difficulty for Caerula Arbor, it isn't for normal survival games.",
+  "command.set_life": "Set Target Life of <player> to <num> .",
+  "command.set_maxlife": "Set MaxTarget Life of <player> to <num> .",
+  "command.set_shield": "Set Shield of <player> to <num> .",
+  "gameplay.life_point.revive.0": "Your've well dined and revives {num} Life Point!",
+  "gameplay.life_point.revive.1": "You've tasted delicacies and revives {num} Life Point!",
+  "gameplay.life_point.revive.2": "You've gotten pleaseure eating and revives {num} Life Point!",
+  "babel.configuration.initial_life_point": "Initial Life Point",
+  "babel.configuration.life_point_global_limit": "Global Life Point Limit",
+  "babel.configuration.player_shield_global_limit": "Global Shield Limit",
+  "babel.configuration.life_point_x_offset": "Life Point X Offset",
+  "babel.configuration.life_point_y_offset": "Life Point Y Offset",
+  "babel.configuration.shield_x_offset": "Shield X Offset",
+  "babel.configuration.shield_y_offset": "Shield Y Offset"
 }

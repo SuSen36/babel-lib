@@ -2,6 +2,7 @@ package com.susen36.babel.capability;
 
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.capability.ep.EPCapability;
+import com.susen36.babel.capability.health.HealthCapability;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -22,6 +23,7 @@ public class BabelCapabilityEvents {
         Entity entity = event.getEntity();
         if (!entity.level().isClientSide() && entity instanceof LivingEntity living) {
             BabelCapability.getEP(living).sync();
+            BabelCapability.getHealth(living).sync();
         }
     }
 
@@ -30,6 +32,7 @@ public class BabelCapabilityEvents {
         Player player = event.getEntity();
         if (!player.level().isClientSide()) {
             BabelCapability.getEP(player).sync();
+            BabelCapability.getHealth(player).sync();
         }
     }
 
@@ -38,6 +41,7 @@ public class BabelCapabilityEvents {
         Player player = event.getEntity();
         if (!player.level().isClientSide()) {
             BabelCapability.getEP(player).sync();
+            BabelCapability.getHealth(player).sync();
         }
     }
 
@@ -46,6 +50,7 @@ public class BabelCapabilityEvents {
         Player player = event.getEntity();
         if (!player.level().isClientSide()) {
             BabelCapability.getEP(player).sync();
+            BabelCapability.getHealth(player).sync();
         }
     }
 
@@ -57,5 +62,8 @@ public class BabelCapabilityEvents {
         EPCapability oldEP = BabelCapability.getEP(oldPlayer);
         EPCapability ep = BabelCapability.getEP(player);
         ep.deserializeNBT(oldPlayer.registryAccess(), oldEP.serializeNBT(oldPlayer.registryAccess()));
+        HealthCapability oldHealth = BabelCapability.getHealth(oldPlayer);
+        HealthCapability health = BabelCapability.getHealth(player);
+        health.deserializeNBT(oldPlayer.registryAccess(), oldHealth.serializeNBT(oldPlayer.registryAccess()));
     }
 }

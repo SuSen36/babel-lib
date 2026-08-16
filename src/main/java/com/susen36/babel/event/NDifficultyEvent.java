@@ -2,20 +2,25 @@ package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.difficulty.NDifficulty;
+import com.susen36.babel.init.BabelEntityTypeTags;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 
 /**
  * 难度（探索等级）通用实体应用逻辑。
@@ -33,6 +38,26 @@ public class NDifficultyEvent {
     /** 绕过标签：加入该标签的实体即使属于默认敌对目标也不会应用难度倍率。 */
     public static final TagKey<EntityType<?>> BYPASSES_DIFFICULTY = TagKey.create(
             Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(BabelMod.MODID, "bypasses_difficulty"));
+
+    @SubscribeEvent
+    public static void onLivingDamage(LivingDamageEvent.Pre event) {
+        Level world = event.getEntity().level();
+        Entity entity = event.getEntity();
+
+        if (NDifficulty.difficultyLevel(world).value() >= 12) {
+            if (world.getLevelData().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
+                    && (entity.getType().is(BabelEntityTypeTags.ELITE)
+                    || entity.getType().is(BabelEntityTypeTags.FORGE_BOSSES))) {
+                LivingEntity living = entity instanceof Mob mob ? mob.getTarget() : null;
+                if (living != null && living.isAlive()) {
+                    Entity boat = entity.getVehicle();
+                    if (boat instanceof Boat) {
+                        boat.hurt(entity.damageSources().generic(), 20);
+                    }
+                }
+            }
+        }
+    }
 
     @SubscribeEvent
     public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
