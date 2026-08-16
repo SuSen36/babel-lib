@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.susen36.babel.util.HealthUtils;
+import com.susen36.babel.util.LifePointUtils;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -29,8 +29,8 @@ public class LifeCommand {
     private static int setLife(CommandContext<CommandSourceStack> argument) throws CommandSyntaxException {
         double value = DoubleArgumentType.getDouble(argument, "life");
         for (Entity entity : EntityArgument.getEntities(argument, "name")) {
-            int setval = (int) Math.min(value, HealthUtils.getMaxLifePoint(entity));
-            HealthUtils.setLifePoint(entity, setval);
+            int setval = (int) Math.min(value, LifePointUtils.getMaxLifePoint(entity));
+            LifePointUtils.setLifePoint(entity, setval);
             sendSuccess(argument, entity, "command.set_life", setval);
         }
         return 0;
@@ -40,7 +40,7 @@ public class LifeCommand {
         double value = DoubleArgumentType.getDouble(argument, "life");
         for (Entity entity : EntityArgument.getEntities(argument, "name")) {
             int setval = (int) value;
-            HealthUtils.setMaxLifePoint(entity, setval);
+            LifePointUtils.setMaxLifePoint(entity, setval);
             sendSuccess(argument, entity, "command.set_maxlife", setval);
         }
         return 0;
@@ -50,7 +50,7 @@ public class LifeCommand {
         double value = DoubleArgumentType.getDouble(argument, "shield");
         for (Entity entity : EntityArgument.getEntities(argument, "name")) {
             int setval = (int) value;
-            HealthUtils.setShieldPoint(entity, setval);
+            LifePointUtils.setShieldPoint(entity, setval);
             sendSuccess(argument, entity, "command.set_shield", setval);
         }
         return 0;

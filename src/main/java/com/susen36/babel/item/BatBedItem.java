@@ -4,7 +4,7 @@ import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.init.BabelBlocks;
-import com.susen36.babel.util.HealthUtils;
+import com.susen36.babel.util.LifePointUtils;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
@@ -26,8 +26,8 @@ public class BatBedItem extends CollectibleItem.CustomCollectibleItem {
 
     @Override
     public void onUse(ItemStack stack, Level level, Player player, CollectibleItem.CustomCollectibleItem self) {
-        HealthUtils.setMaxLifePoint(player, HealthUtils.getMaxLifePoint(player) + 4);
-        HealthUtils.setLifePoint(player, HealthUtils.getLifePoint(player) + 4);
+        LifePointUtils.setMaxLifePoint(player, LifePointUtils.getMaxLifePoint(player) + 4);
+        LifePointUtils.setLifePoint(player, LifePointUtils.getLifePoint(player) + 4);
         ItemStack setstack = new ItemStack(BabelBlocks.BLOCK_BATBED.get()).copy();
         ItemHandlerHelper.giveItemToPlayer(player, setstack);
     }

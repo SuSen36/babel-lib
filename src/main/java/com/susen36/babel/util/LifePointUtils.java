@@ -4,17 +4,15 @@ import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.health.HealthCapability;
 import net.minecraft.world.entity.Entity;
 
-public class HealthUtils {
+public class LifePointUtils {
 
-    private HealthUtils() {
+    private LifePointUtils() {
         throw new UnsupportedOperationException("Utility class");
     }
 
     public static HealthCapability get(Entity entity) {
         return BabelCapability.getHealth(entity);
     }
-
-    // ========== 生命点数 ==========
 
     public static int getLifePoint(Entity entity) {
         return (int) get(entity).getLives();
@@ -24,9 +22,18 @@ public class HealthUtils {
         if (value < 1) {
             return;
         }
-        HealthCapability c = get(entity);
-        c.setLives(value);
-        c.sync();
+        HealthCapability capability = get(entity);
+        capability.setLives(value);
+        capability.sync();
+    }
+
+    public static void addLifePoint(Entity entity, int delta) {
+        if (delta == 0) {
+            return;
+        }
+        HealthCapability capability = get(entity);
+        capability.setLives(capability.getLives() + delta);
+        capability.sync();
     }
 
     public static int getMaxLifePoint(Entity entity) {
@@ -37,12 +44,10 @@ public class HealthUtils {
         if (value < 1) {
             return;
         }
-        HealthCapability c = get(entity);
-        c.setMaxLives(value);
-        c.sync();
+        HealthCapability capability = get(entity);
+        capability.setMaxLives(value);
+        capability.sync();
     }
-
-    // ========== 护盾点数 ==========
 
     public static int getShieldPoint(Entity entity) {
         return (int) get(entity).getShield();
@@ -52,8 +57,17 @@ public class HealthUtils {
         if (value < 0) {
             return;
         }
-        HealthCapability c = get(entity);
-        c.setShield(value);
-        c.sync();
+        HealthCapability capability = get(entity);
+        capability.setShield(value);
+        capability.sync();
+    }
+
+    public static void addShieldPoint(Entity entity, int delta) {
+        if (delta == 0) {
+            return;
+        }
+        HealthCapability capability = get(entity);
+        capability.setShield(capability.getShield() + delta);
+        capability.sync();
     }
 }

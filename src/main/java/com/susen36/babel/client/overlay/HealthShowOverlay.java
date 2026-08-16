@@ -2,7 +2,7 @@ package com.susen36.babel.client.overlay;
 
 import com.susen36.babel.BabelConfig;
 import com.susen36.babel.BabelMod;
-import com.susen36.babel.util.HealthUtils;
+import com.susen36.babel.util.LifePointUtils;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -41,15 +41,15 @@ public class HealthShowOverlay {
 
         guiGraphics.blit(LIFE_POINT, 6 + lifeDx, h - 24 + lifeDy, 0, 0, 24, 16, 24, 16);
 
-        if (HealthUtils.getShieldPoint(player) > 0) {
+        if (LifePointUtils.getShieldPoint(player) > 0) {
             guiGraphics.blit(SHIELD_POINT, 6 + shieldDx, h - 40 + shieldDy, 0, 0, 24, 16, 24, 16);
-            String shield = String.valueOf(HealthUtils.getShieldPoint(player));
+            String shield = String.valueOf(LifePointUtils.getShieldPoint(player));
             guiGraphics.drawString(mc.font, shield, 21 + shieldDx, h - 36 + shieldDy, -16777216, false);
             guiGraphics.drawString(mc.font, shield, 20 + shieldDx, h - 36 + shieldDy, -1, false);
         }
 
-        String lifeMax = "/" + HealthUtils.getMaxLifePoint(player);
-        String life = String.valueOf(HealthUtils.getLifePoint(player));
+        String lifeMax = "/" + LifePointUtils.getMaxLifePoint(player);
+        String life = String.valueOf(LifePointUtils.getLifePoint(player));
         guiGraphics.drawString(mc.font, lifeMax, 37 + lifeDx, h - 21 + lifeDy, -16764109, false);
         guiGraphics.drawString(mc.font, lifeMax, 36 + lifeDx, h - 21 + lifeDy, -10040065, false);
         guiGraphics.drawString(mc.font, life, 21 + lifeDx, h - 21 + lifeDy, -16764109, false);

@@ -4,7 +4,7 @@ import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.init.BabelBlocks;
-import com.susen36.babel.util.HealthUtils;
+import com.susen36.babel.util.LifePointUtils;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -28,16 +28,13 @@ public class KettleItem extends CollectibleItem.CustomCollectibleItem {
 
     @Override
     public void onUse(ItemStack stack, Level level, Player player, CollectibleItem.CustomCollectibleItem self) {
-        double x = player.getX();
-        double y = player.getY();
-        double z = player.getZ();
-        HealthUtils.setMaxLifePoint(player, HealthUtils.getMaxLifePoint(player) + 1);
-        HealthUtils.setLifePoint(player, HealthUtils.getLifePoint(player) + 1);
+        LifePointUtils.setMaxLifePoint(player, LifePointUtils.getMaxLifePoint(player) + 1);
+        LifePointUtils.setLifePoint(player, LifePointUtils.getLifePoint(player) + 1);
         ItemStack setstack = new ItemStack(BabelBlocks.BLOCK_KETTLE.get()).copy();
         ItemHandlerHelper.giveItemToPlayer(player, setstack);
         for (int index0 = 0; index0 < 2; index0++) {
             if (level instanceof ServerLevel serverLevel)
-                serverLevel.addFreshEntity(new ExperienceOrb(serverLevel, x, y, z, 4));
+                serverLevel.addFreshEntity(new ExperienceOrb(serverLevel, player.getX(), player.getY(), player.getZ(), 4));
         }
     }
 }

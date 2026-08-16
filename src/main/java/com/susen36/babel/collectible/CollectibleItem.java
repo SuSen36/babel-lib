@@ -154,8 +154,24 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             @NotNull Player player,
             @NotNull InteractionHand usedHand
     ) {
-        player.startUsingItem(usedHand);
-        return InteractionResultHolder.consume(player.getItemInHand(usedHand));
+        if (!player.isShiftKeyDown()) {
+            player.startUsingItem(usedHand);
+            return InteractionResultHolder.consume(player.getItemInHand(usedHand));
+        } else {
+            return onSneakUse(level, player, usedHand);
+        }
+    }
+
+    /**
+     * 蹲下使用时的特殊 hook，子类可重写；默认不执行任何收藏品流程。
+     */
+    @NotNull
+    protected InteractionResultHolder<ItemStack> onSneakUse(
+            @NotNull Level level,
+            @NotNull Player player,
+            @NotNull InteractionHand hand
+    ) {
+        return InteractionResultHolder.fail(player.getItemInHand(hand));
     }
 
     @Override
@@ -165,7 +181,6 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             @NotNull LivingEntity livingEntity
     ) {
         if (livingEntity instanceof Player player && level instanceof ServerLevel serverLevel) {
-            var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
             var cd = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get());
             if (canAlwaysUse || (!isBanned() && cd.isReady(this, serverLevel.getServer()))) {
                 activate(level, player, stack, this);
@@ -415,8 +430,24 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                 @NotNull Player player,
                 @NotNull InteractionHand usedHand
         ) {
-            player.startUsingItem(usedHand);
-            return InteractionResultHolder.consume(player.getItemInHand(usedHand));
+            if (!player.isShiftKeyDown()) {
+                player.startUsingItem(usedHand);
+                return InteractionResultHolder.consume(player.getItemInHand(usedHand));
+            } else {
+                return onSneakUse(level, player, usedHand);
+            }
+        }
+
+        /**
+         * 蹲下使用时的特殊操作，供子类重写,不执行任何收藏品流程。
+         */
+        @NotNull
+        protected InteractionResultHolder<ItemStack> onSneakUse(
+                @NotNull Level level,
+                @NotNull Player player,
+                @NotNull InteractionHand hand
+        ) {
+            return InteractionResultHolder.pass(player.getItemInHand(hand));
         }
 
         @Override
