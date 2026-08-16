@@ -16,7 +16,7 @@ import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 public class BatBedItem extends CollectibleItem.CustomCollectibleItem {
     public BatBedItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON), false, 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
+        super(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.ALLAY_AMBIENT_WITHOUT_ITEM, 3.5F, 1F)
                         .particle(ParticleTypes.ASH, 72)

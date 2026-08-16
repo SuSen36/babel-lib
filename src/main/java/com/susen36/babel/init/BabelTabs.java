@@ -15,13 +15,11 @@ public class BabelTabs {
         REGISTRY.register("babel_collectibles", () -> CreativeModeTab.builder()
                 .title(Component.translatable("item_group.babel.collectibles"))
                 .withTabsBefore(CreativeModeTabs.COMBAT)
-                .icon(() -> new ItemStack(BabelCollectible.REDSTONE_IRIS_FLOWER))
+                .icon(() -> new ItemStack(BabelCollectible.KETTLE))
                 .displayItems((parameters, output) -> {
                     for (var item : BabelCollectible.BABEL_COLLECTIBLES) {
                         output.accept(item.value());
                     }
-                    output.accept(BabelItems.BLOCK_KETTLE.get());
-                    output.accept(BabelItems.BLOCK_BATBED.get());
                 }).build());
     }
 

@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 public class OmniKeyItem extends CollectibleItem.CustomCollectibleItem {
     public OmniKeyItem() {
-        super(new Item.Properties().durability(64).rarity(Rarity.UNCOMMON), false, 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
+        super(new Item.Properties().durability(64).rarity(Rarity.UNCOMMON), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)

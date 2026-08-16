@@ -27,45 +27,43 @@ import java.util.List;
 
 public final class CollectibleItem extends Item implements CollectibleLike {
     private final CollectibleEffect effect;
-    private final boolean consumeSelf;
     private final int useTicks;
     private final boolean canAlwaysUse;
     private final CollectibleTiers tier;
     private final Levels levels;
     private final CollectibleActivation activation;
 
-    public CollectibleItem(CollectibleEffect effect, boolean consumeSelf) {
-        this(effect, consumeSelf, 25, false, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
+    public CollectibleItem(CollectibleEffect effect) {
+        this(effect, 25, false, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
     }
 
-    public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, boolean canAlwaysUse) {
-        this(effect, consumeSelf, 25, canAlwaysUse, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
+    public CollectibleItem(CollectibleEffect effect, boolean canAlwaysUse) {
+        this(effect, 25, canAlwaysUse, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
     }
 
-    public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, int useTicks) {
-        this(effect, consumeSelf, useTicks, false, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
+    public CollectibleItem(CollectibleEffect effect, int useTicks) {
+        this(effect, useTicks, false, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
     }
 
-    public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, int useTicks, boolean canAlwaysUse) {
-        this(effect, consumeSelf, useTicks, canAlwaysUse, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
+    public CollectibleItem(CollectibleEffect effect, int useTicks, boolean canAlwaysUse) {
+        this(effect, useTicks, canAlwaysUse, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
     }
 
-    public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, boolean canAlwaysUse, Levels levels) {
-        this(effect, consumeSelf, 25, canAlwaysUse, CollectibleTiers.NORMAL, levels, CollectibleActivation.forTier(CollectibleTiers.NORMAL));
+    public CollectibleItem(CollectibleEffect effect, boolean canAlwaysUse, Levels levels) {
+        this(effect, 25, canAlwaysUse, CollectibleTiers.NORMAL, levels, CollectibleActivation.forTier(CollectibleTiers.NORMAL));
     }
 
-    public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, int useTicks, Levels levels) {
-        this(effect, consumeSelf, useTicks, false, CollectibleTiers.NORMAL, levels, CollectibleActivation.forTier(CollectibleTiers.NORMAL));
+    public CollectibleItem(CollectibleEffect effect, int useTicks, Levels levels) {
+        this(effect, useTicks, false, CollectibleTiers.NORMAL, levels, CollectibleActivation.forTier(CollectibleTiers.NORMAL));
     }
 
-    public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, int useTicks, boolean canAlwaysUse, Levels levels) {
-        this(effect, consumeSelf, useTicks, canAlwaysUse, CollectibleTiers.NORMAL, levels, CollectibleActivation.forTier(CollectibleTiers.NORMAL));
+    public CollectibleItem(CollectibleEffect effect, int useTicks, boolean canAlwaysUse, Levels levels) {
+        this(effect, useTicks, canAlwaysUse, CollectibleTiers.NORMAL, levels, CollectibleActivation.forTier(CollectibleTiers.NORMAL));
     }
 
-    public CollectibleItem(CollectibleEffect effect, boolean consumeSelf, int useTicks, boolean canAlwaysUse, CollectibleTiers tier, Levels levels, CollectibleActivation activation) {
+    public CollectibleItem(CollectibleEffect effect, int useTicks, boolean canAlwaysUse, CollectibleTiers tier, Levels levels, CollectibleActivation activation) {
         super(collectibleProperties(tier));
         this.effect = effect;
-        this.consumeSelf = consumeSelf;
         this.useTicks = useTicks;
         this.canAlwaysUse = canAlwaysUse;
         this.tier = tier;
@@ -171,9 +169,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             var cd = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get());
             if (canAlwaysUse || (!isBanned() && cd.isReady(this, serverLevel.getServer()))) {
                 activate(level, player, stack, this);
-                if (consumeSelf) {
-                    return consumeSelf(stack);
-                }
+                return consumeSelf(stack);
             } else {
                 playFailure(level, player, stack);
             }
@@ -253,9 +249,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             Item item = stack.getItem();
             if (!data.isUsed(item) && !isBanned()) {
                 activate(level, player, stack, item);
-                if (consumeSelf) {
-                    consumeSelf(stack);
-                }
+                consumeSelf(stack);
             }
         }
     }
@@ -271,16 +265,14 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     }
 
     public abstract static class CustomCollectibleItem extends Item implements CollectibleLike {
-        private final boolean consumeSelf;
         private final int useTicks;
         private final boolean canAlwaysUse;
         private final CollectibleTiers tier;
         private final Levels levels;
         private final CollectibleActivation activation;
 
-        public CustomCollectibleItem(Properties properties, boolean consumeSelf, int useTicks, boolean canAlwaysUse, CollectibleTiers tier, Levels levels, CollectibleActivation activation) {
+        public CustomCollectibleItem(Properties properties, int useTicks, boolean canAlwaysUse, CollectibleTiers tier, Levels levels, CollectibleActivation activation) {
             super(properties);
-            this.consumeSelf = consumeSelf;
             this.useTicks = useTicks;
             this.canAlwaysUse = canAlwaysUse;
             this.tier = tier;
@@ -348,9 +340,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                 Item item = stack.getItem();
                 if (!data.isUsed(item) && !isBanned()) {
                     activate(level, player, stack, item);
-                    if (consumeSelf) {
-                        consumeSelf(stack);
-                    }
+                    consumeSelf(stack,player);
                 }
             }
         }
@@ -406,9 +396,11 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             return tier == CollectibleTiers.ADVANCED && BabelConfig.banAdvancedCollectibles;
         }
 
-        private ItemStack consumeSelf(@NotNull ItemStack stack) {
-            var stackCopy = stack.copy();
-            stackCopy.shrink(1);
+        private ItemStack consumeSelf(@NotNull ItemStack stack,Player player) {
+            ItemStack stackCopy = stack.copy();
+            if (!player.getAbilities().instabuild) {
+                stackCopy.shrink(1);
+            }
             return stackCopy;
         }
 
@@ -434,13 +426,10 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                 @NotNull LivingEntity livingEntity
         ) {
             if (livingEntity instanceof Player player && level instanceof ServerLevel serverLevel) {
-                var data = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE.get());
                 var cd = player.getData(Collectibles.ATTACHMENT_COLLECTIBLE_COOLDOWN.get());
                 if (canAlwaysUse || (!isBanned() && cd.isReady(this, serverLevel.getServer()))) {
                     activate(level, player, stack, this);
-                    if (consumeSelf) {
-                        return consumeSelf(stack);
-                    }
+                    return consumeSelf(stack,player);
                 } else {
                     playFailure(level, player, stack);
                 }

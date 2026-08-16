@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class RainbowCandyItem extends CollectibleItem.CustomCollectibleItem {
     public RainbowCandyItem() {
-        super(new Item.Properties().stacksTo(64).rarity(Rarity.EPIC).food((new FoodProperties.Builder()).nutrition(6).saturationModifier(0.5f).alwaysEdible().build()), false, 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
+        super(new Item.Properties().stacksTo(64).rarity(Rarity.EPIC).food((new FoodProperties.Builder()).nutrition(6).saturationModifier(0.5f).alwaysEdible().build()), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)
