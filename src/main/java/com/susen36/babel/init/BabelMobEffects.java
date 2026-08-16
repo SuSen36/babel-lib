@@ -7,6 +7,7 @@ import com.susen36.babel.effect.FeeblenessMobEffect;
 import com.susen36.babel.effect.LessArmorMobEffect;
 import com.susen36.babel.effect.PalsyMobEffect;
 import com.susen36.babel.effect.MassLossMobEffect;
+import com.susen36.babel.effect.AddReachMobEffect;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -21,6 +22,7 @@ public class BabelMobEffects {
     public static final DeferredHolder<MobEffect, MobEffect> PALSY = REGISTRY.register("palsy", PalsyMobEffect::new);
     public static final DeferredHolder<MobEffect, FeeblenessMobEffect> FEEBLENESS = REGISTRY.register("feebleness", FeeblenessMobEffect::new);
     public static final DeferredHolder<MobEffect, MassLossMobEffect> MASS_LOSS = REGISTRY.register("mass_loss", MassLossMobEffect::new);
+    public static final DeferredHolder<MobEffect, AddReachMobEffect> ADD_REACH = REGISTRY.register("add_reach", AddReachMobEffect::new);
 
     private BabelMobEffects() {
         throw new UnsupportedOperationException("Utility class");

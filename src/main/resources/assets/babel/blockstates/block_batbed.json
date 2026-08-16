@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "babel:block/block_batbed"
+    },
+    "facing=east": {
+      "model": "babel:block/block_batbed",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "babel:block/block_batbed",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "babel:block/block_batbed",
+      "y": 270
+    }
+  }
+}
