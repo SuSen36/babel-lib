@@ -14,7 +14,7 @@ public class WeakMagicMobEffect extends MobEffect {
 
     public WeakMagicMobEffect() {
         super(MobEffectCategory.HARMFUL, -10079488);
-        this.addAttributeModifier(BabelAttributes.MAGIC_RESISTANCE.get(), ResourceLocation.fromNamespaceAndPath("babel", "weak_magic_resistance"), -1, AttributeModifier.Operation.ADD_VALUE);
+        this.addAttributeModifier(BabelAttributes.MAGIC_RESISTANCE, ResourceLocation.fromNamespaceAndPath("babel", "weak_magic_resistance"), -1, AttributeModifier.Operation.ADD_VALUE);
     }
 
     public static void apply(LivingEntity entity) {
