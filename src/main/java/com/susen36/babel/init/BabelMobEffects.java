@@ -8,7 +8,7 @@ import com.susen36.babel.effect.LessArmorMobEffect;
 import com.susen36.babel.effect.PalsyMobEffect;
 import com.susen36.babel.effect.MassLossMobEffect;
 import com.susen36.babel.effect.AddReachMobEffect;
-import com.susen36.babel.effect.WeakMagicMobEffect;
+import com.susen36.babel.effect.WeakMagicResistanceMobEffect;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -24,7 +24,7 @@ public class BabelMobEffects {
     public static final DeferredHolder<MobEffect, FeeblenessMobEffect> FEEBLENESS = REGISTRY.register("feebleness", FeeblenessMobEffect::new);
     public static final DeferredHolder<MobEffect, MassLossMobEffect> MASS_LOSS = REGISTRY.register("mass_loss", MassLossMobEffect::new);
     public static final DeferredHolder<MobEffect, AddReachMobEffect> ADD_REACH = REGISTRY.register("add_reach", AddReachMobEffect::new);
-    public static final DeferredHolder<MobEffect, WeakMagicMobEffect> WEAK_MAGIC = REGISTRY.register("weak_magic", WeakMagicMobEffect::new);
+    public static final DeferredHolder<MobEffect, WeakMagicResistanceMobEffect> WEAK_MAGIC_RESISTANCE = REGISTRY.register("weak_magic_resistance", WeakMagicResistanceMobEffect::new);
 
     private BabelMobEffects() {
         throw new UnsupportedOperationException("Utility class");

@@ -18,7 +18,7 @@
   "attribute.babel.magic_resistance": "魔法抗性",
   "effect.babel.under_break": "神经崩解",
   "effect.babel.less_armor": "侵蚀损伤",
-  "effect.babel.weak_magic": "魔抗虚化",
+  "effect.babel.weak_magic_resistance": "魔抗弱化",
   "effect.babel.dizzy": "晕眩",
   "effect.babel.essence_resistance": "抵抗",
   "effect.babel.numb": "麻痹",
