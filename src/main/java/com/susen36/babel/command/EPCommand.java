@@ -232,16 +232,20 @@ public class EPCommand {
         }
         if (executedCount == 1) {
             final LivingEntity finalSingleCandidate = singleCandidate;
-            argument.getSource().sendSuccess(() -> Component.literal(String.format("对 %s 造成了 %d 点 %s",
-                            finalSingleCandidate.getDisplayName().getString(), amount, type.description())),
+            argument.getSource().sendSuccess(() -> Component.literal(Component.translatable("command.ep.hurt.single").getString()
+                            .replace("{name}", finalSingleCandidate.getDisplayName().getString())
+                            .replace("{amount}", "" + amount)
+                            .replace("{type}", type.description().getString())),
                     true);
         } else if (executedCount > 0) {
             final int finalExecutedCount = executedCount;
-            argument.getSource().sendSuccess(() -> Component.literal(String.format("对 %d 个实体造成了 %d 点 %s",
-                            finalExecutedCount, amount, type.description())),
+            argument.getSource().sendSuccess(() -> Component.literal(Component.translatable("command.ep.hurt.mult").getString()
+                            .replace("{num}", "" + finalExecutedCount)
+                            .replace("{amount}", "" + amount)
+                            .replace("{type}", type.description().getString())),
                     true);
         } else {
-            argument.getSource().sendFailure(Component.literal("未找到实体！"));
+            argument.getSource().sendFailure(Component.literal(Component.translatable("command.ep.not_found").getString()));
         }
         return executedCount;
     }
@@ -262,16 +266,20 @@ public class EPCommand {
         }
         if (executedCount == 1) {
             final LivingEntity finalSingleCandidate = singleCandidate;
-            argument.getSource().sendSuccess(() -> Component.literal(String.format("为 %s 治愈了 %d 点 %s",
-                            finalSingleCandidate.getDisplayName().getString(), amount, type.description())),
+            argument.getSource().sendSuccess(() -> Component.literal(Component.translatable("command.ep.heal.single").getString()
+                            .replace("{name}", finalSingleCandidate.getDisplayName().getString())
+                            .replace("{amount}", "" + amount)
+                            .replace("{type}", type.description().getString())),
                     true);
         } else if (executedCount > 0) {
             final int finalExecutedCount = executedCount;
-            argument.getSource().sendSuccess(() -> Component.literal(String.format("为 %d 个实体治愈了 %d 点 %s",
-                            finalExecutedCount, amount, type.description())),
+            argument.getSource().sendSuccess(() -> Component.literal(Component.translatable("command.ep.heal.mult").getString()
+                            .replace("{num}", "" + finalExecutedCount)
+                            .replace("{amount}", "" + amount)
+                            .replace("{type}", type.description().getString())),
                     true);
         } else {
-            argument.getSource().sendFailure(Component.literal("未找到实体！"));
+            argument.getSource().sendFailure(Component.literal(Component.translatable("command.ep.not_found").getString()));
         }
         return executedCount;
     }
@@ -283,15 +291,18 @@ public class EPCommand {
             if (entity instanceof LivingEntity living) {
                 EPCapability ep = BabelCapability.getEP(living);
                 if (entity instanceof Player player && !player.level().isClientSide()) {
-                    player.displayClientMessage(Component.literal(
-                                    String.format("%s 累积的 %s 数值为： %d / %d",
-                                            player.getDisplayName().getString(), type.description(), ep.getValue(type),
-                                            (int) BabelAttributes.getMaxElementalValue(living))),
+                    player.displayClientMessage(Component.literal(Component.translatable("command.ep.check").getString()
+                                    .replace("{name}", player.getDisplayName().getString())
+                                    .replace("{type}", type.description().getString())
+                                    .replace("{num}", "" + ep.getValue(type))
+                                    .replace("{max}", "" + (int) BabelAttributes.getMaxElementalValue(living))),
                             false);
                 } else {
-                    argument.getSource().sendSystemMessage(Component.literal(String.format("%s 累积的 %s 数值为： %d / %d",
-                            living.getDisplayName().getString(), type.description(), ep.getValue(type),
-                            (int) BabelAttributes.getMaxElementalValue(living))));
+                    argument.getSource().sendSystemMessage(Component.literal(Component.translatable("command.ep.check").getString()
+                            .replace("{name}", living.getDisplayName().getString())
+                            .replace("{type}", type.description().getString())
+                            .replace("{num}", "" + ep.getValue(type))
+                            .replace("{max}", "" + (int) BabelAttributes.getMaxElementalValue(living))));
                 }
             }
         }
