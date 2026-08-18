@@ -4,6 +4,7 @@ import com.susen36.babel.BabelMod;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -13,6 +14,7 @@ import java.util.Objects;
 public class BabelItems {
     public static final DeferredRegister<Item> REGISTRY = DeferredRegister.create(BuiltInRegistries.ITEM, BabelMod.MODID);
 
+    public static final DeferredHolder<Item, ? extends Item> ORIGINIUM_INGOT = REGISTRY.register("originium_ingot", () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.COMMON)));
     public static final DeferredHolder<Item, ? extends Item> BLOCK_KETTLE = block(BabelBlocks.BLOCK_KETTLE);
     public static final DeferredHolder<Item, ? extends Item> BLOCK_BATBED = block(BabelBlocks.BLOCK_BATBED);
     public static final DeferredHolder<Item, ? extends Item> BATBED_UPPER = block(BabelBlocks.BATBED_UPPER);

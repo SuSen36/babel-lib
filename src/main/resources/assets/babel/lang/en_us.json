@@ -81,5 +81,6 @@
   "block.babel.block_kettle": "Block Kettle",
   "block.babel.block_batbed": "Block Batbed",
   "block.babel.batbed_upper": "Batbed Upper",
+  "item.babel.originium_ingot": "Originium Ingot",
   "item_group.babel.collectibles": "Collectibles"
 }
