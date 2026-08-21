@@ -1,0 +1,13 @@
+{
+  "criteria": {
+    "ban_relic_notice_0": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "ban_relic_notice_0"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
