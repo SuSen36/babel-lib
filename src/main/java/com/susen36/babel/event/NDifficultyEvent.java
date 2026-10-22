@@ -1,0 +1,98 @@
+package com.susen36.babel.event;
+
+import com.susen36.babel.BabelMod;
+import com.susen36.babel.difficulty.NDifficulty;
+import com.susen36.babel.init.BabelEntityTypeTags;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
+
+/**
+ * 难度（探索等级）通用实体应用逻辑。
+ * <p>
+ * 仅复制 N18 相关通用部分：实体生成时按 {@link NDifficulty#multiplier} 提升
+ * 生命、攻击、盔甲值与盔甲韧性，并保持当前血量百分比。不包含任何海嗣专属依赖。
+ */
+@Mod.EventBusSubscriber(modid = BabelMod.MODID)
+public class NDifficultyEvent {
+
+    /** 强制应用标签：加入该标签的实体即使不属于默认敌对目标也会应用难度倍率。 */
+    public static final TagKey<EntityType<?>> APPLIES_DIFFICULTY = TagKey.create(
+            Registries.ENTITY_TYPE, new ResourceLocation(BabelMod.MODID, "applies_difficulty"));
+
+    /** 绕过标签：加入该标签的实体即使属于默认敌对目标也不会应用难度倍率。 */
+    public static final TagKey<EntityType<?>> BYPASSES_DIFFICULTY = TagKey.create(
+            Registries.ENTITY_TYPE, new ResourceLocation(BabelMod.MODID, "bypasses_difficulty"));
+
+    @SubscribeEvent
+    public static void onLivingDamage(LivingDamageEvent event) {
+        Level world = event.getEntity().level();
+        Entity entity = event.getEntity();
+
+        if (NDifficulty.difficultyLevel(world).value() >= 12) {
+            if (world.getLevelData().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
+                    && (entity.getType().is(BabelEntityTypeTags.ELITE)
+                    || entity.getType().is(BabelEntityTypeTags.FORGE_BOSSES))) {
+                LivingEntity living = entity instanceof Mob mob ? mob.getTarget() : null;
+                if (living != null && living.isAlive()) {
+                    Entity boat = entity.getVehicle();
+                    if (boat instanceof Boat) {
+                        boat.hurt(entity.damageSources().generic(), 20);
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
+        Entity entity = event.getEntity();
+        if (entity instanceof LivingEntity living) {
+            EntityType<?> type = entity.getType();
+            if (!type.is(BYPASSES_DIFFICULTY) && (type.is(APPLIES_DIFFICULTY) || entity instanceof Monster)) {
+                Level world = event.getLevel();
+                double n = NDifficulty.multiplier(world);
+                if (n > 1.0) {
+                    double percentage = living.getHealth() / living.getMaxHealth();
+
+                    AttributeInstance maxHealth = living.getAttribute(Attributes.MAX_HEALTH);
+                    if (maxHealth != null) {
+                        maxHealth.setBaseValue(maxHealth.getBaseValue() * n);
+                    }
+                    AttributeInstance armor = living.getAttribute(Attributes.ARMOR);
+                    if (armor != null) {
+                        armor.setBaseValue(armor.getBaseValue() * n);
+                    }
+                    AttributeInstance armorToughness = living.getAttribute(Attributes.ARMOR_TOUGHNESS);
+                    if (armorToughness != null) {
+                        armorToughness.setBaseValue(armorToughness.getBaseValue() * n);
+                    }
+                    AttributeInstance attackDamage = living.getAttribute(Attributes.ATTACK_DAMAGE);
+                    if (attackDamage != null) {
+                        attackDamage.setBaseValue(attackDamage.getBaseValue() * n);
+                    }
+
+                    AttributeInstance newMaxHealth = living.getAttribute(Attributes.MAX_HEALTH);
+                    if (newMaxHealth != null) {
+                        living.setHealth((float) (newMaxHealth.getValue() * percentage));
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "babel:custom/kettle",
+  "textures": {
+    "all": "babel:block/kettle",
+    "particle": "babel:block/kettle",
+    "0": "babel:block/blockkettle"
+  },
+  "render_type": "solid"
+}

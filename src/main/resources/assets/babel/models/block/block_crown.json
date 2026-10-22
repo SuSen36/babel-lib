@@ -1,0 +1,10 @@
+{
+  "parent": "babel:custom/crownlit",
+  "textures": {
+    "all": "babel:block/crowns",
+    "particle": "babel:block/relic_crown",
+    "0": "babel:block/crowns",
+    "1": "babel:block/crowns"
+  },
+  "render_type": "cutout_mipped"
+}

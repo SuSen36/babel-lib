@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "babel:kings_armor",
+    "babel:block_crown",
+    "babel:block_spear",
+    "babel:block_extension",
+    "babel:block_crystal",
+    "babel:block_fate",
+    "babel:allay_block",
+    "babel:golden_chalise"
+  ]
+}

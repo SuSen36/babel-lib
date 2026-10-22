@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "babel:block/block_fate"
+    },
+    "facing=east": {
+      "model": "babel:block/block_fate",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "babel:block/block_fate",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "babel:block/block_fate",
+      "y": 270
+    }
+  }
+}

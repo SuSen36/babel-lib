@@ -1,0 +1,9 @@
+{
+  "parent": "babel:custom/alleystone",
+  "textures": {
+    "all": "babel:block/stoenalley",
+    "particle": "babel:block/stoenalley",
+    "0": "babel:block/stoenalley"
+  },
+  "render_type": "cutout"
+}

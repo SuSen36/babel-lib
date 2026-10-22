@@ -1,0 +1,9 @@
+{
+  "parent": "babel:custom/extension",
+  "textures": {
+    "all": "babel:block/extension",
+    "particle": "babel:block/itenext",
+    "0": "babel:block/extension"
+  },
+  "render_type": "cutout_mipped"
+}

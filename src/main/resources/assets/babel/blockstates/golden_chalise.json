@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=east,waterlogged=false": {
+      "model": "babel:block/golden_chalise",
+      "y": 90
+    },
+    "facing=east,waterlogged=true": {
+      "model": "babel:block/golden_chalise",
+      "y": 90
+    },
+    "facing=north,waterlogged=false": {
+      "model": "babel:block/golden_chalise"
+    },
+    "facing=north,waterlogged=true": {
+      "model": "babel:block/golden_chalise"
+    },
+    "facing=south,waterlogged=false": {
+      "model": "babel:block/golden_chalise",
+      "y": 180
+    },
+    "facing=south,waterlogged=true": {
+      "model": "babel:block/golden_chalise",
+      "y": 180
+    },
+    "facing=west,waterlogged=false": {
+      "model": "babel:block/golden_chalise",
+      "y": 270
+    },
+    "facing=west,waterlogged=true": {
+      "model": "babel:block/golden_chalise",
+      "y": 270
+    }
+  }
+}

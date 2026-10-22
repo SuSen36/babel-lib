@@ -1,0 +1,158 @@
+package com.susen36.babel.client.overlay;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.susen36.babel.BabelConfig;
+import com.susen36.babel.BabelMod;
+import com.susen36.babel.capability.BabelCapability;
+import com.susen36.babel.capability.ep.EPCapability;
+import com.susen36.babel.elemental.base.AbstractEPCapability;
+import com.susen36.babel.init.BabelAttributes;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
+import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import org.jetbrains.annotations.Nullable;
+
+@Mod.EventBusSubscriber(value = {Dist.CLIENT}, modid = BabelMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+public class EPShowOverlay {
+    private static final ResourceLocation EMPTY_ICON = rl("empty_icon");
+    private static final ResourceLocation WHITE_ICON = rl("whiter_icon");
+
+    private static final RandomSource RANDOM = RandomSource.create();
+
+    private static ResourceLocation rl(String name) {
+        return new ResourceLocation(BabelMod.MODID, "textures/gui/ep/" + name + ".png");
+    }
+
+    @SubscribeEvent
+    public static void registerOverlay(RegisterGuiOverlaysEvent event) {
+        event.registerAbove(VanillaGuiOverlay.AIR_LEVEL.id(),
+                "ep_bar",
+                EPShowOverlay::renderEpBar);
+    }
+
+    private static void renderEpBar(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {
+        Minecraft mc = Minecraft.getInstance();
+        Player player = mc.player;
+
+        if (player != null && mc.gameMode != null && mc.gameMode.canHurtPlayer()) {
+            EPCapability ep = BabelCapability.getEP(player);
+            if (ep != null) {
+                float threshold = BabelAttributes.getMaxElementalValue(player);
+                AbstractEPCapability currentElement = ep.getCurrentElement();
+                float progress = currentElement == null ? 0.0F : currentElement.getInjuryProgress();
+
+                if (threshold > 0 && currentElement != null && progress < 1.0F) {
+                    int dx = (int) Math.round(BabelConfig.epXOffset);
+                    int dy = (int) Math.round(BabelConfig.epYOffset);
+                    AbstractEPCapability.EPType type = currentElement.getType();
+
+                    mc.getProfiler().push("ep");
+                    RenderSystem.enableBlend();
+                    if (BabelConfig.epBarStyle) {
+                        int left = mc.getWindow().getGuiScaledWidth() / 2 + 91 + dx;
+                        int top = mc.getWindow().getGuiScaledHeight() - 39 + dy;
+                        renderIcons(guiGraphics, player, left, top, type, progress, currentElement.underBurst(), mc.gui.getGuiTicks());
+                    } else {
+                        int w = mc.getWindow().getGuiScaledWidth();
+                        int h = mc.getWindow().getGuiScaledHeight();
+                        renderRing(guiGraphics, w, h, dx, dy, type, progress);
+                    }
+                    RenderSystem.disableBlend();
+                    mc.getProfiler().pop();
+                }
+            }
+        }
+    }
+
+    private static void renderIcons(GuiGraphics guiGraphics, Player player, int left, int top,
+                                    AbstractEPCapability.EPType type, float progress, boolean burst, int guiTicks) {
+        ResourceLocation icon = getIcon(type);
+        int filled = Mth.clamp(Math.round(TickHandler.bufferProgress * 10.0F), 0, 10);
+        boolean blink = TickHandler.blinkTicks > 0;
+        boolean depleted = burst || progress <= 0.0F;
+        boolean shake = guiTicks % 10 <= 3 && (depleted || player.hasEffect(MobEffects.DARKNESS));
+
+        for (int i = 0; i < 10; i++) {
+            int x = left - i * 8 - 9;
+            int y = top;
+            if (shake) {
+                y += RANDOM.nextInt(3) - 1;
+            }
+            if (i < filled) {
+                guiGraphics.blit(icon, x, y, 9, 9, 0, 0, 9, 9, 9, 9);
+                if (blink) {
+                    guiGraphics.blit(WHITE_ICON, x, y, 9, 9, 0, 0, 9, 9, 9, 9);
+                }
+            } else {
+                guiGraphics.blit(EMPTY_ICON, x, y, 9, 9, 0, 0, 9, 9, 9, 9);
+            }
+        }
+    }
+
+    private static void renderRing(GuiGraphics guiGraphics, int w, int h, int dx, int dy,
+                                   AbstractEPCapability.EPType type, float progress) {
+        ResourceLocation ring = getRing(type);
+        int frame = Mth.clamp(Mth.ceil(progress * 20.0F) * 16, 0, 304);
+        guiGraphics.blit(ring, w / 2 + 92 + dx, h - 19 + dy,
+                frame, 0, 16, 16, 320, 16);
+    }
+
+    private static ResourceLocation getIcon(AbstractEPCapability.EPType type) {
+        return rl(type.getTextureName() + "_icon");
+    }
+
+    private static ResourceLocation getRing(AbstractEPCapability.EPType type) {
+        return rl(type.getTextureName());
+    }
+
+    @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = BabelMod.MODID)
+    public static class TickHandler {
+        static float bufferProgress = 0.0F;
+        static int blinkTicks = 0;
+        private static @Nullable AbstractEPCapability.EPType lastType = null;
+        private static final float TICK_RETENTION = 0.85F;
+
+        @SubscribeEvent
+        public static void onClientTick(TickEvent.ClientTickEvent event) {
+            if (event.phase == TickEvent.Phase.END) {
+                Minecraft mc = Minecraft.getInstance();
+                Player player = mc.player;
+                if (player != null) {
+                    EPCapability ep = BabelCapability.getEP(player);
+                    if (ep != null) {
+                        AbstractEPCapability currentElement = ep.getCurrentElement();
+                        float progress = currentElement == null ? 0.0F : currentElement.getInjuryProgress();
+                        AbstractEPCapability.EPType type = currentElement == null ? null : currentElement.getType();
+                        if (lastType != type) {
+                            lastType = type;
+                            bufferProgress = progress;
+                            blinkTicks = 0;
+                        }
+                        if (type != null) {
+                            bufferProgress = progress * (1 - TICK_RETENTION) + bufferProgress * TICK_RETENTION;
+                            // 上升沿触发脉冲白闪：diff 首次越过阈值时闪 5 tick，之后不再常驻，直到 buffer 追上归零
+                            float diff = Math.abs(progress - bufferProgress);
+                            if (diff > 0.05F && blinkTicks == 0) {
+                                blinkTicks = 5;
+                            } else if (blinkTicks > 0) {
+                                blinkTicks--;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

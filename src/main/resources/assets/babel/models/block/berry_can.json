@@ -1,0 +1,9 @@
+{
+  "parent": "babel:custom/berrycan",
+  "textures": {
+    "all": "babel:block/cannedberry",
+    "particle": "babel:block/cherrycan",
+    "0": "babel:block/cannedberry"
+  },
+  "render_type": "cutout"
+}

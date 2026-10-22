@@ -1,0 +1,9 @@
+{
+  "parent": "babel:custom/batbedupper",
+  "textures": {
+    "all": "babel:block/batbed",
+    "particle": "babel:block/batbed",
+    "0": "babel:block/batbed"
+  },
+  "render_type": "solid"
+}

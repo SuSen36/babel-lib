@@ -1,0 +1,38 @@
+{
+  "money_in": {
+    "subtitle": "subtitles.money_in",
+    "sounds": [
+      {
+        "name": "babel:money_in",
+        "stream": false
+      }
+    ]
+  },
+  "money_out": {
+    "subtitle": "subtitles.money_out",
+    "sounds": [
+      {
+        "name": "babel:money_out",
+        "stream": false
+      }
+    ]
+  },
+  "flutesong": {
+    "subtitle": "subtitles.flutesong",
+    "sounds": [
+      {
+        "name": "babel:flutesong",
+        "stream": true
+      }
+    ]
+  },
+  "target_damaged": {
+    "subtitle": "subtitles.target_damaged",
+    "sounds": [
+      {
+        "name": "babel:damaged",
+        "stream": false
+      }
+    ]
+  }
+}

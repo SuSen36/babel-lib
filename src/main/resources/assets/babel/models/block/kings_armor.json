@@ -1,0 +1,10 @@
+{
+  "parent": "babel:custom/armor",
+  "textures": {
+    "all": "babel:block/armor",
+    "particle": "babel:block/kingsarmor",
+    "0": "babel:block/armor",
+    "missing": "babel:block/armor"
+  },
+  "render_type": "cutout_mipped"
+}
