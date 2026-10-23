@@ -34,5 +34,14 @@
         "stream": false
       }
     ]
+  },
+  "barrier": {
+    "subtitle": "subtitles.barrier",
+    "sounds": [
+      {
+        "name": "babel:barrier",
+        "stream": false
+      }
+    ]
   }
 }

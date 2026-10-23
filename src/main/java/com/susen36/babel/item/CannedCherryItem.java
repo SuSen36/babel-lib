@@ -21,9 +21,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -37,7 +35,7 @@ public class CannedCherryItem extends CollectibleItem.CustomCollectibleItem {
 						.particle(ParticleTypes.HAPPY_VILLAGER, 72)
 						.showOverlay(true)
 						.build());
-		addAttributeModifier(Attributes.ATTACK_DAMAGE, 0.05, AttributeModifier.Operation.MULTIPLY_BASE);
+		addAttributeModifier(Attributes.ATTACK_DAMAGE, 0.09, AttributeModifier.Operation.MULTIPLY_BASE);
 	}
 
 	@Override
@@ -56,18 +54,9 @@ public class CannedCherryItem extends CollectibleItem.CustomCollectibleItem {
 			BlockPos clicked = blockHit.getBlockPos();
 			BlockPos pos = clicked.relative(direction);
 			if (BabelBlocks.BERRY_CAN.get().defaultBlockState().canSurvive(level, pos)) {
-				level.setBlock(pos, BabelBlocks.BERRY_CAN.get().defaultBlockState(), 3);
-				level.playSound(null, clicked, SoundEvents.GLASS_PLACE, SoundSource.BLOCKS, 1, 1);
 				Direction dir = player.getDirection().getOpposite();
-				BlockState bs = level.getBlockState(pos);
-				Property<?> property = bs.getBlock().getStateDefinition().getProperty("facing");
-				if (property instanceof DirectionProperty dp && dp.getPossibleValues().contains(dir)) {
-					level.setBlock(pos, bs.setValue(dp, dir), 3);
-				} else {
-					property = bs.getBlock().getStateDefinition().getProperty("axis");
-					if (property instanceof EnumProperty ap && ap.getPossibleValues().contains(dir.getAxis()))
-						level.setBlock(pos, bs.setValue(ap, dir.getAxis()), 3);
-				}
+				level.setBlock(pos, BabelBlocks.BERRY_CAN.get().defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, dir), 3);
+				level.playSound(null, clicked, SoundEvents.GLASS_PLACE, SoundSource.BLOCKS, 1, 1);
 				itemstack.shrink(1);
 				return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
 			}

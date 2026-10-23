@@ -21,8 +21,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -81,11 +79,7 @@ public class BatbedUpperBlock extends Block {
     }
 
     private static Direction getFacing(BlockState bs) {
-        Property<?> prop = bs.getBlock().getStateDefinition().getProperty("facing");
-        if (prop instanceof DirectionProperty dp)
-            return bs.getValue(dp);
-        prop = bs.getBlock().getStateDefinition().getProperty("axis");
-        return prop instanceof EnumProperty ep && ep.getPossibleValues().toArray()[0] instanceof Direction.Axis ? Direction.fromAxisAndDirection((Direction.Axis) bs.getValue(ep), Direction.AxisDirection.POSITIVE) : Direction.NORTH;
+        return bs.getValue(FACING);
     }
 
     @Override

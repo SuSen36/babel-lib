@@ -11,7 +11,6 @@ import com.susen36.babel.effect.MassLossMobEffect;
 import com.susen36.babel.effect.MuteMobEffect;
 import com.susen36.babel.effect.MagicDodgeMobEffect;
 import com.susen36.babel.effect.PhysicalDodgeMobEffect;
-import com.susen36.babel.effect.AddReachMobEffect;
 import com.susen36.babel.effect.UntameConfirmMobEffect;
 import com.susen36.babel.effect.WeakMagicResistanceMobEffect;
 import net.minecraft.world.effect.MobEffect;
@@ -29,7 +28,6 @@ public class BabelMobEffects {
     public static final RegistryObject<PalsyMobEffect> PALSY = REGISTRY.register("palsy", PalsyMobEffect::new);
     public static final RegistryObject<FeeblenessMobEffect> FEEBLENESS = REGISTRY.register("feebleness", FeeblenessMobEffect::new);
     public static final RegistryObject<MassLossMobEffect> MASS_LOSS = REGISTRY.register("mass_loss", MassLossMobEffect::new);
-    public static final RegistryObject<AddReachMobEffect> ADD_REACH = REGISTRY.register("add_reach", AddReachMobEffect::new);
     public static final RegistryObject<WeakMagicResistanceMobEffect> WEAK_MAGIC_RESISTANCE = REGISTRY.register("weak_magic_resistance", WeakMagicResistanceMobEffect::new);
     public static final RegistryObject<MuteMobEffect> MUTE = REGISTRY.register("mute", MuteMobEffect::new);
     public static final RegistryObject<MagicDodgeMobEffect> MAGIC_DODGE = REGISTRY.register("magic_dodge", MagicDodgeMobEffect::new);

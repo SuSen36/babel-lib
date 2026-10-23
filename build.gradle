@@ -179,6 +179,8 @@ tasks.withType(JavaCompile).configureEach {
     options.errorprone {
         check('NullAway', net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
         errorproneArgs.add('-XepOpt:NullAway:AnnotatedPackages=com.susen36.babel')
+        // ErrorProne 2.36.0 ParameterName 检查器存在 subSequence 越界崩溃，禁用
+        errorproneArgs.add('-Xep:ParameterName:OFF')
         // 注册类静态字段（DeferredRegister/配置模式）由框架在类加载后赋值，非真实空指针风险，暂排除后续分批处理
         errorproneArgs.add('-XepOpt:NullAway:ExcludedClasses=com.susen36.babel.init.BabelCollectible,com.susen36.babel.BabelConfig')
     }

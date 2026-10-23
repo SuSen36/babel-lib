@@ -45,6 +45,7 @@ public class MutenessParticle extends TextureSheetParticle {
             this.spriteSet = spriteSet;
         }
 
+        @Override
         public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             return new MutenessParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet);
         }

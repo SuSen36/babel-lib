@@ -102,6 +102,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         return Rarity.COMMON;
     }
 
+    @Override
     public CollectibleTiers getTier() {
         return tier;
     }

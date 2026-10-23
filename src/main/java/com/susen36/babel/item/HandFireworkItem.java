@@ -4,24 +4,23 @@ import com.susen36.babel.BabelConfig;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
-import com.susen36.babel.init.BabelDamageTypes;
 import com.susen36.babel.init.BabelItemTags;
-import com.susen36.babel.util.ServerTasks;
-import net.minecraft.core.BlockPos;
+import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -29,6 +28,8 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import java.util.List;
 
 public class HandFireworkItem extends CollectibleItem.CustomCollectibleItem {
+
+    private static final double EXPLOSION_RADIUS = 5.0D;
 
     public HandFireworkItem() {
         super(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 25, false, CollectibleTiers.ADVANCED,
@@ -47,10 +48,7 @@ public class HandFireworkItem extends CollectibleItem.CustomCollectibleItem {
             ItemStack mainHandItem = player.getMainHandItem();
             String registryName = BuiltInRegistries.ITEM.getKey(mainHandItem.getItem()).toString();
             if (isFireworkWeapon(mainHandItem, registryName) && player.getRandom().nextFloat() < 0.33F) {
-                level.playSound(null, player.blockPosition(), SoundEvents.FIREWORK_ROCKET_LAUNCH, SoundSource.PLAYERS, 3.6F, 1);
-                double amount = event.getAmount();
-                Vec3 targetPosition = target.position();
-                ServerTasks.schedule(10, () -> detonateFirework(level, target, targetPosition, player, amount));
+                detonateFirework(level, target, player, event.getAmount());
             }
         }
     }
@@ -61,16 +59,50 @@ public class HandFireworkItem extends CollectibleItem.CustomCollectibleItem {
                 || matchesConfigured(BabelConfig.handFireworkRecognizable, registryName);
     }
 
-    private static void detonateFirework(Level level, LivingEntity target, Vec3 targetPosition, Player player, double amount) {
-        if (level instanceof ServerLevel serverLevel) {
-            serverLevel.sendParticles(ParticleTypes.FIREWORK, targetPosition.x, targetPosition.y, targetPosition.z, 85, 2, 2, 2, 0.22);
-        }
-        level.playSound(null, BlockPos.containing(targetPosition), SoundEvents.FIREWORK_ROCKET_TWINKLE, SoundSource.PLAYERS, 3.6F, 1);
+    private static void detonateFirework(Level level, LivingEntity target, Player player, double amount) {
+        Vec3 center = target.position();
+        level.playSound(null, center.x, center.y, center.z, SoundEvents.FIREWORK_ROCKET_LARGE_BLAST, SoundSource.PLAYERS, 3.6F, 1);
+        BabelNetwork.sendFireworkParticles(target, center.x, center.y + 0.5, center.z, randomFireworkNbt(player.getRandom()));
         List<LivingEntity> nearbyEntities = level.getEntitiesOfClass(LivingEntity.class,
-                new AABB(targetPosition, targetPosition).inflate(2.5),
+                new AABB(center, center).inflate(EXPLOSION_RADIUS),
                 candidate -> candidate != player && (candidate.getType() == target.getType() || candidate instanceof Monster));
         for (LivingEntity candidate : nearbyEntities) {
-            candidate.hurt(BabelDamageTypes.source(level, BabelDamageTypes.HAND_FIREWORK, player), (float) (amount * 3));
+            boolean visible = false;
+            for (int i = 0; i < 2; ++i) {
+                Vec3 sample = new Vec3(candidate.getX(), candidate.getY(0.5D * i), candidate.getZ());
+                HitResult hitResult = level.clip(new ClipContext(center, sample, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+                if (hitResult.getType() == HitResult.Type.MISS) {
+                    visible = true;
+                    break;
+                }
+            }
+            if (visible) {
+                double dist = Math.sqrt(candidate.distanceToSqr(center.x, center.y, center.z));
+                float damage = (float) (amount * 3 * Math.sqrt((EXPLOSION_RADIUS - dist) / EXPLOSION_RADIUS));
+                candidate.hurt(level.damageSources().playerAttack(player), damage);
+            }
         }
+    }
+
+    private static CompoundTag randomFireworkNbt(RandomSource random) {
+        CompoundTag explosion = new CompoundTag();
+        explosion.putByte("Type", (byte) random.nextInt(5));
+        if (random.nextBoolean()) {
+            explosion.putBoolean("Flicker", true);
+        }
+        if (random.nextBoolean()) {
+            explosion.putBoolean("Trail", true);
+        }
+        int colorCount = random.nextInt(8) + 1;
+        int[] colors = new int[colorCount];
+        for (int i = 0; i < colorCount; i++) {
+            colors[i] = DyeColor.values()[random.nextInt(DyeColor.values().length)].getFireworkColor();
+        }
+        explosion.putIntArray("Colors", colors);
+        ListTag explosions = new ListTag();
+        explosions.add(explosion);
+        CompoundTag fireworkNbt = new CompoundTag();
+        fireworkNbt.put("Explosions", explosions);
+        return fireworkNbt;
     }
 }

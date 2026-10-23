@@ -5,7 +5,6 @@ import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.init.BabelAttributes;
-import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -53,10 +52,7 @@ public class SurvivorContractItem extends CollectibleItem.CustomCollectibleItem 
         if (layer >= 0 && layer < 32
                 && (victim instanceof Monster || (victim instanceof Mob mob ? mob.getTarget() : null) == player)
                 && (Math.random() < 0.35 || victim.getType().is(FORGE_BOSSES))) {
-            if (player != null) {
-                Collectibles.getLayerData(player).setLayer(this, layer + 1);
-            }
-            BabelNetwork.syncCollectibles(player);
+            Collectibles.addLayerAndSync(player, this, 1);
             if (victim.level() instanceof ServerLevel level) {
                 level.sendParticles(ParticleTypes.WAX_ON, victim.getX(), victim.getY(), victim.getZ(), 48, 0.7, 1.5, 0.7, 0.2);
             }

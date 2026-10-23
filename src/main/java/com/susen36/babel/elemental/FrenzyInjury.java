@@ -1,6 +1,5 @@
 package com.susen36.babel.elemental;
 
-import com.susen36.babel.BabelMod;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
 import com.susen36.babel.init.BabelDamageTypes;
 import net.minecraft.world.entity.LivingEntity;
@@ -8,12 +7,10 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class FrenzyInjury extends AbstractEPCapability {
-    private static final String ATTACK_SPEED_NAME = BabelMod.MODID + ":frenzy_attack_speed";
-    private static final UUID ATTACK_SPEED_ID = UUID.nameUUIDFromBytes(ATTACK_SPEED_NAME.getBytes(StandardCharsets.UTF_8));
+    private static final AttributeModifier ATTACK_SPEED_BONUS = new AttributeModifier(UUID.fromString("7d4e9a2b-3f6c-4b8e-9d1a-5c2e8f0b3a17"), "babel:frenzy_attack_speed", 0.5, AttributeModifier.Operation.MULTIPLY_TOTAL);
 
     private int frenzyStacks = 2;
     private  int maxFrenzyStacks = 10;
@@ -28,8 +25,8 @@ public class FrenzyInjury extends AbstractEPCapability {
         frenzyStacks = 1;
         AttributeInstance attackSpeed = livingEntity.getAttribute(Attributes.ATTACK_SPEED);
         if (attackSpeed != null) {
-            attackSpeed.removeModifier(ATTACK_SPEED_ID);
-            attackSpeed.addTransientModifier(new AttributeModifier(ATTACK_SPEED_ID, ATTACK_SPEED_NAME, 0.5, AttributeModifier.Operation.MULTIPLY_TOTAL));
+            attackSpeed.removeModifier(ATTACK_SPEED_BONUS.getId());
+            attackSpeed.addTransientModifier(ATTACK_SPEED_BONUS);
         }
     }
 
@@ -39,8 +36,8 @@ public class FrenzyInjury extends AbstractEPCapability {
         maxFrenzyStacks = 8;
         AttributeInstance attackSpeed = livingEntity.getAttribute(Attributes.ATTACK_SPEED);
         if (attackSpeed != null) {
-            attackSpeed.removeModifier(ATTACK_SPEED_ID);
-            attackSpeed.addTransientModifier(new AttributeModifier(ATTACK_SPEED_ID, ATTACK_SPEED_NAME, 0.5, AttributeModifier.Operation.MULTIPLY_TOTAL));
+            attackSpeed.removeModifier(ATTACK_SPEED_BONUS.getId());
+            attackSpeed.addTransientModifier(ATTACK_SPEED_BONUS);
         }
     }
 
@@ -65,7 +62,7 @@ public class FrenzyInjury extends AbstractEPCapability {
     private void removeAttackSpeedBonus() {
         AttributeInstance attackSpeed = livingEntity.getAttribute(Attributes.ATTACK_SPEED);
         if (attackSpeed != null) {
-            attackSpeed.removeModifier(ATTACK_SPEED_ID);
+            attackSpeed.removeModifier(ATTACK_SPEED_BONUS.getId());
         }
     }
 

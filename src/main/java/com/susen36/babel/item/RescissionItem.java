@@ -41,6 +41,7 @@ public class RescissionItem extends CollectibleItem.CustomCollectibleItem {
 
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+		player.giveExperienceLevels(4);
 		Vec3 center = new Vec3(player.getX(), player.getY(), player.getZ());
 		List<Entity> entfound = level.getEntitiesOfClass(Entity.class, new AABB(center, center).inflate(1.0D), e -> true)
 				.stream().sorted(Comparator.comparingDouble(entcnd -> entcnd.distanceToSqr(center))).toList();

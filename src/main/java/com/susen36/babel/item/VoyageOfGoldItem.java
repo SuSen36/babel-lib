@@ -3,19 +3,19 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
-import com.susen36.babel.init.BabelMobEffects;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 public class VoyageOfGoldItem extends CollectibleItem.CustomCollectibleItem {
     public VoyageOfGoldItem() {
@@ -29,10 +29,9 @@ public class VoyageOfGoldItem extends CollectibleItem.CustomCollectibleItem {
 
     @Override
     public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-        if (level instanceof ServerLevel serverLevel){
+        if (level instanceof ServerLevel serverLevel) {
             RandomSource random = player.getRandom();
             double centerY = player.getY() + player.getBbHeight() * 0.5;
-
             for (int i = 0; i < 8; i++) {
                 serverLevel.addFreshEntity(new ExperienceOrb(
                         serverLevel,
@@ -41,10 +40,7 @@ public class VoyageOfGoldItem extends CollectibleItem.CustomCollectibleItem {
                         player.getZ() + Mth.nextDouble(random, -0.8, 0.8),
                         4));
             }
-
-            player.addEffect(new MobEffectInstance(
-                    BabelMobEffects.ADD_REACH.get(), 400, 1,
-                    false, false, false));
+            ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.GOLD_INGOT, 8));
         }
     }
 }

@@ -23,43 +23,38 @@ public class LifePointEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onPlayerDeath(LivingDeathEvent event) {
-        if (!(event.getEntity() instanceof Player player) || player.level().isClientSide() || event.isCanceled()) {
-            return;
-        }
-        if (!player.level().getGameRules().getBoolean(BabelGameRules.TARGET_LIFE_FUNCTION)) {
-            return;
-        }
-        if (HealthConsumeEvent.firePre(player, event.getSource())) {
-            return;
-        }
+        if (event.getEntity() instanceof Player player && !player.level().isClientSide() && !event.isCanceled()
+                && player.level().getGameRules().getBoolean(BabelGameRules.TARGET_LIFE_FUNCTION)
+                && !HealthConsumeEvent.firePre(player, event.getSource())) {
+            HealthCapability health = BabelCapability.getHealth(player);
+            boolean blocked = false;
+            boolean isShield = false;
 
-        HealthCapability health = BabelCapability.getHealth(player);
-        boolean blocked = false;
-        boolean isShield = false;
+            if (health != null) {
+                if (health.getShield() > 0) {
+                    blocked = true;
+                    isShield = true;
+                    health.setShield(health.getShield() - 1);
+                } else if (health.getLives() > 1) {
+                    blocked = true;
+                    health.setLives(health.getLives() - 1);
+                }
 
-        if (health != null) {
-            if (health.getShield() > 0) {
-                blocked = true;
-                isShield = true;
-                health.setShield(health.getShield() - 1);
-            } else if (health.getLives() > 1) {
-                blocked = true;
-                health.setLives(health.getLives() - 1);
+                if (blocked) {
+                    event.setCanceled(true);
+                    player.setHealth(player.getMaxHealth());
+                    double x = player.getX();
+                    double y = player.getY();
+                    double z = player.getZ();
+                    player.level().playSound(null, x, y, z, BabelSounds.TARGET_DAMAGED.get(), SoundSource.PLAYERS, 0.33F, 1.0F);
+                    if (player.level() instanceof ServerLevel serverLevel) {
+                        serverLevel.sendParticles(isShield ? BabelParticles.SHIELDLOSS.get() : BabelParticles.LIFELOSS.get(), x, y + 0.95, z, 72, 0.75, 0.55, 0.75, 0.2);
+                    }
+                    health.sync();
+                }
             }
-
-            if (blocked) {
-                event.setCanceled(true);
-                player.setHealth(player.getMaxHealth());
-                double x = player.getX();
-                double y = player.getY();
-                double z = player.getZ();
-                player.level().playSound(null, x, y, z, BabelSounds.TARGET_DAMAGED.get(), SoundSource.PLAYERS, 0.33F, 1.0F);
-                if(player.level() instanceof ServerLevel serverLevel)
-                    serverLevel.sendParticles(isShield ? BabelParticles.SHIELDLOSS.get() : BabelParticles.LIFELOSS.get(), x, y + 0.95, z, 72, 0.75, 0.55, 0.75, 0.2);
-                health.sync();
-            }
+            HealthConsumeEvent.firePost(player, event.getSource(), blocked, blocked && isShield, blocked && !isShield);
         }
-        HealthConsumeEvent.firePost(player, event.getSource(), blocked, blocked && isShield, blocked && !isShield);
     }
 
     @SubscribeEvent

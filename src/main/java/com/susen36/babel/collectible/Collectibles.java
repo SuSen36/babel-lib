@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 
 public class Collectibles implements INBTSerializable<ListTag> {
@@ -88,19 +89,23 @@ public class Collectibles implements INBTSerializable<ListTag> {
         original.invalidateCaps();
     }
 
-    /** 等价于 NeoForge 附件取数：player.getData(ATTACHMENT_COLLECTIBLE.get())。 */
     public static @NotNull Collectibles getData(@NotNull Player player) {
         return CollectibleCapability.of(player).getUsed();
     }
 
-    /** 等价于 NeoForge 附件取数：player.getData(ATTACHMENT_COLLECTIBLE_LAYER.get())。 */
     public static @NotNull Collectibles.Layer getLayerData(@NotNull Player player) {
         return CollectibleCapability.of(player).getLayer();
     }
 
-    /** 等价于 NeoForge 附件取数：player.getData(ATTACHMENT_COLLECTIBLE_COOLDOWN.get())。 */
     public static @NotNull Collectibles.Cooldown getCooldownData(@NotNull Player player) {
         return CollectibleCapability.of(player).getCooldown();
+    }
+
+    public static void addLayerAndSync(@NotNull Player player, @NotNull Item item, int delta) {
+        if (!player.level().isClientSide) {
+            getLayerData(player).addLayer(item, delta);
+            BabelNetwork.syncCollectibles(player);
+        }
     }
 
     public static Tag serializeUsed(@NotNull Player player) {
@@ -340,6 +345,10 @@ public class Collectibles implements INBTSerializable<ListTag> {
                             continue;
                         }
 
+                        if (Collectibles.get(key) == null) {
+                            BabelMod.LOGGER.warn("Dropping invalid collectible id in Layer NBT: {}", key);
+                            continue;
+                        }
                         if (!layer.containsKey(key)) {
                             layer.put(key, value);
                         } else {
@@ -493,6 +502,10 @@ public class Collectibles implements INBTSerializable<ListTag> {
                             continue;
                         }
 
+                        if (Collectibles.get(key) == null) {
+                            BabelMod.LOGGER.warn("Dropping invalid collectible id in Cooldown NBT: {}", key);
+                            continue;
+                        }
                         if (!cooldown.containsKey(key)) {
                             cooldown.put(key, value);
                         } else {

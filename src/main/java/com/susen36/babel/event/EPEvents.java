@@ -10,11 +10,16 @@ import com.susen36.babel.elemental.FrenzyInjury;
 import com.susen36.babel.effect.PalsyMobEffect;
 import com.susen36.babel.init.BabelAttributes;
 import com.susen36.babel.init.BabelMobEffects;
+import com.susen36.babel.init.BabelParticles;
+import com.susen36.babel.init.BabelSounds;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -100,6 +105,37 @@ public class EPEvents {
             amount = Math.max(originalAmount * 0.05F, amount);
             if (amount < originalAmount) {
                 event.setAmount(amount);
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public static void handleBarrierFunc(LivingDamageEvent event) {
+        DamageSource source = event.getSource();
+        LivingEntity entity = event.getEntity();
+        if (!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !source.is(DamageTypeTags.BYPASSES_EFFECTS)) {
+            AttributeInstance instance = entity.getAttribute(BabelAttributes.BARRIER.get());
+            if (instance != null) {
+                float amount = event.getAmount();
+                double brr = instance.getValue();
+                if (brr > 0.0) {
+                    double disp;
+                    if (brr >= amount) {
+                        instance.setBaseValue(brr - amount);
+                        disp = amount;
+                        event.setAmount(0.0F);
+                    } else {
+                        instance.setBaseValue(0.0);
+                        disp = brr;
+                        event.setAmount(amount - (float) brr);
+                    }
+                    entity.level().playSound(null, entity.blockPosition(), BabelSounds.BARRIER.get(),
+                            SoundSource.HOSTILE, 2.0F, (float) Mth.nextDouble(RandomSource.create(), 0.9, 1.1));
+                    if (entity.level() instanceof ServerLevel level) {
+                        level.sendParticles(BabelParticles.BARRIER_SHOW.get(), entity.getX(), entity.getY() + 0.75, entity.getZ(),
+                                (int) Math.min(disp * 0.5, 24), 0.75, 0.75, 0.75, 0.1);
+                    }
+                }
             }
         }
     }

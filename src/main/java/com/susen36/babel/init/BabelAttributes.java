@@ -1,5 +1,6 @@
 package com.susen36.babel.init;
 
+import com.susen36.babel.BabelConfig;
 import com.susen36.babel.BabelMod;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,6 +28,8 @@ public class BabelAttributes {
     public static final RegistryObject<Attribute> MAGIC_MISS_RATE = simpleRangedAttr("magic_missrate", 0.0, 95.0, 0.0);
     public static final RegistryObject<Attribute> PHYSICAL_MISS_RATE = simpleRangedAttr("physical_missrate", 0.0, 95.0, 0.0);
     public static final RegistryObject<Attribute> GENERAL_DEFENSE = simpleRangedAttr("general_defense", 0.0, 131071.0, 0.0);
+    public static final RegistryObject<Attribute> BARRIER = simpleRangedAttr("barrier", 0.0, 214748364.0, 0.0);
+    public static final RegistryObject<Attribute> MAX_LIFE_POINT = simpleRangedAttr("max_life_point", 1.0, 214748364.0, BabelConfig.LIFE_POINT_INIT.getDefault());
 
     private static final List<RegistryObject<Attribute>> LIVING_ATTRIBUTES = List.of(
             MAX_ELEMENTAL_VALUE,
@@ -36,7 +39,9 @@ public class BabelAttributes {
             ELEMENTAL_MODIFIER,
             MAGIC_MISS_RATE,
             PHYSICAL_MISS_RATE,
-            GENERAL_DEFENSE
+            GENERAL_DEFENSE,
+            BARRIER,
+            MAX_LIFE_POINT
     );
 
     public static RegistryObject<Attribute> simpleRangedAttr(String name, double min, double max, double def) {

@@ -5,54 +5,7 @@ import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleBuilder;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
-import com.susen36.babel.item.AlleySculptureItem;
-import com.susen36.babel.item.ArchfiendsArtifactItem;
-import com.susen36.babel.item.ArchfiendsBedItem;
-import com.susen36.babel.item.ArchfiendsFlagItem;
-import com.susen36.babel.item.BatBedItem;
-import com.susen36.babel.item.BowlSeagrassItem;
-import com.susen36.babel.item.BrilliantLamentItem;
-import com.susen36.babel.item.CannedCherryItem;
-import com.susen36.babel.item.CoffeeCandyItem;
-import com.susen36.babel.item.RelicCrownItem;
-import com.susen36.babel.item.CrimsonTreatyItem;
-import com.susen36.babel.item.GoldenChaliseItem;
-import com.susen36.babel.item.GoldenStormItem;
-import com.susen36.babel.item.GuardianStareItem;
-import com.susen36.babel.item.HandFertilityItem;
-import com.susen36.babel.item.HandFireworkItem;
-import com.susen36.babel.item.HandOfBarrenItem;
-import com.susen36.babel.item.HandOfEngraveItem;
-import com.susen36.babel.item.HandSpeedItem;
-import com.susen36.babel.item.HandStrangleItem;
-import com.susen36.babel.item.HandSwipeItem;
-import com.susen36.babel.item.HandSwordItem;
-import com.susen36.babel.item.HandThornsItem;
-import com.susen36.babel.item.KettleItem;
-import com.susen36.babel.item.KingCrownItem;
-import com.susen36.babel.item.KingsArmourItem;
-import com.susen36.babel.item.KingsCrystalItem;
-import com.susen36.babel.item.KingsExtensionItem;
-import com.susen36.babel.item.KingsSpearItem;
-import com.susen36.babel.item.LegendChitinItem;
-import com.susen36.babel.item.LiveRoseItem;
-import com.susen36.babel.item.MeatCanItem;
-import com.susen36.babel.item.OddFluteItem;
-import com.susen36.babel.item.OldSteamArmorItem;
-import com.susen36.babel.item.OmniKeyItem;
-import com.susen36.babel.item.PiglinDiaryItem;
-import com.susen36.babel.item.ProofOfLongevityItem;
-import com.susen36.babel.item.RainbowCandyItem;
-import com.susen36.babel.item.OriginiumIrisFlowerItem;
-import com.susen36.babel.item.RescissionItem;
-import com.susen36.babel.item.RoyalFateItem;
-import com.susen36.babel.item.SarkazKingBedItem;
-import com.susen36.babel.item.SmellyHemostaticItem;
-import com.susen36.babel.item.SoloMusicBoxItem;
-import com.susen36.babel.item.SurvivorContractItem;
-import com.susen36.babel.item.ToponymTextologyItem;
-import com.susen36.babel.item.UnripeYearningItem;
-import com.susen36.babel.item.VoyageOfGoldItem;
+import com.susen36.babel.item.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
@@ -85,13 +38,12 @@ public class BabelCollectible {
     public static RegistryObject<Item> HAND_OF_BARREN;
     public static RegistryObject<Item> HAND_SWORD;
     public static RegistryObject<Item> HAND_OF_ENGRAVE;
+    public static RegistryObject<Item> HAND_OF_SNATCHER;
+    public static RegistryObject<Item> HAND_OF_DIFFUSION;
+    public static RegistryObject<Item> HAND_OF_FLOWING_WATER;
 
     public static RegistryObject<Item> LEGEND_CHITIN;
     public static RegistryObject<Item> DISO;
-    public static RegistryObject<Item> DISO_FLESH;
-    public static RegistryObject<Item> DISO_BLOOD;
-    public static RegistryObject<Item> DISO_NEURO;
-    public static RegistryObject<Item> DISO_ATTENTION;
     public static RegistryObject<Item> AHND_SWIPE;
     public static RegistryObject<Item> HANSHAND_SPIKE;
     public static RegistryObject<Item> SARKAZ_KING_RYLFATE;
@@ -131,6 +83,13 @@ public class BabelCollectible {
     public static RegistryObject<Item> OLD_STEAM_ARMOR;
     public static RegistryObject<Item> BRILLIANT_LAMENT;
     public static RegistryObject<Item> LIVE_ROSE;
+    public static RegistryObject<Item> KNIGHTS_CODE;
+    public static RegistryObject<Item> DARKNIGHT_WHISPERER;
+    public static RegistryObject<Item> GODMOTHERS_TOKEN;
+    public static RegistryObject<Item> GAULISH_SILVER_COIN;
+    public static RegistryObject<Item> GAULISH_BANK_CHECK;
+    public static RegistryObject<Item> TOPOGRAPHICAL_MAP;
+    public static RegistryObject<Item> DIVINE_CONCH;
 
     public static final ArrayList<RegistryObject<Item>> BABEL_COLLECTIBLES = new ArrayList<>();
 
@@ -158,13 +117,12 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(HAND_OF_BARREN = REGISTRY.registerCollectible("hand_of_barren", HandOfBarrenItem::new));
         BABEL_COLLECTIBLES.add(HAND_SWORD = REGISTRY.registerCollectible("hand_sword", HandSwordItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_ENGRAVE = REGISTRY.registerCollectible("hand_of_engrave", HandOfEngraveItem::new));
+        BABEL_COLLECTIBLES.add(HAND_OF_SNATCHER = REGISTRY.registerCollectible("hand_of_snatcher", HandOfSnatcherItem::new));
+        BABEL_COLLECTIBLES.add(HAND_OF_DIFFUSION = REGISTRY.registerCollectible("hand_of_diffusion", HandOfDiffusionItem::new));
+        BABEL_COLLECTIBLES.add(HAND_OF_FLOWING_WATER = REGISTRY.registerCollectible("hand_of_flowing_water", HandOfFlowingWaterItem::new));
 
         LEGEND_CHITIN = REGISTRY.registerCollectible("legend_chitin", LegendChitinItem::new);
         DISO = registerBoolean("diso");
-        DISO_FLESH = registerBoolean("diso_flesh");
-        DISO_BLOOD = registerBoolean("diso_blood");
-        DISO_NEURO = registerBoolean("diso_neuro");
-        DISO_ATTENTION = registerBoolean("diso_attention");
         AHND_SWIPE = registerBoolean("ahnd_swipe");
         HANSHAND_SPIKE = registerBoolean("hanshand_spike");
         SARKAZ_KING_RYLFATE = registerBoolean("sarkaz_king_rylfate");
@@ -202,6 +160,13 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(OLD_STEAM_ARMOR = REGISTRY.registerCollectible("old_steam_armor", OldSteamArmorItem::new));
         BABEL_COLLECTIBLES.add(BRILLIANT_LAMENT = REGISTRY.registerCollectible("brilliant_lament", BrilliantLamentItem::new));
         BABEL_COLLECTIBLES.add(LIVE_ROSE = REGISTRY.registerCollectible("live_rose", LiveRoseItem::new));
+        BABEL_COLLECTIBLES.add(KNIGHTS_CODE = REGISTRY.registerCollectible("knights_code", KnightsCodeItem::new));
+        BABEL_COLLECTIBLES.add(DARKNIGHT_WHISPERER = REGISTRY.registerCollectible("darknight_whisperer", DarknightWhispererItem::new));
+        BABEL_COLLECTIBLES.add(GAULISH_SILVER_COIN = REGISTRY.registerCollectible("gaulish_silver_coin", GaulishSilverCoinItem::new));
+        BABEL_COLLECTIBLES.add(GAULISH_BANK_CHECK = REGISTRY.registerCollectible("gaulish_bank_check", GaulishBankCheckItem::new));
+        BABEL_COLLECTIBLES.add(TOPOGRAPHICAL_MAP = REGISTRY.registerCollectible("topographical_map", TopographicalMapItem::new));
+        BABEL_COLLECTIBLES.add(GODMOTHERS_TOKEN = REGISTRY.registerCollectible("godmothers_token", GodmothersTokenItem::new));
+        BABEL_COLLECTIBLES.add(DIVINE_CONCH = REGISTRY.registerCollectible("divine_conch", DivineConchItem::new));
     }
 
     private static RegistryObject<Item> registerBoolean(String name) {

@@ -3,13 +3,13 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
-import com.susen36.babel.init.BabelMobEffects;
 import com.susen36.babel.init.BabelSounds;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -46,6 +46,6 @@ public class OddFluteItem extends CollectibleItem.CustomCollectibleItem {
 			}
 		}
 		if (!level.isClientSide())
-			player.addEffect(new MobEffectInstance(BabelMobEffects.ADD_REACH.get(), 300, 0, false, false));
+			player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 900, 0, false, false));
 	}
 }

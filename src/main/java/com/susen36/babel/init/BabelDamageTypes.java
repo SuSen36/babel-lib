@@ -18,9 +18,7 @@ public class BabelDamageTypes {
     public static final ResourceKey<DamageType> ELEMENT_BREAK = create("element_break");
     public static final ResourceKey<DamageType> FRENZY_BREAK = create("frenzy_break");
     public static final ResourceKey<DamageType> HAND_OF_CHOKER = create("hand_of_choker");
-    public static final ResourceKey<DamageType> HAND_SPIKE = create("hand_spike");
     public static final ResourceKey<DamageType> WIPE_MAGIC = create("wipe_magic");
-    public static final ResourceKey<DamageType> HAND_FIREWORK = create("hand_firework");
 
     private BabelDamageTypes() {
         throw new UnsupportedOperationException("Utility class");

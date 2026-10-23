@@ -44,7 +44,9 @@ public class CollectiblesScreen extends Screen {
         var used = Collectibles.getData(player);
         for (var entry : Collectibles.Collectibles.values()) {
             if (used.isUsed(entry.get())) {
-                this.entries.add(new ItemStack(entry.get()));
+                ItemStack stack = new ItemStack(entry.get());
+                stack.setCount(Math.max(1, Collectibles.getLayerData(player).getLayer(entry.get())));
+                this.entries.add(stack);
             }
         }
         this.totalPages = Math.max(1, (this.entries.size() + PAGE_SIZE - 1) / PAGE_SIZE);

@@ -29,6 +29,6 @@ public class GoldenStormItem extends CollectibleItem.CustomCollectibleItem {
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
 		if (!level.isClientSide())
-			player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 0));
+			player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 1000, 0));
 	}
 }

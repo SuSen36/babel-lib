@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Locale;
 import java.util.function.Function;
 
 public abstract class AbstractEPCapability implements INBTSerializable<CompoundTag> {
@@ -68,7 +69,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
         }
 
         public static EPType byNickName(String nickName) {
-            nickName = nickName.toLowerCase();
+            nickName = nickName.toLowerCase(Locale.ROOT);
             for (EPType t : values()) {
                 if (t.nickName.equals(nickName)) return t;
             }
@@ -76,7 +77,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
         }
 
         public String asString() {
-            return this.name().toLowerCase();
+            return this.name().toLowerCase(Locale.ROOT);
         }
     }
 

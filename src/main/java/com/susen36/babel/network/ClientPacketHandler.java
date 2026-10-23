@@ -8,6 +8,7 @@ import com.susen36.babel.network.receive.CollectibleItemUseMessage;
 import com.susen36.babel.network.receive.CollectibleSyncMessage;
 import com.susen36.babel.network.receive.CooldownSyncMessage;
 import com.susen36.babel.network.receive.EPSyncMessage;
+import com.susen36.babel.network.receive.FireworkParticleMessage;
 import com.susen36.babel.network.receive.HealthSyncMessage;
 import com.susen36.babel.util.CooldownUtils;
 import net.minecraft.client.Minecraft;
@@ -76,5 +77,12 @@ public class ClientPacketHandler {
             }
         }
         CooldownUtils.setServerCurrentTick(message.currentTick);
+    }
+
+    public static void handle(FireworkParticleMessage message) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level != null) {
+            mc.level.createFireworks(message.x, message.y, message.z, 0, 0, 0, message.fireworkNbt);
+        }
     }
 }

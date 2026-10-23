@@ -28,7 +28,6 @@ public class PalsyMobEffect extends MobEffect {
         super(MobEffectCategory.HARMFUL, -8355712);
     }
 
-
     @Override
     public boolean isDurationEffectTick(int duration, int amplifier) {
         return true;

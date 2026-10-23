@@ -3,6 +3,7 @@ package com.susen36.babel.capability;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.capability.health.HealthCapability;
+import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -30,6 +31,9 @@ public class BabelCapabilityEvents {
             if (health != null) {
                 health.sync();
             }
+            if (living instanceof Player player) {
+                BabelNetwork.syncCollectibles(player);
+            }
         }
     }
 
@@ -45,6 +49,7 @@ public class BabelCapabilityEvents {
             if (health != null) {
                 health.sync();
             }
+            BabelNetwork.syncCollectibles(player);
         }
     }
 
@@ -60,6 +65,7 @@ public class BabelCapabilityEvents {
             if (health != null) {
                 health.sync();
             }
+            BabelNetwork.syncCollectibles(player);
         }
     }
 
@@ -75,6 +81,7 @@ public class BabelCapabilityEvents {
             if (health != null) {
                 health.sync();
             }
+            BabelNetwork.syncCollectibles(player);
         }
     }
 

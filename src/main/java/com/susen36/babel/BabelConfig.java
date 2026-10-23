@@ -9,14 +9,6 @@ import java.util.List;
 public class BabelConfig {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
-    private static final ForgeConfigSpec.IntValue MAGIC_NUMBER = BUILDER
-            .comment("A magic number")
-            .defineInRange("magicNumber", 42, 0, Integer.MAX_VALUE);
-
-    public static final ForgeConfigSpec.ConfigValue<String> MAGIC_NUMBER_INTRODUCTION = BUILDER
-            .comment("What you want the introduction message to be for the magic number")
-            .define("magicNumberIntroduction", "Babel magic number: ");
-
     public static final ForgeConfigSpec.BooleanValue EP_BAR_STYLE = BUILDER
             .comment("元素损伤显示采用和饥饿值相似的小图标，若关闭则为圆环")
             .define("ep_icon_style", false);
@@ -82,8 +74,6 @@ public class BabelConfig {
             .defineInRange("shield_y_offset", 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
     static final ForgeConfigSpec SPEC = BUILDER.build();
-    public static int magicNumber;
-    public static String magicNumberIntroduction;
     public static boolean epBarStyle;
     public static boolean banAdvancedCollectibles;
     public static double collectibleLootChance;
@@ -104,8 +94,6 @@ public class BabelConfig {
 
     @SubscribeEvent
     public static void onLoad(final ModConfigEvent.Loading event) {
-        magicNumber = MAGIC_NUMBER.get();
-        magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
         epBarStyle = EP_BAR_STYLE.get();
         banAdvancedCollectibles = BAN_ADVANCED_COLLECTIBLES.get();
         collectibleLootChance = COLLECTIBLE_LOOT_CHANCE.get();
@@ -125,8 +113,6 @@ public class BabelConfig {
     }
 
     public static void onReloading(final ModConfigEvent.Reloading event) {
-        magicNumber = MAGIC_NUMBER.get();
-        magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
         epBarStyle = EP_BAR_STYLE.get();
         banAdvancedCollectibles = BAN_ADVANCED_COLLECTIBLES.get();
         collectibleLootChance = COLLECTIBLE_LOOT_CHANCE.get();

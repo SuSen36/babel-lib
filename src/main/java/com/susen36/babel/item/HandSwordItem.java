@@ -42,7 +42,6 @@ public class HandSwordItem extends CollectibleItem.CustomCollectibleItem {
             if (!target.hasEffect(BabelMobEffects.LESS_ARMOR.get())) {
                 target.addEffect(new MobEffectInstance(BabelMobEffects.LESS_ARMOR.get(), 120, 1));
             }
-            player.addEffect(new MobEffectInstance(BabelMobEffects.ADD_REACH.get(), 120, 3, false, false));
             player.heal((float) (player.getMaxHealth() * 0.1));
         }
     }

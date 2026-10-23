@@ -59,7 +59,7 @@ public class HandOfEngraveItem extends CollectibleItem.CustomCollectibleItem {
                     || matchesConfigured(BabelConfig.handEngraveRecognizable,
                             BuiltInRegistries.ITEM.getKey(mainHandItem.getItem()).toString());
             if (validWeapon) {
-                Collectibles.getLayerData(player).setLayer(this, layer + 1);
+                Collectibles.addLayerAndSync(player, this, 1);
             }
         }
     }

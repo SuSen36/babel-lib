@@ -17,7 +17,7 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
@@ -42,16 +42,14 @@ public class OmniKeyItem extends CollectibleItem.CustomCollectibleItem {
         HitResult hit = player.pick(5.0D, 1.0F, false);
         if (hit instanceof BlockHitResult blockHit) {
             BlockPos pos = blockHit.getBlockPos();
-            BlockState blockstate = level.getBlockState(pos);
-            if (blockstate.getBlock() == Blocks.IRON_DOOR || blockstate.getBlock() == Blocks.IRON_TRAPDOOR) {
-                if (!(blockstate.getBlock().getStateDefinition().getProperty("open") instanceof BooleanProperty getbp5 && blockstate.getValue(getbp5))) {
-                    BlockState bs = level.getBlockState(pos);
-                    if (bs.getBlock().getStateDefinition().getProperty("open") instanceof BooleanProperty booleanProp)
-                        level.setBlock(pos, bs.setValue(booleanProp, true), 3);
-                    level.scheduleTick(pos, level.getBlockState(pos).getBlock(), 22);
+            BlockState state = level.getBlockState(pos);
+            if (state.getBlock() == Blocks.IRON_DOOR || state.getBlock() == Blocks.IRON_TRAPDOOR) {
+                if (!state.getValue(BlockStateProperties.OPEN)) {
+                    level.setBlock(pos, state.setValue(BlockStateProperties.OPEN, true), 3);
+                    level.scheduleTick(pos, state.getBlock(), 22);
                     level.playSound(null, pos, SoundEvents.CHAIN_STEP, SoundSource.NEUTRAL, 1, 1);
-                    if (level instanceof ServerLevel _level) {
-                        if (itemstack.hurt(1, _level.getRandom(), null)) {
+                    if (level instanceof ServerLevel serverLevel && !player.getAbilities().instabuild) {
+                        if (itemstack.hurt(1, serverLevel.getRandom(), null)) {
                             itemstack.shrink(1);
                         }
                     }

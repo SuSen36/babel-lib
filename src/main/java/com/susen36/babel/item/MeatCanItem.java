@@ -31,7 +31,7 @@ public class MeatCanItem extends CollectibleItem.CustomCollectibleItem {
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
 		if (!level.isClientSide())
-			player.addEffect(new MobEffectInstance(MobEffects.HEAL, 1, 0));
+			player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 1800, 0));
 		Item emptyCan = BuiltInRegistries.ITEM.get(new ResourceLocation("caerula_arbor", "empty_can"));
 		ItemStack setstack = new ItemStack(emptyCan).copy();
 		ItemHandlerHelper.giveItemToPlayer(player, setstack);
