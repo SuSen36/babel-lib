@@ -2,12 +2,7 @@ package com.susen36.babel.network;
 
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.collectible.Collectibles;
-import com.susen36.babel.network.receive.CollectibleItemUseMessage;
-import com.susen36.babel.network.receive.CollectibleSyncMessage;
-import com.susen36.babel.network.receive.CooldownSyncMessage;
-import com.susen36.babel.network.receive.EPSyncMessage;
-import com.susen36.babel.network.receive.FireworkParticleMessage;
-import com.susen36.babel.network.receive.HealthSyncMessage;
+import com.susen36.babel.network.receive.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -45,6 +40,7 @@ public class BabelNetwork {
         CHANNEL.registerMessage(packetId++, CollectibleItemUseMessage.class, CollectibleItemUseMessage.ENCODER, CollectibleItemUseMessage.DECODER, CollectibleItemUseMessage.HANDLER, Optional.empty());
         CHANNEL.registerMessage(packetId++, CooldownSyncMessage.class, CooldownSyncMessage.ENCODER, CooldownSyncMessage.DECODER, CooldownSyncMessage.HANDLER, Optional.empty());
         CHANNEL.registerMessage(packetId++, FireworkParticleMessage.class, FireworkParticleMessage.ENCODER, FireworkParticleMessage.DECODER, FireworkParticleMessage.HANDLER, Optional.empty());
+        CHANNEL.registerMessage(packetId++, MerchantOffersMessage.class, MerchantOffersMessage.ENCODER, MerchantOffersMessage.DECODER, MerchantOffersMessage.HANDLER, Optional.empty());
     }
 
     public static void sendTo(Object message, ServerPlayer player) {

@@ -196,7 +196,9 @@
   "item.babel.yearning.description_0": "§b每拥有 4 级经验值，玩家最大生命值 +1，盔甲值和击退抗性 +3%（最多叠加64层，仅玩家穿着胸甲时生效）",
   "item.babel.yearning.description_1": "§o未成形的想法如婴孩般眷恋创造者，它们狂热地护卫着造物主，直至灵光乍现，蜕变成形，离家远行。",
   "item.babel.originium_ingot": "源石锭",
+  "item.babel.cannot_spawn_egg": "坎诺特刷怪蛋",
   "item_group.babel.collectibles": "收藏品陈列",
+  "item_group.babel.babel_tower": "巴别塔",
   "item.babel.util_allay": "悦灵塑像",
   "item.babel.util_allay.description_0": "§b使用后玩家目标生命上限+3",
   "item.babel.util_allay.description_1": "§o一个手掌大小的雕像，听说是悦灵表示友好的造物",
@@ -292,8 +294,12 @@
   "item.babel.divine_conch": "神音海螺",
   "item.babel.divine_conch.description_0": "§b生命上限+6%",
   "item.babel.divine_conch.description_1": "§o吹响它，那些你不曾见过、甚至不曾听闻的神明将回应你的声音。其实就是一个空心海螺。",
+  "item.babel.flawless_jadestone": "无瑕宝玉",
+  "item.babel.flawless_jadestone.description_0": "§b使用后获得25个源石锭",
+  "item.babel.flawless_jadestone.description_1": "§o即便城池三度因其而毁，它也依然光洁无瑕，无可挑剔。持有它的萨尔贡皇帝直至今日都没想好用什么珠宝与之相衬，只有争斗的硝烟永伴。",
   "item.babel.paper_bag": "纸质包装",
   "subtitles.flutesong": "笛音",
   "subtitles.target_damaged": "损失目标生命",
-  "subtitles.barrier": "护盾屏障"
+  "subtitles.barrier": "护盾屏障",
+  "entity.babel.cannot": "坎诺特·古德英纳夫"
 }

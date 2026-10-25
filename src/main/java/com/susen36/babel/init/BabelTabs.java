@@ -23,6 +23,16 @@ public class BabelTabs {
                         }
                     }).build());
 
+    public static final RegistryObject<CreativeModeTab> BABEL_TOWER_TAB =
+            REGISTRY.register("babel_tower", () -> CreativeModeTab.builder()
+                    .title(Component.translatable("item_group.babel.babel_tower"))
+                    .withTabsBefore(CreativeModeTabs.COMBAT)
+                    .icon(() -> new ItemStack(BabelItems.ORIGINIUM_INGOT.get()))
+                    .displayItems((parameters, output) -> {
+                        output.accept(BabelItems.ORIGINIUM_INGOT.get());
+                        output.accept(BabelItems.CANNOT_SPAWN_EGG.get());
+                    }).build());
+
     private BabelTabs() {
         throw new UnsupportedOperationException("Utility class");
     }

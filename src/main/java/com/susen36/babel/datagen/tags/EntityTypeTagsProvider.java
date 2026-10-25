@@ -32,7 +32,6 @@ public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        // forge:bosses 非 Forge 内置标签，需在此声明才能被 applies_difficulty 引用
         tag(FORGE_BOSSES);
 
         tag(APPLIES_DIFFICULTY)

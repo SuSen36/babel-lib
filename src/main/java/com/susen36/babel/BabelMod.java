@@ -2,7 +2,6 @@ package com.susen36.babel;
 
 import com.mojang.logging.LogUtils;
 import com.susen36.babel.capability.BabelCapability;
-import com.susen36.babel.client.overlay.EPShowOverlay;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.init.*;
 import com.susen36.babel.network.BabelNetwork;
@@ -28,6 +27,8 @@ public class BabelMod {
         BabelBlocks.REGISTRY.register(modEventBus);
         BabelBlockEntities.REGISTRY.register(modEventBus);
         BabelItems.REGISTRY.register(modEventBus);
+        BabelEntities.REGISTRY.register(modEventBus);
+        BabelMenus.REGISTRY.register(modEventBus);
         BabelAttributes.REGISTER.register(modEventBus);
         BabelMobEffects.REGISTRY.register(modEventBus);
         BabelPotions.REGISTRY.register(modEventBus);

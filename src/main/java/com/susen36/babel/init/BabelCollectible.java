@@ -41,6 +41,7 @@ public class BabelCollectible {
     public static RegistryObject<Item> HAND_OF_SNATCHER;
     public static RegistryObject<Item> HAND_OF_DIFFUSION;
     public static RegistryObject<Item> HAND_OF_FLOWING_WATER;
+    public static RegistryObject<Item> FLAWLESS_JADESTONE;
 
     public static RegistryObject<Item> LEGEND_CHITIN;
     public static RegistryObject<Item> DISO;
@@ -167,6 +168,7 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(TOPOGRAPHICAL_MAP = REGISTRY.registerCollectible("topographical_map", TopographicalMapItem::new));
         BABEL_COLLECTIBLES.add(GODMOTHERS_TOKEN = REGISTRY.registerCollectible("godmothers_token", GodmothersTokenItem::new));
         BABEL_COLLECTIBLES.add(DIVINE_CONCH = REGISTRY.registerCollectible("divine_conch", DivineConchItem::new));
+        BABEL_COLLECTIBLES.add(FLAWLESS_JADESTONE = REGISTRY.registerCollectible("flawless_jadestone", FlawlessJadestoneItem::new));
     }
 
     private static RegistryObject<Item> registerBoolean(String name) {

@@ -197,7 +197,9 @@
   "item.babel.yearning.description_0": "§bPlayer health +1, toughness and knockback resistance +3% with each 2 lels of exp",
   "item.babel.yearning.description_1": "§oThese incomplete thoughts cling to their creators, zealously guarding them until they obtain their forms through a sudden revelation and embark on a long journey.",
   "item.babel.originium_ingot": "Originium Ingot",
+  "item.babel.cannot_spawn_egg": "Cannot Spawn Egg",
   "item_group.babel.collectibles": "Collectibles",
+  "item_group.babel.babel_tower": "Babel Tower",
   "item.babel.util_allay": "Allay Sculpture",
   "item.babel.util_allay.description_0": "§bPlayer Maxlife +3 when used",
   "item.babel.util_allay.description_1": "§oA hand-size  sculpture, which is said to be created by allay to convert friendlyness",
@@ -296,10 +298,14 @@
   "item.babel.divine_conch": "Conch of Divine Whispers",
   "item.babel.divine_conch.description_0": "§bMax health +6%",
   "item.babel.divine_conch.description_1": "§oSound it, and gods you've never seen or even heard of will answer your call. Actually, it's just a hollow conch shell.",
+  "item.babel.flawless_jadestone": "Flawless Jadestone",
+  "item.babel.flawless_jadestone.description_0": "§bGain 25 Originium Ingots when used",
+  "item.babel.flawless_jadestone.description_1": "§oEven though it thrice brought the city to ruins, it yet shines radiantly in its flawless form. Even today, the Sargon emperor in possession of the gem has yet to find another piece of jewelry matching its brilliance, leaving it with naught but gunsmoke for a companion.",
   "item.babel.paper_bag": "Paper Bag",
   "effect.babel.untame_confirm": "Untame Confirm",
   "effect.babel.mass_loss": "Mass Loss",
   "subtitles.flutesong": "Flute",
   "subtitles.target_damaged": "Target life lost",
-  "subtitles.barrier": "Barrier"
+  "subtitles.barrier": "Barrier",
+  "entity.babel.cannot": "Cannot Goodenough"
 }
