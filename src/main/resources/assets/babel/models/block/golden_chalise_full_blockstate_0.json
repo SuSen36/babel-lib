@@ -1,9 +1,0 @@
-{
-  "parent": "babel:custom/golden_chalise_half",
-  "textures": {
-    "all": "babel:block/golden_chalise_half",
-    "particle": "babel:block/golden_chalise_full",
-    "0": "babel:block/golden_chalise_half"
-  },
-  "render_type": "cutout"
-}

@@ -19,15 +19,15 @@
       "model": "babel:block/boiling_kettle_blockstate_0"
     },
     "facing=east,blockstate=1": {
-      "model": "babel:block/boiling_kettle_blockstate_0",
+      "model": "babel:block/block_kettle_lay",
       "y": 90
     },
     "facing=south,blockstate=1": {
-      "model": "babel:block/boiling_kettle_blockstate_0",
+      "model": "babel:block/block_kettle_lay",
       "y": 180
     },
     "facing=west,blockstate=1": {
-      "model": "babel:block/boiling_kettle_blockstate_0",
+      "model": "babel:block/block_kettle_lay",
       "y": 270
     }
   }

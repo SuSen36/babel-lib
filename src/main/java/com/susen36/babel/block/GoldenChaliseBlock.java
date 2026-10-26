@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
@@ -32,18 +33,19 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class GoldenChaliseBlock extends Block implements SimpleWaterloggedBlock, EntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final IntegerProperty BLOCKSTATE = IntegerProperty.create("blockstate", 0, 2);
 
     public GoldenChaliseBlock() {
         super(BlockBehaviour.Properties.of().sound(SoundType.METAL).strength(8f, 1200f).noOcclusion().isRedstoneConductor((bs, br, bp) -> false));
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
-                .setValue(WATERLOGGED, false));
+                .setValue(WATERLOGGED, false)
+                .setValue(BLOCKSTATE, 0));
     }
 
     @Override
@@ -76,7 +78,7 @@ public class GoldenChaliseBlock extends Block implements SimpleWaterloggedBlock,
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, WATERLOGGED);
+        builder.add(FACING, WATERLOGGED, BLOCKSTATE);
     }
 
     @Override
@@ -128,6 +130,8 @@ public class GoldenChaliseBlock extends Block implements SimpleWaterloggedBlock,
                 int maxAdd = Math.min(itemstack.getCount(), 64 - chalise.getAmount());
                 if (maxAdd > 0) {
                     chalise.setAmount(chalise.getAmount() + maxAdd);
+                    int visual = chalise.getAmount() == 0 ? 0 : chalise.getAmount() < 32 ? 1 : 2;
+                    world.setBlock(pos, blockstate.setValue(BLOCKSTATE, visual), 3);
                     itemstack.shrink(maxAdd);
                     world.playSound(null, pos, BabelSounds.MONEY_IN.get(), SoundSource.BLOCKS, 1, 1);
                     return InteractionResult.sidedSuccess(world.isClientSide());
@@ -138,6 +142,8 @@ public class GoldenChaliseBlock extends Block implements SimpleWaterloggedBlock,
             if (itemstack.isEmpty()) {
                 if (chalise.getAmount() > 0) {
                     chalise.setAmount(chalise.getAmount() - 1);
+                    int visual = chalise.getAmount() == 0 ? 0 : chalise.getAmount() < 32 ? 1 : 2;
+                    world.setBlock(pos, blockstate.setValue(BLOCKSTATE, visual), 3);
                     if (world instanceof ServerLevel level) {
                         ItemEntity entityToSpawn = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.75, pos.getZ() + 0.5, new ItemStack(Items.GOLD_INGOT));
                         entityToSpawn.setPickUpDelay(10);
@@ -153,12 +159,12 @@ public class GoldenChaliseBlock extends Block implements SimpleWaterloggedBlock,
     }
 
     @Override
-    public void playerDestroy(Level world, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
-        super.playerDestroy(world, player, pos, state, blockEntity, tool);
-        if (blockEntity instanceof GoldenChaliseBlockEntity chalise && chalise.getAmount() > 0 && world instanceof ServerLevel level) {
+    public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock()) && world instanceof ServerLevel level && world.getBlockEntity(pos) instanceof GoldenChaliseBlockEntity chalise && chalise.getAmount() > 0) {
             ItemEntity itemEntity = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(Items.GOLD_INGOT, chalise.getAmount()));
             itemEntity.setPickUpDelay(10);
             level.addFreshEntity(itemEntity);
         }
+        super.onRemove(state, world, pos, newState, isMoving);
     }
 }

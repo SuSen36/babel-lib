@@ -17,7 +17,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -377,16 +376,30 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         public void applyEffectTick(Player player, int layer) {
         }
 
-        /** 以玩家为中心的立方体半边长，32×32×32 即 16.0，供范围查询 inflate 使用。 */
+        /** 以玩家为中心的立方体半边长，32×32×32 即 16.0。 */
         public static final double MONSTER_RANGE = 16.0D;
 
-        /** 返回 true 的收藏品才会触发周围怪物查询与 onMonsterInRange 分发，默认关闭以免产生无消费者的空查询。 */
-        public boolean hasMonsterRangeEffect() {
-            return false;
+        @FunctionalInterface
+        public interface RangeEffect<T extends LivingEntity> {
+            void apply(T entity, Player player, int layer);
         }
 
-        /** 玩家周围 32×32×32 内的每只怪物，每 20 tick 回调一次。 */
-        public void onMonsterInRange(Monster monster, Player player, int layer) {
+        public record RangeBinding<T extends LivingEntity>(Class<T> entityType, double range, RangeEffect<T> effect) {
+        }
+
+        private final List<RangeBinding<?>> rangeEffects = new ArrayList<>();
+
+        /** 注册范围效果：每 20 tick 对玩家周围 range×2 立方体内的每只指定类型实体回调一次。 */
+        protected final <T extends LivingEntity> void addRangeEffect(Class<T> entityType, double range, RangeEffect<T> effect) {
+            this.rangeEffects.add(new RangeBinding<>(entityType, range, effect));
+        }
+
+        protected final <T extends LivingEntity> void addRangeEffect(Class<T> entityType, RangeEffect<T> effect) {
+            this.addRangeEffect(entityType, MONSTER_RANGE, effect);
+        }
+
+        public final List<RangeBinding<?>> getRangeEffects() {
+            return this.rangeEffects;
         }
 
         /** LivingHurtEvent 阶段回调；事件可能已取消、直接伤害来源可能是持有者本人，需要时由实现自行判定。 */

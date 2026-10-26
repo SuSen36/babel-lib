@@ -1,9 +1,0 @@
-{
-  "parent": "babel:custom/spear",
-  "textures": {
-    "all": "babel:block/spear",
-    "particle": "babel:block/relic_spear",
-    "0": "babel:block/spear"
-  },
-  "render_type": "cutout_mipped"
-}

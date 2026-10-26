@@ -9,7 +9,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 
@@ -28,18 +27,11 @@ public class SeaTerrorJerkyItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)
                         .showOverlay(true)
                         .build());
-    }
-
-    @Override
-    public boolean hasMonsterRangeEffect() {
-        return true;
-    }
-
-    @Override
-    public void onMonsterInRange(Monster monster, Player player, int layer) {
-        AttributeInstance armor = monster.getAttribute(Attributes.ARMOR);
-        if (armor != null && armor.getModifier(UUID.fromString("7f3a9e2c-5b4d-4a1e-8c6f-1d2e3f4a5b6c")) == null) {
-            armor.addTransientModifier(SEA_TERROR_DEBUFF);
-        }
+        addRangeEffect(Monster.class, (monster, player, layer) -> {
+            AttributeInstance armor = monster.getAttribute(Attributes.ARMOR);
+            if (armor != null && armor.getModifier(UUID.fromString("7f3a9e2c-5b4d-4a1e-8c6f-1d2e3f4a5b6c")) == null) {
+                armor.addTransientModifier(SEA_TERROR_DEBUFF);
+            }
+        });
     }
 }

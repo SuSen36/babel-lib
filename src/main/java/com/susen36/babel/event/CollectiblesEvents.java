@@ -8,7 +8,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.AABB;
@@ -20,7 +19,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = BabelMod.MODID)
 public class CollectiblesEvents {
@@ -57,30 +58,43 @@ public class CollectiblesEvents {
                 }
             });
             if (player.tickCount % 20 == 0) {
-                applyMonsterRangeEffects(player);
+                applyRangeEffects(player);
             }
         }
     }
 
-    private static void applyMonsterRangeEffects(Player player) {
+    private static void applyRangeEffects(Player player) {
         if (!player.level().isClientSide()) {
             Collectibles usedData = Collectibles.getData(player);
             Collectibles.Layer layerData = Collectibles.getLayerData(player);
-            List<Monster> monsters = null;
+            Map<RangeKey, List<? extends LivingEntity>> rangedEntities = new HashMap<>();
             for (RegistryObject<Item> holder : Collectibles.Collectibles.values()) {
-                if (usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible
-                        && collectible.hasMonsterRangeEffect()) {
-                    if (monsters == null) {
-                        monsters = player.level().getEntitiesOfClass(Monster.class,
-                                new AABB(player.position(), player.position())
-                                        .inflate(CollectibleItem.CustomCollectibleItem.MONSTER_RANGE));
-                    }
+                if (usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     int layer = layerData.getLayer(holder.get());
-                    for (Monster monster : monsters) {
-                        collectible.onMonsterInRange(monster, player, layer);
+                    for (CollectibleItem.CustomCollectibleItem.RangeBinding<?> binding : collectible.getRangeEffects()) {
+                        dispatchRange(binding, rangedEntities, player, layer);
                     }
                 }
             }
+        }
+    }
+
+    private record RangeKey(Class<?> entityType, double range) {
+    }
+
+    private static <T extends LivingEntity> void dispatchRange(
+            CollectibleItem.CustomCollectibleItem.RangeBinding<T> binding,
+            Map<RangeKey, List<? extends LivingEntity>> rangedEntities,
+            Player player, int layer) {
+        RangeKey key = new RangeKey(binding.entityType(), binding.range());
+        List<? extends LivingEntity> entities = rangedEntities.get(key);
+        if (entities == null) {
+            entities = player.level().getEntitiesOfClass(binding.entityType(),
+                    new AABB(player.position(), player.position()).inflate(binding.range()));
+            rangedEntities.put(key, entities);
+        }
+        for (LivingEntity living : entities) {
+            binding.effect().apply(binding.entityType().cast(living), player, layer);
         }
     }
 

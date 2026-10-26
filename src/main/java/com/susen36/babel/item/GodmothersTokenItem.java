@@ -9,7 +9,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 
@@ -28,18 +27,11 @@ public class GodmothersTokenItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)
                         .showOverlay(true)
                         .build());
-    }
-
-    @Override
-    public boolean hasMonsterRangeEffect() {
-        return true;
-    }
-
-    @Override
-    public void onMonsterInRange(Monster monster, Player player, int layer) {
-        AttributeInstance attackDamage = monster.getAttribute(Attributes.ATTACK_DAMAGE);
-        if (attackDamage != null && attackDamage.getModifier(UUID.fromString("4a9d1c7b-3e2f-4b8a-8c5d-9e0f1a2b3c4d")) == null) {
-            attackDamage.addTransientModifier(GODMOTHER_DEBUFF);
-        }
+        addRangeEffect(Monster.class, (monster, player, layer) -> {
+            AttributeInstance attackDamage = monster.getAttribute(Attributes.ATTACK_DAMAGE);
+            if (attackDamage != null && attackDamage.getModifier(UUID.fromString("4a9d1c7b-3e2f-4b8a-8c5d-9e0f1a2b3c4d")) == null) {
+                attackDamage.addTransientModifier(GODMOTHER_DEBUFF);
+            }
+        });
     }
 }

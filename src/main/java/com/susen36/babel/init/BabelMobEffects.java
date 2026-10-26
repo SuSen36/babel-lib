@@ -1,18 +1,7 @@
 package com.susen36.babel.init;
 
 import com.susen36.babel.BabelMod;
-import com.susen36.babel.effect.StunMobEffect;
-import com.susen36.babel.effect.EssenceResistanceMobEffect;
-import com.susen36.babel.effect.FeeblenessMobEffect;
-import com.susen36.babel.effect.FrozenMobEffect;
-import com.susen36.babel.effect.LessArmorMobEffect;
-import com.susen36.babel.effect.PalsyMobEffect;
-import com.susen36.babel.effect.MassLossMobEffect;
-import com.susen36.babel.effect.MuteMobEffect;
-import com.susen36.babel.effect.MagicDodgeMobEffect;
-import com.susen36.babel.effect.PhysicalDodgeMobEffect;
-import com.susen36.babel.effect.UntameConfirmMobEffect;
-import com.susen36.babel.effect.WeakMagicResistanceMobEffect;
+import com.susen36.babel.effect.*;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -29,7 +18,7 @@ public class BabelMobEffects {
     public static final RegistryObject<FeeblenessMobEffect> FEEBLENESS = REGISTRY.register("feebleness", FeeblenessMobEffect::new);
     public static final RegistryObject<MassLossMobEffect> MASS_LOSS = REGISTRY.register("mass_loss", MassLossMobEffect::new);
     public static final RegistryObject<WeakMagicResistanceMobEffect> WEAK_MAGIC_RESISTANCE = REGISTRY.register("weak_magic_resistance", WeakMagicResistanceMobEffect::new);
-    public static final RegistryObject<MuteMobEffect> MUTE = REGISTRY.register("mute", MuteMobEffect::new);
+    public static final RegistryObject<SilencedMobEffect> SILENCED = REGISTRY.register("silenced", SilencedMobEffect::new);
     public static final RegistryObject<MagicDodgeMobEffect> MAGIC_DODGE = REGISTRY.register("magic_dodge", MagicDodgeMobEffect::new);
     public static final RegistryObject<PhysicalDodgeMobEffect> PHYSICAL_DODGE = REGISTRY.register("physical_dodge", PhysicalDodgeMobEffect::new);
     public static final RegistryObject<MobEffect> UNTAME_CONFIRM = REGISTRY.register("untame_confirm", UntameConfirmMobEffect::new);

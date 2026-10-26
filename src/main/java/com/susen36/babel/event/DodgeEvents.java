@@ -11,10 +11,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
 
 @Mod.EventBusSubscriber(modid = BabelMod.MODID)
 public class DodgeEvents {
@@ -26,7 +26,7 @@ public class DodgeEvents {
         AttributeInstance dodgeRate = target.getAttribute(EPEvents.isMagic(source) ? BabelAttributes.MAGIC_MISS_RATE.get() : BabelAttributes.PHYSICAL_MISS_RATE.get());
         if (!event.isCanceled() && dodgeRate != null && dodgeRate.getValue() > 0
                 && !source.is(BabelDamageTags.BYPASS_MISS)
-                && !target.hasEffect(BabelMobEffects.MUTE.get())
+                && !target.hasEffect(BabelMobEffects.SILENCED.get())
                 && (source.is(BabelDamageTags.SKIP_SOURCE_CHECK) || source.getEntity() != null)
                 && target.getRandom().nextDouble() * 100 < dodgeRate.getValue()) {
             if (target.level() instanceof ServerLevel level) {

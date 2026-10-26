@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/goat_horn",
+  "textures": {
+    "layer0": "babel:item/rock_horn"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "tooting": 1
+      },
+      "model": "babel:item/rock_horn_tooting"
+    }
+  ]
+}

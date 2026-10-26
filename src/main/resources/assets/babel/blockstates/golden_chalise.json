@@ -1,33 +1,93 @@
 {
   "variants": {
-    "facing=east,waterlogged=false": {
+    "facing=east,waterlogged=false,blockstate=0": {
       "model": "babel:block/golden_chalise",
       "y": 90
     },
-    "facing=east,waterlogged=true": {
+    "facing=east,waterlogged=false,blockstate=1": {
+      "model": "babel:block/golden_chalise_half",
+      "y": 90
+    },
+    "facing=east,waterlogged=false,blockstate=2": {
+      "model": "babel:block/golden_chalise_full",
+      "y": 90
+    },
+    "facing=east,waterlogged=true,blockstate=0": {
       "model": "babel:block/golden_chalise",
       "y": 90
     },
-    "facing=north,waterlogged=false": {
+    "facing=east,waterlogged=true,blockstate=1": {
+      "model": "babel:block/golden_chalise_half",
+      "y": 90
+    },
+    "facing=east,waterlogged=true,blockstate=2": {
+      "model": "babel:block/golden_chalise_full",
+      "y": 90
+    },
+    "facing=north,waterlogged=false,blockstate=0": {
       "model": "babel:block/golden_chalise"
     },
-    "facing=north,waterlogged=true": {
+    "facing=north,waterlogged=false,blockstate=1": {
+      "model": "babel:block/golden_chalise_half"
+    },
+    "facing=north,waterlogged=false,blockstate=2": {
+      "model": "babel:block/golden_chalise_full"
+    },
+    "facing=north,waterlogged=true,blockstate=0": {
       "model": "babel:block/golden_chalise"
     },
-    "facing=south,waterlogged=false": {
+    "facing=north,waterlogged=true,blockstate=1": {
+      "model": "babel:block/golden_chalise_half"
+    },
+    "facing=north,waterlogged=true,blockstate=2": {
+      "model": "babel:block/golden_chalise_full"
+    },
+    "facing=south,waterlogged=false,blockstate=0": {
       "model": "babel:block/golden_chalise",
       "y": 180
     },
-    "facing=south,waterlogged=true": {
+    "facing=south,waterlogged=false,blockstate=1": {
+      "model": "babel:block/golden_chalise_half",
+      "y": 180
+    },
+    "facing=south,waterlogged=false,blockstate=2": {
+      "model": "babel:block/golden_chalise_full",
+      "y": 180
+    },
+    "facing=south,waterlogged=true,blockstate=0": {
       "model": "babel:block/golden_chalise",
       "y": 180
     },
-    "facing=west,waterlogged=false": {
+    "facing=south,waterlogged=true,blockstate=1": {
+      "model": "babel:block/golden_chalise_half",
+      "y": 180
+    },
+    "facing=south,waterlogged=true,blockstate=2": {
+      "model": "babel:block/golden_chalise_full",
+      "y": 180
+    },
+    "facing=west,waterlogged=false,blockstate=0": {
       "model": "babel:block/golden_chalise",
       "y": 270
     },
-    "facing=west,waterlogged=true": {
+    "facing=west,waterlogged=false,blockstate=1": {
+      "model": "babel:block/golden_chalise_half",
+      "y": 270
+    },
+    "facing=west,waterlogged=false,blockstate=2": {
+      "model": "babel:block/golden_chalise_full",
+      "y": 270
+    },
+    "facing=west,waterlogged=true,blockstate=0": {
       "model": "babel:block/golden_chalise",
+      "y": 270
+    },
+    "facing=west,waterlogged=true,blockstate=1": {
+      "model": "babel:block/golden_chalise_half",
+      "y": 270
+    },
+    "facing=west,waterlogged=true,blockstate=2": {
+      "model": "babel:block/golden_chalise_full",
       "y": 270
     }
   }

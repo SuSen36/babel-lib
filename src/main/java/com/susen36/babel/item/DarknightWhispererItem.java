@@ -9,7 +9,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 
@@ -28,21 +27,14 @@ public class DarknightWhispererItem extends CollectibleItem.CustomCollectibleIte
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)
                         .showOverlay(true)
                         .build());
-    }
-
-    @Override
-    public boolean hasMonsterRangeEffect() {
-        return true;
-    }
-
-    @Override
-    public void onMonsterInRange(Monster monster, Player player, int layer) {
-        AttributeInstance maxHealth = monster.getAttribute(Attributes.MAX_HEALTH);
-        if (maxHealth != null && maxHealth.getModifier(UUID.fromString("2c6b0f5e-8a1d-4c3e-9f7a-6d5e4b3a2c1b")) == null) {
-            maxHealth.addTransientModifier(DARKNIGHT_DEBUFF);
-            if (monster.getHealth() > monster.getMaxHealth()) {
-                monster.setHealth(monster.getMaxHealth());
+        addRangeEffect(Monster.class, (monster, player, layer) -> {
+            AttributeInstance maxHealth = monster.getAttribute(Attributes.MAX_HEALTH);
+            if (maxHealth != null && maxHealth.getModifier(UUID.fromString("2c6b0f5e-8a1d-4c3e-9f7a-6d5e4b3a2c1b")) == null) {
+                maxHealth.addTransientModifier(DARKNIGHT_DEBUFF);
+                if (monster.getHealth() > monster.getMaxHealth()) {
+                    monster.setHealth(monster.getMaxHealth());
+                }
             }
-        }
+        });
     }
 }
