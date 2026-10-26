@@ -3,12 +3,14 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.init.BabelAttributes;
 import com.susen36.babel.init.BabelBlocks;
 import com.susen36.babel.util.LifePointUtils;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -25,11 +27,11 @@ public class AlleySculptureItem extends CollectibleItem.CustomCollectibleItem {
 						.particle(ParticleTypes.RAIN, 72)
 						.showOverlay(true)
 						.build());
+		addAttributeModifier(BabelAttributes.MAX_LIFE_POINT.get(), 3, AttributeModifier.Operation.ADDITION);
 	}
 
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-		LifePointUtils.setMaxLifePoint(player, LifePointUtils.getMaxLifePoint(player) + 3);
 		LifePointUtils.setLifePoint(player, LifePointUtils.getLifePoint(player) + 3);
 	}
 

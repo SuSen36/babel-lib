@@ -12,13 +12,12 @@ import net.minecraft.world.level.LevelReader;
 import javax.annotation.Nullable;
 
 public class BabelDamageTypes {
+    public static final ResourceKey<DamageType> ELEMENT_BREAK = create("element_break");
     public static final ResourceKey<DamageType> SANITY_BREAK = create("sanity_break");
     public static final ResourceKey<DamageType> CORROSION_BREAK = create("corrosion_break");
     public static final ResourceKey<DamageType> BURN_BREAK = create("burn_break");
-    public static final ResourceKey<DamageType> ELEMENT_BREAK = create("element_break");
     public static final ResourceKey<DamageType> FRENZY_BREAK = create("frenzy_break");
-    public static final ResourceKey<DamageType> HAND_OF_CHOKER = create("hand_of_choker");
-    public static final ResourceKey<DamageType> WIPE_MAGIC = create("wipe_magic");
+    public static final ResourceKey<DamageType> TRUE_DAMAGE = create("true_damage");
 
     private BabelDamageTypes() {
         throw new UnsupportedOperationException("Utility class");

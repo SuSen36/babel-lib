@@ -48,6 +48,7 @@ public class CannotEntity extends AbstractVillager {
     private static final int PRICE_HIGH_TIER = 16;
 
     public final AnimationState idleAnimationState = new AnimationState();
+    private int despawnDelay;
 
     public CannotEntity(EntityType<? extends CannotEntity> type, Level level) {
         super(type, level);
@@ -73,6 +74,33 @@ public class CannotEntity extends AbstractVillager {
             this.idleAnimationState.animateWhen(!this.walkAnimation.isMoving(), this.tickCount);
         }
         super.tick();
+    }
+
+    public void aiStep() {
+        super.aiStep();
+        if (!this.level().isClientSide) {
+            this.maybeDespawn();
+        }
+    }
+
+    private void maybeDespawn() {
+        if (this.despawnDelay > 0 && !this.isTrading() && --this.despawnDelay == 0) {
+            this.discard();
+        }
+    }
+
+    public void setDespawnDelay(int delay) {
+        this.despawnDelay = delay;
+    }
+
+    public int getDespawnDelay() {
+        return this.despawnDelay;
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putInt("DespawnDelay", this.despawnDelay);
     }
 
     @Nullable
@@ -143,6 +171,9 @@ public class CannotEntity extends AbstractVillager {
 
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+        if (tag.contains("DespawnDelay", 99)) {
+            this.despawnDelay = tag.getInt("DespawnDelay");
+        }
         this.setAge(Math.max(0, this.getAge()));
     }
 

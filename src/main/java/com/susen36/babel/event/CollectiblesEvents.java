@@ -13,16 +13,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.event.entity.living.*;
+import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
-import net.minecraftforge.event.entity.living.LivingHealEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.player.CriticalHitEvent;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.List;
 
@@ -138,6 +134,22 @@ public class CollectiblesEvents {
         Player player = event.getEntity();
         forEachUsedCollectible(player, (collectible, owner, layer) ->
                 collectible.onCriticalHit(event, owner, layer));
+    }
+
+    @SubscribeEvent
+    public static void onUseItemFinish(LivingEntityUseItemEvent.Finish event) {
+        if (event.getEntity() instanceof Player player) {
+            forEachUsedCollectible(player, (collectible, owner, layer) ->
+                    collectible.onUseItemEnd(event, owner, layer));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onUseItemStop(LivingEntityUseItemEvent.Stop event) {
+        if (event.getEntity() instanceof Player player) {
+            forEachUsedCollectible(player, (collectible, owner, layer) ->
+                    collectible.onUseItemEnd(event, owner, layer));
+        }
     }
 
     @SubscribeEvent

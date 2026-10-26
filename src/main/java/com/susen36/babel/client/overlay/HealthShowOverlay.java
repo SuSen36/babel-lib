@@ -47,8 +47,9 @@ public class HealthShowOverlay {
 
             String lifeMax = "/" + LifePointUtils.getMaxLifePoint(player);
             String life = String.valueOf(LifePointUtils.getLifePoint(player));
-            guiGraphics.drawString(mc.font, lifeMax, 37 + lifeDx, h - 21 + lifeDy, -16764109, false);
-            guiGraphics.drawString(mc.font, lifeMax, 36 + lifeDx, h - 21 + lifeDy, -10040065, false);
+            int lifeMaxX = 20 + lifeDx + mc.font.width(life);
+            guiGraphics.drawString(mc.font, lifeMax, lifeMaxX + 1, h - 21 + lifeDy, -16764109, false);
+            guiGraphics.drawString(mc.font, lifeMax, lifeMaxX, h - 21 + lifeDy, -10040065, false);
             guiGraphics.drawString(mc.font, life, 21 + lifeDx, h - 21 + lifeDy, -16764109, false);
             guiGraphics.drawString(mc.font, life, 20 + lifeDx, h - 21 + lifeDy, -1, false);
         }

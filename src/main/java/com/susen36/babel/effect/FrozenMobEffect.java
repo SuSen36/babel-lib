@@ -23,9 +23,6 @@ public class FrozenMobEffect extends MobEffect {
         this.addAttributeModifier(Attributes.JUMP_STRENGTH, "5f9a3c7e-1d2b-4c8a-9e0f-00000000000e", -1, AttributeModifier.Operation.MULTIPLY_BASE);
         this.addAttributeModifier(Attributes.KNOCKBACK_RESISTANCE, "5f9a3c7e-1d2b-4c8a-9e0f-00000000000f", 0.5, AttributeModifier.Operation.ADDITION);
         this.addAttributeModifier(ForgeMod.STEP_HEIGHT_ADDITION.get(), "5f9a3c7e-1d2b-4c8a-9e0f-000000000010", -1, AttributeModifier.Operation.MULTIPLY_BASE);
-        this.addAttributeModifier(Attributes.ARMOR_TOUGHNESS, "5f9a3c7e-1d2b-4c8a-9e0f-000000000011", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
-        this.addAttributeModifier(Attributes.ARMOR, "5f9a3c7e-1d2b-4c8a-9e0f-000000000012", -0.4, AttributeModifier.Operation.MULTIPLY_BASE);
-        this.addAttributeModifier(Attributes.ATTACK_DAMAGE, "5f9a3c7e-1d2b-4c8a-9e0f-000000000013", -0.5, AttributeModifier.Operation.MULTIPLY_BASE);
     }
 
     @Override

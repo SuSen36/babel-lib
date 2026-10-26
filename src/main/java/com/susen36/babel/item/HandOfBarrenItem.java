@@ -17,7 +17,6 @@ import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 
 import java.util.Map;
@@ -28,7 +27,7 @@ public class HandOfBarrenItem extends CollectibleItem.CustomCollectibleItem {
     private static final TagKey<Item> MINECRAFT_AXES = ItemTags.create(new ResourceLocation("minecraft:axes"));
 
     private static final int BUFF_DURATION_TICKS = 160;
-    private static final int MAX_STACKS = 7;
+    private static final int MAX_STACKS = 8;
 
     private static final Map<Player, Buff> ACTIVE_BUFFS = new WeakHashMap<>();
 

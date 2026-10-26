@@ -8,15 +8,14 @@ import com.susen36.babel.init.BabelGameRules;
 import com.susen36.babel.init.BabelParticles;
 import com.susen36.babel.init.BabelSounds;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Difficulty;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 @Mod.EventBusSubscriber(modid = BabelMod.MODID)
 public class LifePointEvents {
@@ -24,6 +23,7 @@ public class LifePointEvents {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onPlayerDeath(LivingDeathEvent event) {
         if (event.getEntity() instanceof Player player && !player.level().isClientSide() && !event.isCanceled()
+                && !event.getSource().is(DamageTypes.GENERIC_KILL)
                 && player.level().getGameRules().getBoolean(BabelGameRules.TARGET_LIFE_FUNCTION)
                 && !HealthConsumeEvent.firePre(player, event.getSource())) {
             HealthCapability health = BabelCapability.getHealth(player);

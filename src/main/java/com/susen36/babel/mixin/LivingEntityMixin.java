@@ -2,8 +2,8 @@ package com.susen36.babel.mixin;
 
 import com.susen36.babel.init.BabelMobEffects;
 import com.susen36.babel.item.HandOfFlowingWaterItem;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -31,7 +31,8 @@ public abstract class LivingEntityMixin {
     @Inject(method = "updateUsingItem", at = @At("HEAD"), cancellable = true)
     private void updateUsingItemWithFeebleness(ItemStack itemStack, CallbackInfo ci) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        if (entity instanceof Player player && (player.hasEffect(BabelMobEffects.FEEBLENESS.get()) || HandOfFlowingWaterItem.isFlowing(player))) {
+        if (entity instanceof Player player && (player.hasEffect(BabelMobEffects.FEEBLENESS.get())
+                || (HandOfFlowingWaterItem.isFlowing(player) && HandOfFlowingWaterItem.isBowOrCrossbow(itemStack)))) {
             itemStack.onUseTick(player.level(), player, this.getUseItemRemainingTicks());
             if (this.shouldTriggerItemUseEffects()) {
                 this.triggerItemUseEffects(itemStack, 5);
@@ -42,7 +43,7 @@ public abstract class LivingEntityMixin {
             } else {
                 double useRate = Mth.clamp(player.getAttributeValue(Attributes.ATTACK_SPEED) / 4.0D, 0.1D, 8.0D);
                 if (HandOfFlowingWaterItem.isFlowing(player)) {
-                    useRate *= 1.5D;
+                    useRate *= 1.0D + 0.25D * HandOfFlowingWaterItem.activeStacks(player);
                 }
                 feeblenessUseTickRemainder += useRate;
                 int ticksToRemove = Mth.floor(feeblenessUseTickRemainder);

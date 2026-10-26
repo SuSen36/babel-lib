@@ -3,30 +3,32 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.util.LifePointUtils;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 
-public class BowlSeagrassItem extends CollectibleItem.CustomCollectibleItem {
-	public BowlSeagrassItem() {
-		super(new Item.Properties().stacksTo(16).rarity(Rarity.COMMON).food((new FoodProperties.Builder()).nutrition(3).saturationMod(0.4f).alwaysEat().build()), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
+public class KingsFellowshipItem extends CollectibleItem.CustomCollectibleItem {
+	public KingsFellowshipItem() {
+		super(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON), 25, false, CollectibleTiers.RARE, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
-						.sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
-						.particle(ParticleTypes.HAPPY_VILLAGER, 72)
+						.sound(SoundEvents.TOTEM_USE, 2F, 1F)
+						.particle(ParticleTypes.ENCHANTED_HIT, 72)
 						.showOverlay(true)
 						.build());
 	}
 
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-		if (!level.isClientSide())
-			player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 2400, 0));
+		LifePointUtils.addShieldPoint(player, 2);
+		int lives = LifePointUtils.getLifePoint(player);
+		if (lives > 1) {
+			LifePointUtils.addShieldPoint(player, lives - 1);
+			LifePointUtils.setLifePoint(player, 1);
+		}
 	}
 }

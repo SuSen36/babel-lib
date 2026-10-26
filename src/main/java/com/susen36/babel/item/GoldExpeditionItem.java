@@ -17,8 +17,8 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class VoyageOfGoldItem extends CollectibleItem.CustomCollectibleItem {
-    public VoyageOfGoldItem() {
+public class GoldExpeditionItem extends CollectibleItem.CustomCollectibleItem {
+    public GoldExpeditionItem() {
         super(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)

@@ -181,6 +181,19 @@ tasks.withType(JavaCompile).configureEach {
         errorproneArgs.add('-XepOpt:NullAway:AnnotatedPackages=com.susen36.babel')
         // ErrorProne 2.36.0 ParameterName 检查器存在 subSequence 越界崩溃，禁用
         errorproneArgs.add('-Xep:ParameterName:OFF')
+        // 以下检查对 MC/Mixin 结构系统性误报：Mixin 注入方法必然无调用方、实体比较必须用引用相等、
+        errorproneArgs.addAll([
+                '-Xep:UnusedMethod:OFF',
+                '-Xep:UnusedVariable:OFF',
+                '-Xep:ReferenceEquality:OFF',
+                '-Xep:UnnecessaryParentheses:OFF',
+                '-Xep:OperatorPrecedence:OFF',
+                '-Xep:MissingOverride:OFF',
+                '-Xep:NonApiType:OFF',
+                '-Xep:ProtectedMembersInFinalClass:OFF',
+                '-Xep:ImmutableEnumChecker:OFF',
+                '-Xep:FutureReturnValueIgnored:OFF'
+        ])
         // 注册类静态字段（DeferredRegister/配置模式）由框架在类加载后赋值，非真实空指针风险，暂排除后续分批处理
         errorproneArgs.add('-XepOpt:NullAway:ExcludedClasses=com.susen36.babel.init.BabelCollectible,com.susen36.babel.BabelConfig')
     }

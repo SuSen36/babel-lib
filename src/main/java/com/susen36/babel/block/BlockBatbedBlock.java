@@ -11,24 +11,16 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.ambient.Bat;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -103,8 +95,8 @@ public class BlockBatbedBlock extends Block {
             int x = pos.getX();
             int y = pos.getY();
             int z = pos.getZ();
-            return (world.getBlockState(BlockPos.containing((double) x + getFacing(blockstate).getOpposite().getStepX(), y, (double) z + getFacing(blockstate).getOpposite().getStepZ()))).canBeReplaced()
-                    || (world.getBlockState(BlockPos.containing((double) x + getFacing(blockstate).getOpposite().getStepX(), y, (double) z + getFacing(blockstate).getOpposite().getStepZ()))).getBlock() == BabelBlocks.BATBED_UPPER.get();
+            return world.getBlockState(BlockPos.containing((double) x + getFacing(blockstate).getOpposite().getStepX(), y, (double) z + getFacing(blockstate).getOpposite().getStepZ())).canBeReplaced()
+                    || world.getBlockState(BlockPos.containing((double) x + getFacing(blockstate).getOpposite().getStepX(), y, (double) z + getFacing(blockstate).getOpposite().getStepZ())).getBlock() == BabelBlocks.BATBED_UPPER.get();
         }
         return super.canSurvive(blockstate, worldIn, pos);
     }
@@ -149,7 +141,7 @@ public class BlockBatbedBlock extends Block {
         List<Entity> entfound = world.getEntitiesOfClass(Entity.class, new AABB(center, center).inflate(64 / 2d), e -> true).stream().sorted(Comparator.comparingDouble(entcnd -> entcnd.distanceToSqr(center))).toList();
         for (Entity entityiterator : entfound) {
             if ((entityiterator instanceof Bat || entityiterator instanceof LivingEntity livEnt1 && livEnt1.getMobType() == MobType.UNDEAD)
-                    && new Vec3(((double) x + 0.5), ((double) y + 1), ((double) z + 0.5)).distanceTo(new Vec3((entityiterator.getX()), (entityiterator.getY()), (entityiterator.getZ()))) > 1) {
+                    && new Vec3((double) x + 0.5, (double) y + 1, (double) z + 0.5).distanceTo(new Vec3(entityiterator.getX(), entityiterator.getY(), entityiterator.getZ())) > 1) {
                 if (Math.random() < 0.2) {
                     if (entityiterator instanceof Mob mob)
                         mob.getNavigation().moveTo(((double) x + Mth.nextDouble(RandomSource.create(), -3, 4)), y, ((double) z + Mth.nextDouble(RandomSource.create(), -3, 4)), 1);

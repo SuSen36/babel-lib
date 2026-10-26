@@ -9,10 +9,10 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.client.event.RenderGuiEvent;
 
 @Mod.EventBusSubscriber(value = {Dist.CLIENT}, modid = BabelMod.MODID)
 public class WeakArmorOverlay {
@@ -36,13 +36,13 @@ public class WeakArmorOverlay {
 		boolean least = amplifier > 9;
 		if (hasArmor && hasMagic) {
 			texture = new ResourceLocation(BabelMod.MODID,
-					"textures/gui/overlay/" + (least ? "least" : "less") + "_armor_ui.png");
+					"textures/gui/overlay/" + (least ? "least" : "less") + "_armor_and_weak_magic_resistance.png");
 		} else if (hasArmor) {
 			texture = new ResourceLocation(BabelMod.MODID,
-					"textures/gui/overlay/" + (least ? "least" : "less") + "_armor_ui_blue.png");
+					"textures/gui/overlay/" + (least ? "least" : "less") + "_armor.png");
 		} else if (hasMagic) {
 			texture = new ResourceLocation(BabelMod.MODID,
-					"textures/gui/overlay/" + (least ? "least" : "less") + "_armor_ui_purple.png");
+					"textures/gui/overlay/" + (least ? "least_" : "") + "weak_magic_resistance.png");
 		}
 		if (texture != null) {
 			int width = Minecraft.getInstance().getWindow().getGuiScaledWidth();

@@ -164,7 +164,6 @@ public class CannotScreen extends AbstractContainerScreen<CannotMenu> {
         if (i > 1) {
             int j = SCROLL_BAR_HEIGHT - (27 + (i - 1) * SCROLL_BAR_HEIGHT / i);
             int k = 1 + j / i + SCROLL_BAR_HEIGHT / i;
-            int l = 113;
             int i1 = Math.min(113, this.scrollOff * k);
             if (this.scrollOff == i - 1) {
                 i1 = 113;

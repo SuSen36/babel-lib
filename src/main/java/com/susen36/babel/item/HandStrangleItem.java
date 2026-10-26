@@ -39,8 +39,8 @@ public class HandStrangleItem extends CollectibleItem.CustomCollectibleItem {
             ItemStack mainHandItem = player.getMainHandItem();
             String registryName = BuiltInRegistries.ITEM.getKey(mainHandItem.getItem()).toString();
             if (isStrangleWeapon(mainHandItem, registryName)
-                    && target.isAlive() && target.getHealth() < target.getMaxHealth() * 0.25F) {
-                target.hurt(BabelDamageTypes.source(level, BabelDamageTypes.HAND_OF_CHOKER, player), target.getMaxHealth() * 99);
+                    && target.isAlive() && target.getHealth() < target.getMaxHealth() * 0.20F) {
+                target.hurt(BabelDamageTypes.source(level, BabelDamageTypes.TRUE_DAMAGE, player), target.getMaxHealth() * 99);
                 if (level instanceof ServerLevel serverLevel) {
                     serverLevel.sendParticles(ParticleTypes.GLOW_SQUID_INK, target.getX(), target.getY(), target.getZ(), 128, 1, 1, 1, 0.33);
                 }

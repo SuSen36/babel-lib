@@ -16,7 +16,7 @@ public class BabelEntities {
 
     public static final RegistryObject<EntityType<CannotEntity>> CANNOT = REGISTRY.register("cannot",
             () -> EntityType.Builder.of(CannotEntity::new, MobCategory.CREATURE)
-                    .sized(0.6F, 2.1F)
+                    .sized(0.6F, 2.4F)
                     .clientTrackingRange(10)
                     .build("babel:cannot"));
 

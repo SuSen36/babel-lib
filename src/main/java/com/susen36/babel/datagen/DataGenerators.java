@@ -1,6 +1,7 @@
 package com.susen36.babel.datagen;
 
 import com.susen36.babel.BabelMod;
+import com.susen36.babel.datagen.tags.DamageTypeTagsProvider;
 import com.susen36.babel.datagen.tags.EntityTypeTagsProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
@@ -22,6 +23,7 @@ public class DataGenerators {
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 
+        generator.addProvider(event.includeServer(), new DamageTypeTagsProvider(output, lookupProvider, existingFileHelper));
         generator.addProvider(event.includeServer(), new EntityTypeTagsProvider(output, lookupProvider, existingFileHelper));
     }
 }

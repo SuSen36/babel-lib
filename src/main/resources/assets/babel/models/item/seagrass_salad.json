@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "babel:item/bowl_seagrass"
+    "layer0": "babel:item/seagrass_salad"
   }
 }

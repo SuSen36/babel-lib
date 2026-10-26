@@ -24,11 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
-import net.minecraftforge.event.entity.living.LivingHealEvent;
+import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
@@ -119,21 +115,21 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     }
 
     /**
-     * 所有收藏品通用两行描述：键名按注册名生成，颜色由本地化值内嵌的 § 代码控制。
+     * 所有收藏品通用逐行描述：键名按注册名生成，直到 lang 中不存在下一个 description_N 为止。
      */
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @NotNull Level level, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         String descKey = this.getDescriptionId() + ".description";
-        String key0 = descKey + "_0";
-        String key1 = descKey + "_1";
-        Component line0 = Component.translatable(key0).withStyle(ChatFormatting.AQUA, ChatFormatting.ITALIC);
-        if (!line0.getString().equals(key0)) {
-            tooltip.add(line0);
-        }
-        Component line1 = Component.translatable(key1).withStyle(ChatFormatting.GRAY);
-        if (!line1.getString().equals(key1)) {
-            tooltip.add(line1);
+        for (int i = 0; ; i++) {
+            String key = descKey + "_" + i;
+            Component line = i == 0
+                    ? Component.translatable(key).withStyle(ChatFormatting.AQUA, ChatFormatting.ITALIC)
+                    : Component.translatable(key).withStyle(ChatFormatting.GRAY);
+            if (line.getString().equals(key)) {
+                break;
+            }
+            tooltip.add(line);
         }
     }
 
@@ -422,6 +418,9 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         public void onCriticalHit(CriticalHitEvent event, Player player, int layer) {
         }
 
+        public void onUseItemEnd(LivingEntityUseItemEvent event, Player player, int layer) {
+        }
+
         public void onExperienceDrop(LivingExperienceDropEvent event, Player player, int layer) {
         }
 
@@ -437,21 +436,21 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         }
 
         /**
-         * 所有收藏品通用两行描述：键名按注册名生成，颜色由本地化值内嵌的 § 代码控制。
+         * 所有收藏品通用逐行描述：键名按注册名生成，直到 lang 中不存在下一个 description_N 为止。
          */
         @Override
         final public void appendHoverText(@NotNull ItemStack stack, @NotNull Level level, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltip, flag);
             String descKey = this.getDescriptionId() + ".description";
-            String key0 = descKey + "_0";
-            String key1 = descKey + "_1";
-            Component line0 = Component.translatable(key0).withStyle(ChatFormatting.AQUA, ChatFormatting.ITALIC);
-            if (!line0.getString().equals(key0)) {
-                tooltip.add(line0);
-            }
-            Component line1 = Component.translatable(key1).withStyle(ChatFormatting.GRAY);
-            if (!line1.getString().equals(key1)) {
-                tooltip.add(line1);
+            for (int i = 0; ; i++) {
+                String key = descKey + "_" + i;
+                Component line = i == 0
+                        ? Component.translatable(key).withStyle(ChatFormatting.AQUA, ChatFormatting.ITALIC)
+                        : Component.translatable(key).withStyle(ChatFormatting.GRAY);
+                if (line.getString().equals(key)) {
+                    break;
+                }
+                tooltip.add(line);
             }
         }
 

@@ -3,6 +3,7 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.init.BabelAttributes;
 import com.susen36.babel.init.BabelBlocks;
 import com.susen36.babel.init.BabelItems;
 import com.susen36.babel.util.LifePointUtils;
@@ -13,6 +14,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -31,11 +33,11 @@ public class KettleItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)
                         .showOverlay(true)
                         .build());
+        addAttributeModifier(BabelAttributes.MAX_LIFE_POINT.get(), 1, AttributeModifier.Operation.ADDITION);
     }
 
     @Override
     public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-        LifePointUtils.setMaxLifePoint(player, LifePointUtils.getMaxLifePoint(player) + 1);
         LifePointUtils.setLifePoint(player, LifePointUtils.getLifePoint(player) + 1);
         for (int index0 = 0; index0 < 2; index0++) {
             if (level instanceof ServerLevel serverLevel)

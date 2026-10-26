@@ -15,7 +15,7 @@ public abstract class BowItemMixin {
     @Redirect(method = "releaseUsing",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;shrink(I)V"))
     private void maybeSkipArrowConsumption(ItemStack arrows, int count, ItemStack bow, Level level, LivingEntity shooter, int remainingTicks) {
-        if (!(shooter instanceof Player player && HandOfFlowingWaterItem.isFlowing(player) && player.getRandom().nextBoolean())) {
+        if (!(shooter instanceof Player player && HandOfFlowingWaterItem.isFlowing(player) && HandOfFlowingWaterItem.rollArrowPreservation(player, level))) {
             arrows.shrink(count);
         }
     }

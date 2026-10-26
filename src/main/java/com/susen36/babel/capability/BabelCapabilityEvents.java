@@ -99,6 +99,7 @@ public class BabelCapabilityEvents {
         HealthCapability health = BabelCapability.getHealth(player);
         if (oldHealth != null && health != null) {
             health.deserializeNBT(oldHealth.serializeNBT());
+            health.sync();
         }
     }
 }

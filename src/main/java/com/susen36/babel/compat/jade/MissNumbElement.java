@@ -3,7 +3,6 @@ package com.susen36.babel.compat.jade;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.susen36.babel.BabelMod;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec2;
@@ -33,7 +32,6 @@ public class MissNumbElement extends Element {
 
     @Override
     public Vec2 getSize() {
-        Font font = Minecraft.getInstance().font;
         return new Vec2((float) (getPhysicalPartLen() + getMagicPartLen() + getNumbPartLen()), 11.0F);
     }
 

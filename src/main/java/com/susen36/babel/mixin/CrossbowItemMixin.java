@@ -14,7 +14,7 @@ public abstract class CrossbowItemMixin {
     @Redirect(method = "loadProjectile",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;split(I)Lnet/minecraft/world/item/ItemStack;"))
     private static ItemStack maybeSkipBoltConsumption(ItemStack bolts, int count, LivingEntity shooter, ItemStack crossbow, ItemStack projectile, boolean multishotExtra, boolean creative) {
-        if (shooter instanceof Player player && HandOfFlowingWaterItem.isFlowing(player) && player.getRandom().nextBoolean()) {
+        if (shooter instanceof Player player && HandOfFlowingWaterItem.isFlowing(player) && HandOfFlowingWaterItem.rollArrowPreservation(player, shooter.level())) {
             return bolts.copyWithCount(1);
         }
         return bolts.split(count);
