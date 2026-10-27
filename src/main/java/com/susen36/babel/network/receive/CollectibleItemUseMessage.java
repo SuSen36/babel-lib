@@ -2,7 +2,6 @@ package com.susen36.babel.network.receive;
 
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.network.ClientPacketHandler;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;

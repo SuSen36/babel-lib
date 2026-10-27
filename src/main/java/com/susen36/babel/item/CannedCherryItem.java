@@ -47,7 +47,7 @@ public class CannedCherryItem extends CollectibleItem.CustomCollectibleItem {
 	@Override
 	protected InteractionResultHolder<ItemStack> onSneakUse(Level level, Player player, InteractionHand hand) {
 		ItemStack itemstack = player.getItemInHand(hand);
-		HitResult hit = player.pick(5.0D, 1.0F, false);
+		HitResult hit = player.pick(player.getBlockReach(), 1.0F, false);
 		if (hit instanceof BlockHitResult blockHit) {
 			Direction direction = blockHit.getDirection();
 			BlockPos clicked = blockHit.getBlockPos();
@@ -56,7 +56,9 @@ public class CannedCherryItem extends CollectibleItem.CustomCollectibleItem {
 				Direction dir = player.getDirection().getOpposite();
 				level.setBlock(pos, BabelBlocks.BERRY_CAN.get().defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, dir), 3);
 				level.playSound(null, clicked, SoundEvents.GLASS_PLACE, SoundSource.BLOCKS, 1, 1);
-				itemstack.shrink(1);
+				if (!player.getAbilities().instabuild) {
+					itemstack.shrink(1);
+				}
 				return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
 			}
 		}

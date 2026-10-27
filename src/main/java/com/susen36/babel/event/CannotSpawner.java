@@ -41,28 +41,24 @@ public class CannotSpawner {
             for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
                 if (!player.isSpectator() && player.tickCount % 1200 == 0
                         && player.level().getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) {
-                    trySpawn(player);
+                    CompoundTag data = player.getPersistentData();
+                    if (!data.contains(SPAWN_DELAY_KEY, 99)) {
+                        data.putInt(SPAWN_DELAY_KEY, SPAWN_DELAY);
+                    }
+                    if (!data.contains(SPAWN_CHANCE_KEY, 99)) {
+                        data.putInt(SPAWN_CHANCE_KEY, MIN_SPAWN_CHANCE);
+                    }
+                    int spawnDelay = data.getInt(SPAWN_DELAY_KEY) - 1200;
+                    data.putInt(SPAWN_DELAY_KEY, spawnDelay);
+                    if (spawnDelay <= 0) {
+                        data.putInt(SPAWN_DELAY_KEY, SPAWN_DELAY);
+                        int chance = data.getInt(SPAWN_CHANCE_KEY);
+                        data.putInt(SPAWN_CHANCE_KEY, Mth.clamp(chance + SPAWN_CHANCE_INCREASE, MIN_SPAWN_CHANCE, MAX_SPAWN_CHANCE));
+                        if (player.getRandom().nextInt(100) <= chance && spawnCannot(player)) {
+                            data.putInt(SPAWN_CHANCE_KEY, MIN_SPAWN_CHANCE);
+                        }
+                    }
                 }
-            }
-        }
-    }
-
-    private static void trySpawn(ServerPlayer player) {
-        CompoundTag data = player.getPersistentData();
-        if (!data.contains(SPAWN_DELAY_KEY, 99)) {
-            data.putInt(SPAWN_DELAY_KEY, SPAWN_DELAY);
-        }
-        if (!data.contains(SPAWN_CHANCE_KEY, 99)) {
-            data.putInt(SPAWN_CHANCE_KEY, MIN_SPAWN_CHANCE);
-        }
-        int spawnDelay = data.getInt(SPAWN_DELAY_KEY) - 1200;
-        data.putInt(SPAWN_DELAY_KEY, spawnDelay);
-        if (spawnDelay <= 0) {
-            data.putInt(SPAWN_DELAY_KEY, SPAWN_DELAY);
-            int chance = data.getInt(SPAWN_CHANCE_KEY);
-            data.putInt(SPAWN_CHANCE_KEY, Mth.clamp(chance + SPAWN_CHANCE_INCREASE, MIN_SPAWN_CHANCE, MAX_SPAWN_CHANCE));
-            if (player.getRandom().nextInt(100) <= chance && spawnCannot(player)) {
-                data.putInt(SPAWN_CHANCE_KEY, MIN_SPAWN_CHANCE);
             }
         }
     }

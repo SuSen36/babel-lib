@@ -16,7 +16,7 @@ public final class BabelEntityTypeTags {
     private BabelEntityTypeTags() {
     }
 
-    /** 精英生物标签，默认空，由依赖模组填充。 */
+    /** 精英生物标签，datagen 内置原版精锐敌怪，依赖模组可继续追加。 */
     public static final TagKey<EntityType<?>> ELITE = create("elite");
 
     /** forge 生态通用的首领生物标签。 */

@@ -2,6 +2,7 @@ package com.susen36.babel.collectible;
 
 import com.susen36.babel.BabelConfig;
 import com.susen36.babel.api.event.CollectibleEvent;
+import com.susen36.babel.api.event.LifePointConsumeEvent;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -419,6 +420,10 @@ public final class CollectibleItem extends Item implements CollectibleLike {
 
         /** 持有者承受伤害（LivingDamageEvent 阶段），可通过 event 调整最终伤害。 */
         public void onMobHurt(LivingDamageEvent event, Player player, int layer) {
+        }
+
+        /** 持有者失去生命值或护盾（LifePointConsumeEvent 阶段）；type 为扣除的资源类型，amount 为扣除量，事件只读。 */
+        public void onLifePointLoss(LifePointConsumeEvent event, Player player, int layer) {
         }
 
         /** 持有者接受治疗或生命回复（LivingHealEvent 阶段）；药水治疗与饱食自然回复都走 LivingEntity.heal，setAmount 可调整治疗量。 */

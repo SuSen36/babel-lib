@@ -45,7 +45,7 @@ public class RelicCrownItem extends CollectibleItem.CustomCollectibleItem {
 	@Override
 	protected InteractionResultHolder<ItemStack> onSneakUse(Level level, Player player, InteractionHand hand) {
 		ItemStack itemstack = player.getItemInHand(hand);
-		HitResult hit = player.pick(5.0D, 1.0F, false);
+		HitResult hit = player.pick(player.getBlockReach(), 1.0F, false);
 		if (hit instanceof BlockHitResult blockHit) {
 			UseOnContext context = new UseOnContext(player, hand, blockHit);
 			BlockPlaceContext blockContext = new BlockPlaceContext(context);

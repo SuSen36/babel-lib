@@ -12,16 +12,18 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * {@code babel:applies_difficulty} 默认纳入末影龙与 {@code forge:bosses}；
- * {@code babel:bypasses_difficulty} 保持为空，交由依赖模组自行添加。
+ * {@code babel:elite} 默认纳入原版精锐敌怪；{@code babel:bypasses_difficulty} 保持为空，交由依赖模组自行添加。
  */
 public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
 
     private static final TagKey<EntityType<?>> APPLIES_DIFFICULTY = babelEntityTypeTag("applies_difficulty");
     private static final TagKey<EntityType<?>> BYPASSES_DIFFICULTY = babelEntityTypeTag("bypasses_difficulty");
+    private static final TagKey<EntityType<?>> ELITE = babelEntityTypeTag("elite");
     private static final TagKey<EntityType<?>> FORGE_BOSSES = TagKey.create(
             Registries.ENTITY_TYPE, new ResourceLocation("forge", "bosses"));
 
@@ -38,7 +40,18 @@ public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
                 .add(ResourceKey.create(Registries.ENTITY_TYPE, EntityType.getKey(EntityType.ENDER_DRAGON)))
                 .addTag(FORGE_BOSSES);
 
+        tag(ELITE)
+                .add(entityTypeKey(EntityType.BLAZE), entityTypeKey(EntityType.ELDER_GUARDIAN),
+                        entityTypeKey(EntityType.ENDERMAN), entityTypeKey(EntityType.EVOKER), entityTypeKey(EntityType.GHAST),
+                        entityTypeKey(EntityType.PIGLIN_BRUTE), entityTypeKey(EntityType.RAVAGER), entityTypeKey(EntityType.SHULKER),
+                        entityTypeKey(EntityType.VINDICATOR), entityTypeKey(EntityType.WARDEN),
+                        entityTypeKey(EntityType.WITHER_SKELETON));
+
         tag(BYPASSES_DIFFICULTY);
+    }
+
+    private static ResourceKey<EntityType<?>> entityTypeKey(EntityType<?> type) {
+        return ResourceKey.create(Registries.ENTITY_TYPE, Objects.requireNonNull(EntityType.getKey(type)));
     }
 
     private static TagKey<EntityType<?>> babelEntityTypeTag(String path) {

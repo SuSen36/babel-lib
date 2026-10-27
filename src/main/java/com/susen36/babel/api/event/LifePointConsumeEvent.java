@@ -1,7 +1,6 @@
 package com.susen36.babel.api.event;
 
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -12,52 +11,56 @@ import net.minecraftforge.eventbus.api.Cancelable;
  * <p>
  * babel 负责核心扣除与阻挡死亡逻辑,依赖模组通过该事件处理模组专属效果。
  */
-public class HealthConsumeEvent extends LivingEvent {
-    private final DamageSource source;
-    private final boolean blocked;
-    private final boolean shieldConsumed;
-    private final boolean livesConsumed;
+public class LifePointConsumeEvent extends LivingEvent {
 
-    protected HealthConsumeEvent(Player player, DamageSource source, boolean blocked, boolean shieldConsumed, boolean livesConsumed) {
+    private final DamageSource source;
+    private final Type type;
+    private final float amount;
+
+    public LifePointConsumeEvent(Player player, DamageSource source, Type type, float amount) {
         super(player);
         this.source = source;
-        this.blocked = blocked;
-        this.shieldConsumed = shieldConsumed;
-        this.livesConsumed = livesConsumed;
+        this.type = type;
+        this.amount = amount;
     }
 
     public DamageSource getSource() {
         return source;
     }
 
-    public boolean isBlocked() {
-        return blocked;
+    public Type getType() {
+        return type;
     }
 
-    public boolean isShieldConsumed() {
-        return shieldConsumed;
-    }
-
-    public boolean isLivesConsumed() {
-        return livesConsumed;
+    public float getAmount() {
+        return amount;
     }
 
     /**
      * 扣除前触发的前置事件，可取消。模组用于跳过豁免类伤害（如绕过保护标签）的目标生命扣除。
+     * <p>
+     * 此时尚未决定扣除哪一类资源，因此不携带扣除信息。
      */
     @Cancelable
-    public static class Pre extends HealthConsumeEvent {
+    public static class Pre extends LivingEvent {
+        private final DamageSource source;
+
         public Pre(Player player, DamageSource source) {
-            super(player, source, false, false, false);
+            super(player);
+            this.source = source;
+        }
+
+        public DamageSource getSource() {
+            return source;
         }
     }
 
     /**
      * 扣除并阻挡死亡后触发的事件，用于播放音效、粒子、药水、成就等模组专属效果。
      */
-    public static class Post extends HealthConsumeEvent {
-        public Post(Player player, DamageSource source, boolean blocked, boolean shieldConsumed, boolean livesConsumed) {
-            super(player, source, blocked, shieldConsumed, livesConsumed);
+    public static class Post extends LifePointConsumeEvent {
+        public Post(Player player, DamageSource source, Type type, float amount) {
+            super(player, source, type, amount);
         }
     }
 
@@ -67,8 +70,14 @@ public class HealthConsumeEvent extends LivingEvent {
         return event.isCanceled();
     }
 
-    public static void firePost(Player player, DamageSource source, boolean blocked, boolean shieldConsumed, boolean livesConsumed) {
-        Post event = new Post(player, source, blocked, shieldConsumed, livesConsumed);
+    public static void firePost(Player player, DamageSource source, Type type, float amount) {
+        Post event = new Post(player, source, type, amount);
         MinecraftForge.EVENT_BUS.post(event);
+    }
+
+    /** 实际被扣除的资源类型。 */
+    public enum Type {
+        SHIELD,
+        LIVES
     }
 }

@@ -39,7 +39,7 @@ public class OmniKeyItem extends CollectibleItem.CustomCollectibleItem {
     @Override
     protected InteractionResultHolder<ItemStack> onSneakUse(Level level, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
-        HitResult hit = player.pick(5.0D, 1.0F, false);
+        HitResult hit = player.pick(player.getBlockReach(), 1.0F, false);
         if (hit instanceof BlockHitResult blockHit) {
             BlockPos pos = blockHit.getBlockPos();
             BlockState state = level.getBlockState(pos);

@@ -33,9 +33,9 @@ public class BabelConfig {
             .comment("其它能使收藏品刻勋之手生效的物品。最好是三叉戟。")
             .defineList("hand_engrave_recognizable", List.of("iceandfire:tide_trident"), entry -> true);
 
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> CRIMSON_TREATY_RECOGNIZABLE = BUILDER
-            .comment("其它能使收藏品绯红盟约生效的生物。最好来自下界。")
-            .defineList("crimson_treaty_recognizable", List.of("cataclysm:ignis", "cataclysm:netherite_monstrosity"), entry -> true);
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ROYAL_ALLIANCE_TREATY_RECOGNIZABLE = BUILDER
+            .comment("其它能使收藏品王庭盟约生效的生物。最好来自下界。")
+            .defineList("royal_alliance_treaty_recognizable", List.of("cataclysm:ignis", "cataclysm:netherite_monstrosity"), entry -> true);
 
     public static final ForgeConfigSpec.DoubleValue EP_X_OFFSET = BUILDER
             .comment("元素损伤渲染x轴偏移。正数值为向右偏移")
@@ -90,7 +90,7 @@ public class BabelConfig {
     public static List<? extends String> handStrangleRecognizable;
     public static List<? extends String> handFireworkRecognizable;
     public static List<? extends String> handEngraveRecognizable;
-    public static List<? extends String> crimsonTreatyRecognizable;
+    public static List<? extends String> royalAllianceTreatyRecognizable;
 
     @SubscribeEvent
     public static void onLoad(final ModConfigEvent.Loading event) {
@@ -109,7 +109,7 @@ public class BabelConfig {
         handStrangleRecognizable = HAND_STRANGLE_RECOGNIZABLE.get();
         handFireworkRecognizable = HAND_FIREWORK_RECOGNIZABLE.get();
         handEngraveRecognizable = HAND_ENGRAVE_RECOGNIZABLE.get();
-        crimsonTreatyRecognizable = CRIMSON_TREATY_RECOGNIZABLE.get();
+        royalAllianceTreatyRecognizable = ROYAL_ALLIANCE_TREATY_RECOGNIZABLE.get();
     }
 
     public static void onReloading(final ModConfigEvent.Reloading event) {
@@ -128,6 +128,6 @@ public class BabelConfig {
         handStrangleRecognizable = HAND_STRANGLE_RECOGNIZABLE.get();
         handFireworkRecognizable = HAND_FIREWORK_RECOGNIZABLE.get();
         handEngraveRecognizable = HAND_ENGRAVE_RECOGNIZABLE.get();
-        crimsonTreatyRecognizable = CRIMSON_TREATY_RECOGNIZABLE.get();
+        royalAllianceTreatyRecognizable = ROYAL_ALLIANCE_TREATY_RECOGNIZABLE.get();
     }
 }

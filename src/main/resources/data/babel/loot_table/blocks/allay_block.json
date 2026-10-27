@@ -11,7 +11,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "babel:util_allay"
+          "name": "babel:allay_sculpture"
         }
       ],
       "rolls": 1.0

@@ -103,4 +103,10 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    exit_code = main()
+    if len(sys.argv) == 1 and sys.stdin is not None and sys.stdin.isatty():
+        try:
+            input("Press Enter to exit...")
+        except EOFError:
+            pass
+    raise SystemExit(exit_code)

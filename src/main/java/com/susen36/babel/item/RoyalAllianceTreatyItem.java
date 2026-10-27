@@ -18,19 +18,18 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 
-public class CrimsonTreatyItem extends CollectibleItem.CustomCollectibleItem {
+public class RoyalAllianceTreatyItem extends CollectibleItem.CustomCollectibleItem {
 
 	private static final TagKey<EntityType<?>> NETHER_MOBS = TagKey.create(
 			Registries.ENTITY_TYPE, new ResourceLocation("forge:nether_mobs"));
 	private static final TagKey<EntityType<?>> FORGE_BOSSES = TagKey.create(
 			Registries.ENTITY_TYPE, new ResourceLocation("forge:bosses"));
 
-	public CrimsonTreatyItem() {
+	public RoyalAllianceTreatyItem() {
 		super(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC), 25, false, CollectibleTiers.ADVANCED, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
@@ -46,7 +45,7 @@ public class CrimsonTreatyItem extends CollectibleItem.CustomCollectibleItem {
 			boolean valid = sourceEntity.getType().is(NETHER_MOBS);
 			if (!valid) {
 				String regName = BuiltInRegistries.ENTITY_TYPE.getKey(sourceEntity.getType()).toString();
-				valid = matchesConfigured(BabelConfig.crimsonTreatyRecognizable, regName);
+				valid = matchesConfigured(BabelConfig.royalAllianceTreatyRecognizable, regName);
 			}
 			if (valid) {
 				double amount = event.getAmount();

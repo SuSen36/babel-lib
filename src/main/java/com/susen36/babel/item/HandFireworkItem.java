@@ -12,6 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Monster;
@@ -63,9 +64,11 @@ public class HandFireworkItem extends CollectibleItem.CustomCollectibleItem {
         Vec3 center = target.position();
         level.playSound(null, center.x, center.y, center.z, SoundEvents.FIREWORK_ROCKET_LARGE_BLAST, SoundSource.PLAYERS, 3.6F, 1);
         BabelNetwork.sendFireworkParticles(target, center.x, center.y + 0.5, center.z, randomFireworkNbt(player.getRandom()));
+        double radiusSqr = EXPLOSION_RADIUS * EXPLOSION_RADIUS;
         List<LivingEntity> nearbyEntities = level.getEntitiesOfClass(LivingEntity.class,
                 new AABB(center, center).inflate(EXPLOSION_RADIUS),
-                candidate -> candidate != player && (candidate.getType() == target.getType() || candidate instanceof Monster));
+                candidate -> candidate != player && (candidate.getType() == target.getType() || candidate instanceof Monster)
+                        && candidate.distanceToSqr(center.x, center.y, center.z) < radiusSqr);
         for (LivingEntity candidate : nearbyEntities) {
             boolean visible = false;
             for (int i = 0; i < 2; ++i) {
@@ -77,8 +80,8 @@ public class HandFireworkItem extends CollectibleItem.CustomCollectibleItem {
                 }
             }
             if (visible) {
-                double dist = Math.sqrt(candidate.distanceToSqr(center.x, center.y, center.z));
-                float damage = (float) (amount * 3 * Math.sqrt((EXPLOSION_RADIUS - dist) / EXPLOSION_RADIUS));
+                float dist = Mth.sqrt((float) candidate.distanceToSqr(center.x, center.y, center.z));
+                float damage = (float) (amount * 3 * Mth.sqrt((float) ((EXPLOSION_RADIUS - dist) / EXPLOSION_RADIUS)));
                 candidate.hurt(level.damageSources().playerAttack(player), damage);
             }
         }

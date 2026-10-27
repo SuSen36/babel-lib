@@ -1,6 +1,7 @@
 package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
+import com.susen36.babel.api.event.LifePointConsumeEvent;
 import com.susen36.babel.collectible.CollectibleAttributes;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.Collectibles;
@@ -131,6 +132,14 @@ public class CollectiblesEvents {
         if (event.getEntity() instanceof Player player) {
             forEachUsedCollectible(player, (collectible, owner, layer) ->
                     collectible.onOwnerHeal(event, owner, layer));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLifePointLoss(LifePointConsumeEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            forEachUsedCollectible(player, (collectible, owner, layer) ->
+                    collectible.onLifePointLoss(event, owner, layer));
         }
     }
 

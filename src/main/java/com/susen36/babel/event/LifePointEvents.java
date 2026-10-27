@@ -1,7 +1,8 @@
 package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
-import com.susen36.babel.api.event.HealthConsumeEvent;
+import com.susen36.babel.api.event.LifePointConsumeEvent;
+import com.susen36.babel.api.event.LifePointConsumeEvent.Type;
 import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.health.HealthCapability;
 import com.susen36.babel.init.BabelGameRules;
@@ -25,22 +26,20 @@ public class LifePointEvents {
         if (event.getEntity() instanceof Player player && !player.level().isClientSide() && !event.isCanceled()
                 && !event.getSource().is(DamageTypes.GENERIC_KILL)
                 && player.level().getGameRules().getBoolean(BabelGameRules.TARGET_LIFE_FUNCTION)
-                && !HealthConsumeEvent.firePre(player, event.getSource())) {
+                && !LifePointConsumeEvent.firePre(player, event.getSource())) {
             HealthCapability health = BabelCapability.getHealth(player);
-            boolean blocked = false;
-            boolean isShield = false;
+            Type type = null;
 
             if (health != null) {
                 if (health.getShield() > 0) {
-                    blocked = true;
-                    isShield = true;
+                    type = Type.SHIELD;
                     health.setShield(health.getShield() - 1);
                 } else if (health.getLives() > 1) {
-                    blocked = true;
+                    type = Type.LIVES;
                     health.setLives(health.getLives() - 1);
                 }
 
-                if (blocked) {
+                if (type != null) {
                     event.setCanceled(true);
                     player.setHealth(player.getMaxHealth());
                     double x = player.getX();
@@ -48,12 +47,12 @@ public class LifePointEvents {
                     double z = player.getZ();
                     player.level().playSound(null, x, y, z, BabelSounds.TARGET_DAMAGED.get(), SoundSource.PLAYERS, 0.33F, 1.0F);
                     if (player.level() instanceof ServerLevel serverLevel) {
-                        serverLevel.sendParticles(isShield ? BabelParticles.SHIELDLOSS.get() : BabelParticles.LIFELOSS.get(), x, y + 0.95, z, 72, 0.75, 0.55, 0.75, 0.2);
+                        serverLevel.sendParticles(type == Type.SHIELD ? BabelParticles.SHIELDLOSS.get() : BabelParticles.LIFELOSS.get(), x, y + 0.95, z, 72, 0.75, 0.55, 0.75, 0.2);
                     }
                     health.sync();
+                    LifePointConsumeEvent.firePost(player, event.getSource(), type, 1F);
                 }
             }
-            HealthConsumeEvent.firePost(player, event.getSource(), blocked, blocked && isShield, blocked && !isShield);
         }
     }
 

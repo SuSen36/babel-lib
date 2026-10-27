@@ -20,7 +20,7 @@ public class BabelCollectible {
     public static CollectibleBuilder REGISTRY;
 
     public static RegistryObject<Item> ORIGINIUM_IRIS_FLOWER;
-    public static RegistryObject<Item> UTIL_OMNIKEY;
+    public static RegistryObject<Item> OMNIKEY;
     public static RegistryObject<Item> GOLD_EXPEDITION;
     public static RegistryObject<Item> PIGLIN_DIARY;
     public static RegistryObject<Item> KETTLE;
@@ -53,17 +53,20 @@ public class BabelCollectible {
     public static RegistryObject<Item> VAMPIRES_BED;
     public static RegistryObject<Item> SARKAZ_KING_BANNER;
     public static RegistryObject<Item> SARKAZ_KING_ARTIFACT;
-    public static RegistryObject<Item> TREATY;
+    public static RegistryObject<Item> ROYAL_ALLIANCE_TREATY;
     public static RegistryObject<Item> SEAGRASS_SALAD;
     public static RegistryObject<Item> ACAHUALLAN_BOWL;
-    public static RegistryObject<Item> UTIL_STARE;
+    public static RegistryObject<Item> GUARDIAN_STARE;
     public static RegistryObject<Item> PROOF_OF_LONGEVITY;
     public static RegistryObject<Item> HEMOST;
     public static RegistryObject<Item> SOLO_MUSIC_BOX;
     public static RegistryObject<Item> TOPONYM_TEXTOLOGY;
     public static RegistryObject<Item> YEARNING;
 
-    public static RegistryObject<Item> UTIL_ALLAY;
+    public static RegistryObject<Item> ALLAY_SCULPTURE;
+    public static RegistryObject<Item> CHURCH_ALMS_VOUCHER;
+    public static RegistryObject<Item> WORN_GROUP_PHOTO;
+    public static RegistryObject<Item> ABYSSAL_WYRDMASK;
     public static RegistryObject<Item> KING_ARMOR;
     public static RegistryObject<Item> KING_SPEAR;
     public static RegistryObject<Item> KING_EXTENSION;
@@ -82,7 +85,8 @@ public class BabelCollectible {
     public static RegistryObject<Item> GOLDEN_STORM;
     public static RegistryObject<Item> ODD_FLUTE;
     public static RegistryObject<Item> FEATURED_CANNED_MEAT;
-    public static RegistryObject<Item> UTIL_RESCISSION;
+    public static RegistryObject<Item> RESCISSION;
+    public static RegistryObject<Item> SHEET_MUSIC;
     public static RegistryObject<Item> OLD_STEAM_ARMOR;
     public static RegistryObject<Item> BRILLIANT_LAMENT;
     public static RegistryObject<Item> LIVE_ROSE;
@@ -98,6 +102,9 @@ public class BabelCollectible {
     public static RegistryObject<Item> COBBLESTONE_ALTAR;
     public static RegistryObject<Item> ROCK_HORN;
     public static RegistryObject<Item> ANGELINA_INSPIRATION;
+    public static RegistryObject<Item> RAINBOW_JAR;
+    public static RegistryObject<Item> ORIRON_ROUND_SHIELD;
+    public static RegistryObject<Item> FRISTON_P;
 
     public static final ArrayList<RegistryObject<Item>> BABEL_COLLECTIBLES = new ArrayList<>();
 
@@ -110,7 +117,7 @@ public class BabelCollectible {
     public static void register(IEventBus bus) {
         REGISTRY = CollectibleBuilder.create(BabelMod.MODID, bus);
         BABEL_COLLECTIBLES.add(ORIGINIUM_IRIS_FLOWER = REGISTRY.registerCollectible("originium_iris_flower", OriginiumIrisFlowerItem::new));
-        BABEL_COLLECTIBLES.add(UTIL_OMNIKEY = REGISTRY.registerCollectible("util_omnikey", OmniKeyItem::new));
+        BABEL_COLLECTIBLES.add(OMNIKEY = REGISTRY.registerCollectible("omnikey", OmniKeyItem::new));
         BABEL_COLLECTIBLES.add(GOLD_EXPEDITION = REGISTRY.registerCollectible("gold_expedition", GoldExpeditionItem::new));
         BABEL_COLLECTIBLES.add(PIGLIN_DIARY = REGISTRY.registerCollectible("piglin_diary", PiglinDiaryItem::new));
         BABEL_COLLECTIBLES.add(KETTLE = REGISTRY.registerCollectible("kettle", KettleItem::new));
@@ -142,16 +149,19 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(VAMPIRES_BED = REGISTRY.registerCollectible("vampires_bed", ArchfiendsBedItem::new));
         BABEL_COLLECTIBLES.add(SARKAZ_KING_BANNER = REGISTRY.registerCollectible("sarkaz_king_banner", ArchfiendsBannerItem::new));
         BABEL_COLLECTIBLES.add(SARKAZ_KING_ARTIFACT = REGISTRY.registerCollectible("sarkaz_king_artifact", ArchfiendsArtifactItem::new));
-        BABEL_COLLECTIBLES.add(TREATY = REGISTRY.registerCollectible("treaty", CrimsonTreatyItem::new));
+        BABEL_COLLECTIBLES.add(ROYAL_ALLIANCE_TREATY = REGISTRY.registerCollectible("royal_alliance_treaty", RoyalAllianceTreatyItem::new));
         BABEL_COLLECTIBLES.add(SEAGRASS_SALAD = REGISTRY.registerCollectible("seagrass_salad", SeagrassSaladItem::new));
         BABEL_COLLECTIBLES.add(ACAHUALLAN_BOWL = REGISTRY.registerCollectible("acahuallan_bowl", AcahuallanBowlItem::new));
-        BABEL_COLLECTIBLES.add(UTIL_STARE = REGISTRY.registerCollectible("util_stare", GuardianStareItem::new));
+        BABEL_COLLECTIBLES.add(GUARDIAN_STARE = REGISTRY.registerCollectible("guardian_stare", GuardianStareItem::new));
         BABEL_COLLECTIBLES.add(PROOF_OF_LONGEVITY = REGISTRY.registerCollectible("proof_of_longevity", ProofOfLongevityItem::new));
         BABEL_COLLECTIBLES.add(HEMOST = REGISTRY.registerCollectible("hemost", SmellyHemostaticItem::new));
         BABEL_COLLECTIBLES.add(SOLO_MUSIC_BOX = REGISTRY.registerCollectible("solo_music_box", SoloMusicBoxItem::new));
         BABEL_COLLECTIBLES.add(TOPONYM_TEXTOLOGY = REGISTRY.registerCollectible("toponym_textology", ToponymTextologyItem::new));
         BABEL_COLLECTIBLES.add(YEARNING = REGISTRY.registerCollectible("yearning", UnripeYearningItem::new));
-        BABEL_COLLECTIBLES.add(UTIL_ALLAY = REGISTRY.registerCollectible("util_allay", AlleySculptureItem::new));
+        BABEL_COLLECTIBLES.add(ALLAY_SCULPTURE = REGISTRY.registerCollectible("allay_sculpture", AlleySculptureItem::new));
+        BABEL_COLLECTIBLES.add(CHURCH_ALMS_VOUCHER = REGISTRY.registerCollectible("church_alms_voucher", ChurchAlmsVoucherItem::new));
+        BABEL_COLLECTIBLES.add(WORN_GROUP_PHOTO = REGISTRY.registerCollectible("worn_group_photo", WornGroupPhotoItem::new));
+        BABEL_COLLECTIBLES.add(ABYSSAL_WYRDMASK = REGISTRY.registerCollectible("abyssal_wyrdmask", AbyssalWyrdmaskItem::new));
         BABEL_COLLECTIBLES.add(KING_ARMOR = REGISTRY.registerCollectible("king_armor", KingsArmourItem::new));
         BABEL_COLLECTIBLES.add(KING_SPEAR = REGISTRY.registerCollectible("king_spear", KingsSpearItem::new));
         BABEL_COLLECTIBLES.add(KING_EXTENSION = REGISTRY.registerCollectible("king_extension", KingsExtensionItem::new));
@@ -169,7 +179,8 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(GOLDEN_STORM = REGISTRY.registerCollectible("golden_storm", GoldenStormItem::new));
         BABEL_COLLECTIBLES.add(ODD_FLUTE = REGISTRY.registerCollectible("odd_flute", OddFluteItem::new));
         BABEL_COLLECTIBLES.add(FEATURED_CANNED_MEAT = REGISTRY.registerCollectible("featured_canned_meat", MeatCanItem::new));
-        BABEL_COLLECTIBLES.add(UTIL_RESCISSION = REGISTRY.registerCollectible("util_rescission", RescissionItem::new));
+        BABEL_COLLECTIBLES.add(RESCISSION = REGISTRY.registerCollectible("rescission", RescissionItem::new));
+        BABEL_COLLECTIBLES.add(SHEET_MUSIC = REGISTRY.registerCollectible("sheet_music", SheetMusicItem::new));
         BABEL_COLLECTIBLES.add(OLD_STEAM_ARMOR = REGISTRY.registerCollectible("old_steam_armor", OldSteamArmorItem::new));
         BABEL_COLLECTIBLES.add(BRILLIANT_LAMENT = REGISTRY.registerCollectible("brilliant_lament", BrilliantLamentItem::new));
         BABEL_COLLECTIBLES.add(LIVE_ROSE = REGISTRY.registerCollectible("live_rose", LiveRoseItem::new));
@@ -186,6 +197,9 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(COBBLESTONE_ALTAR = REGISTRY.registerCollectible("cobblestone_altar", CobblestoneAltarItem::new));
         BABEL_COLLECTIBLES.add(ROCK_HORN = REGISTRY.registerCollectible("rock_horn", RockHornItem::new));
         BABEL_COLLECTIBLES.add(ANGELINA_INSPIRATION = REGISTRY.registerCollectible("angelina_inspiration", AngelinaInspirationItem::new));
+        BABEL_COLLECTIBLES.add(RAINBOW_JAR = REGISTRY.registerCollectible("rainbow_jar", RainbowJarItem::new));
+        BABEL_COLLECTIBLES.add(ORIRON_ROUND_SHIELD = REGISTRY.registerCollectible("oriron_round_shield", OrironRoundShieldItem::new));
+        BABEL_COLLECTIBLES.add(FRISTON_P = REGISTRY.registerCollectible("friston_p", FristonPItem::new));
     }
 
     private static RegistryObject<Item> registerBoolean(String name) {

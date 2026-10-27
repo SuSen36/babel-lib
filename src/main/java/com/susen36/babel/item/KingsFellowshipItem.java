@@ -44,7 +44,7 @@ public class KingsFellowshipItem extends CollectibleItem.CustomCollectibleItem {
 	@Override
 	protected InteractionResultHolder<ItemStack> onSneakUse(Level level, Player player, InteractionHand hand) {
 		ItemStack itemstack = player.getItemInHand(hand);
-		HitResult hit = player.pick(5.0D, 1.0F, false);
+		HitResult hit = player.pick(player.getBlockReach(), 1.0F, false);
 		if (hit instanceof BlockHitResult blockHit) {
 			UseOnContext context = new UseOnContext(player, hand, blockHit);
 			BlockPlaceContext blockContext = new BlockPlaceContext(context);
@@ -55,7 +55,9 @@ public class KingsFellowshipItem extends CollectibleItem.CustomCollectibleItem {
 					if (level.getBlockEntity(blockContext.getClickedPos()) instanceof KingPedestalBlockEntity pedestal) {
 						pedestal.setItem(itemstack.copy());
 					}
-					itemstack.shrink(1);
+					if (!player.getAbilities().instabuild) {
+						itemstack.shrink(1);
+					}
 					return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
 				}
 			}

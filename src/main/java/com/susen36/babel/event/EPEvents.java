@@ -1,17 +1,17 @@
 package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
-import com.susen36.babel.manager.EPManager;
 import com.susen36.babel.api.event.ResistDamageEvent;
 import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.ep.EPCapability;
-import com.susen36.babel.elemental.base.AbstractEPCapability;
-import com.susen36.babel.elemental.FrenzyInjury;
 import com.susen36.babel.effect.PalsyMobEffect;
+import com.susen36.babel.elemental.FrenzyInjury;
+import com.susen36.babel.elemental.base.AbstractEPCapability;
 import com.susen36.babel.init.BabelAttributes;
 import com.susen36.babel.init.BabelMobEffects;
 import com.susen36.babel.init.BabelParticles;
 import com.susen36.babel.init.BabelSounds;
+import com.susen36.babel.manager.EPManager;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -28,12 +28,12 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import javax.annotation.Nullable;
 import java.util.Map;

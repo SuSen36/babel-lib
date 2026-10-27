@@ -21,7 +21,6 @@ public class BabelMobEffects {
     public static final RegistryObject<SilencedMobEffect> SILENCED = REGISTRY.register("silenced", SilencedMobEffect::new);
     public static final RegistryObject<MagicDodgeMobEffect> MAGIC_DODGE = REGISTRY.register("magic_dodge", MagicDodgeMobEffect::new);
     public static final RegistryObject<PhysicalDodgeMobEffect> PHYSICAL_DODGE = REGISTRY.register("physical_dodge", PhysicalDodgeMobEffect::new);
-    public static final RegistryObject<MobEffect> UNTAME_CONFIRM = REGISTRY.register("untame_confirm", UntameConfirmMobEffect::new);
 
     private BabelMobEffects() {
         throw new UnsupportedOperationException("Utility class");

@@ -2,8 +2,8 @@ package com.susen36.babel.item;
 
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
-import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.init.BabelAttributes;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
@@ -39,7 +39,7 @@ public class SurvivorContractItem extends CollectibleItem.CustomCollectibleItem 
                         .build());
         addLayerAttributeModifier(Attributes.ATTACK_DAMAGE, 0.2, AttributeModifier.Operation.MULTIPLY_BASE);
         addLayerAttributeModifier(Attributes.ARMOR, 1.0, AttributeModifier.Operation.ADDITION);
-        addLayerAttributeModifier(BabelAttributes.GENERAL_DEFENSE.get(), 0.25, AttributeModifier.Operation.ADDITION);
+        addLayerAttributeModifier(BabelAttributes.DEFENSE.get(), 0.25, AttributeModifier.Operation.ADDITION);
     }
 
     @Override
