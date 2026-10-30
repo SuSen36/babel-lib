@@ -7,9 +7,9 @@ import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 
 @Mod.EventBusSubscriber(modid = BabelMod.MODID)
 public class PlayerLogInEventHandler {
@@ -27,7 +27,6 @@ public class PlayerLogInEventHandler {
 					}
 					serverPlayer.displayClientMessage(Component.translatable("gameplay.relic_ban.notice.0"), false);
 					serverPlayer.displayClientMessage(Component.translatable("gameplay.relic_ban.notice.1"), false);
-					serverPlayer.displayClientMessage(Component.translatable("gameplay.relic_ban.notice.2"), false);
 				}
 			}
 		}

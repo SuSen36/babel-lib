@@ -19,7 +19,6 @@ public class SilencedMobEffect extends MobEffect {
         if (entity.level() instanceof ServerLevel level) {
             level.sendParticles(BabelParticles.MUTING.get(), entity.getX(), entity.getY(), entity.getZ(), 2, 1, 1, 1, 0.1);
         }
-        //TODO mixin苦力怕更好
         if (entity instanceof Creeper creeper) {
             CompoundTag tag = new CompoundTag();
             entity.saveWithoutId(tag);

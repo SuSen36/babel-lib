@@ -1,10 +1,8 @@
 package com.susen36.babel.network.receive;
 
-import com.susen36.babel.BabelMod;
 import com.susen36.babel.network.ClientPacketHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.BiConsumer;
@@ -22,8 +20,6 @@ import java.util.function.Supplier;
  * </ul>
  */
 public class CollectibleSyncMessage {
-
-    public static final ResourceLocation ID = new ResourceLocation(BabelMod.MODID, "collectible_sync");
 
     public final int playerId;
     public final CompoundTag data;

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.loot.CollectibleLootModifier;
+import com.susen36.babel.loot.OriginiumIngotLootModifier;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -22,7 +23,6 @@ import java.util.Map;
 @Mixin(LootModifierManager.class)
 public class LootModifierManagerMixin {
 
-    // Mixin 注入的目标类字段由运行时赋值，编译期无初始化路径
     @SuppressWarnings("NullAway.Init")
     @Shadow(remap = false)
     private Map<ResourceLocation, IGlobalLootModifier> registeredLootModifiers;
@@ -32,6 +32,8 @@ public class LootModifierManagerMixin {
         Map<ResourceLocation, IGlobalLootModifier> modifiers = new HashMap<>(registeredLootModifiers);
         modifiers.put(new ResourceLocation(BabelMod.MODID, "collectibles_in_chests"),
                 new CollectibleLootModifier(new LootItemCondition[0]));
+        modifiers.put(new ResourceLocation(BabelMod.MODID, "originium_ingot_from_entities"),
+                new OriginiumIngotLootModifier(new LootItemCondition[0]));
         registeredLootModifiers = ImmutableMap.copyOf(modifiers);
     }
 }

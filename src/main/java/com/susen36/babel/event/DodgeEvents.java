@@ -6,6 +6,7 @@ import com.susen36.babel.init.BabelAttributes;
 import com.susen36.babel.init.BabelDamageTags;
 import com.susen36.babel.init.BabelMobEffects;
 import com.susen36.babel.init.BabelParticles;
+import com.susen36.babel.util.DataUtils;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -23,14 +24,14 @@ public class DodgeEvents {
     public static void onLivingAttack(LivingAttackEvent event) {
         LivingEntity target = event.getEntity();
         DamageSource source = event.getSource();
-        AttributeInstance dodgeRate = target.getAttribute(EPEvents.isMagic(source) ? BabelAttributes.MAGIC_MISS_RATE.get() : BabelAttributes.PHYSICAL_MISS_RATE.get());
+        AttributeInstance dodgeRate = target.getAttribute(DataUtils.isMagic(source) ? BabelAttributes.MAGIC_MISS_RATE.get() : BabelAttributes.PHYSICAL_MISS_RATE.get());
         if (!event.isCanceled() && dodgeRate != null && dodgeRate.getValue() > 0
                 && !source.is(BabelDamageTags.BYPASS_MISS)
                 && !target.hasEffect(BabelMobEffects.SILENCED.get())
                 && (source.is(BabelDamageTags.SKIP_SOURCE_CHECK) || source.getEntity() != null)
                 && target.getRandom().nextDouble() * 100 < dodgeRate.getValue()) {
             if (target.level() instanceof ServerLevel level) {
-                SimpleParticleType particle = EPEvents.isMagic(source) ? BabelParticles.MISS_MAGIC.get() : BabelParticles.MISS_PHYSICAL.get();
+                SimpleParticleType particle = DataUtils.isMagic(source) ? BabelParticles.MISS_MAGIC.get() : BabelParticles.MISS_PHYSICAL.get();
                 level.sendParticles(particle, target.getX(), target.getY(), target.getZ(), 6, 1, 1, 1, 0.1);
             }
             DodgeEvent.postDodge(target, source);

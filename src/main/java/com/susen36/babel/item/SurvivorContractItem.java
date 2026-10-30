@@ -52,7 +52,9 @@ public class SurvivorContractItem extends CollectibleItem.CustomCollectibleItem 
         if (layer >= 0 && layer < 32
                 && (victim instanceof Monster || (victim instanceof Mob mob ? mob.getTarget() : null) == player)
                 && (Math.random() < 0.35 || victim.getType().is(FORGE_BOSSES))) {
-            Collectibles.addLayerAndSync(player, this, 1);
+            if (player != null) {
+                Collectibles.addLayerAndSync(player, this, 1);
+            }
             if (victim.level() instanceof ServerLevel level) {
                 level.sendParticles(ParticleTypes.WAX_ON, victim.getX(), victim.getY(), victim.getZ(), 48, 0.7, 1.5, 0.7, 0.2);
             }

@@ -48,7 +48,7 @@ public class HandFireworkItem extends CollectibleItem.CustomCollectibleItem {
             Level level = player.level();
             ItemStack mainHandItem = player.getMainHandItem();
             String registryName = BuiltInRegistries.ITEM.getKey(mainHandItem.getItem()).toString();
-            if (isFireworkWeapon(mainHandItem, registryName) && player.getRandom().nextFloat() < 0.33F) {
+            if (isFireworkWeapon(mainHandItem, registryName) && player.getRandom().nextFloat() < 0.25F) {
                 detonateFirework(level, target, player, event.getAmount());
             }
         }
@@ -81,7 +81,7 @@ public class HandFireworkItem extends CollectibleItem.CustomCollectibleItem {
             }
             if (visible) {
                 float dist = Mth.sqrt((float) candidate.distanceToSqr(center.x, center.y, center.z));
-                float damage = (float) (amount * 3 * Mth.sqrt((float) ((EXPLOSION_RADIUS - dist) / EXPLOSION_RADIUS)));
+                float damage = (float) (amount * 2 * Mth.sqrt((float) ((EXPLOSION_RADIUS - dist) / EXPLOSION_RADIUS)));
                 candidate.hurt(level.damageSources().playerAttack(player), damage);
             }
         }

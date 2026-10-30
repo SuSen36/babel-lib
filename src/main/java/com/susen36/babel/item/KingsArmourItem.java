@@ -41,7 +41,6 @@ public class KingsArmourItem extends CollectibleItem.CustomCollectibleItem {
 			LifePointUtils.setLifePoint(player, 1);
 		}
 		double shieldAfterLifeTransfer = LifePointUtils.getShieldPoint(player) + storedLives;
-		LifePointUtils.setShieldPoint(player, (int) shieldAfterLifeTransfer);
 		LifePointUtils.setShieldPoint(player, (int) (shieldAfterLifeTransfer + 3));
 	}
 

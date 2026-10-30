@@ -1,6 +1,5 @@
 package com.susen36.babel.network.receive;
 
-import com.susen36.babel.BabelMod;
 import com.susen36.babel.network.ClientPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -11,8 +10,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class CollectibleItemUseMessage {
-
-    public static final ResourceLocation ID = new ResourceLocation(BabelMod.MODID, "collectible_item_use_sync");
 
     public final ResourceLocation id;
 

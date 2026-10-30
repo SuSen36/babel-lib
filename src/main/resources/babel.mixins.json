@@ -4,13 +4,18 @@
   "package": "com.susen36.babel.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "BowItemMixin",
+    "CrossbowItemMixin",
+    "EnderManMixin",
+    "EntityMixin",
     "LivingEntityMixin",
     "LootModifierManagerMixin",
-    "ThrownTridentMixin",
-    "BowItemMixin",
-    "CrossbowItemMixin"
+    "ThrownTridentMixin"
   ],
-  "client": [],
+  "client": [
+    "EntityRendererMixin",
+    "LivingEntityRendererMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   },

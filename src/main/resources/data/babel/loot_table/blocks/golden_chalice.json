@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "babel:golden_chalise"
+          "name": "babel:golden_chalice"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "babel:blocks/golden_chalise"
+  "random_sequence": "babel:blocks/golden_chalice"
 }

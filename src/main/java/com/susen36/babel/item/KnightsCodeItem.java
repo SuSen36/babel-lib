@@ -6,7 +6,6 @@ import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.init.BabelItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -24,8 +23,8 @@ public class KnightsCodeItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.CLOUD, 72)
                         .showOverlay(true)
                         .build());
-        addConditionalAttributeModifier(Attributes.ATTACK_SPEED, 0.01, AttributeModifier.Operation.MULTIPLY_TOTAL,
-                (player, self) -> Mth.clamp(countOriginiumIngots(player), 0, 200) / 5);
+        addConditionalAttributeModifier(Attributes.ATTACK_SPEED, 0.05, AttributeModifier.Operation.MULTIPLY_TOTAL,
+                (player, self) -> countOriginiumIngots(player) / 5);
     }
 
     private static int countOriginiumIngots(Player player) {

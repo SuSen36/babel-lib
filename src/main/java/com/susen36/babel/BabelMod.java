@@ -5,6 +5,9 @@ import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.init.*;
 import com.susen36.babel.network.BabelNetwork;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionBrewing;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -44,5 +47,11 @@ public class BabelMod {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(BabelNetwork::register);
+        event.enqueueWork(() -> {
+            PotionBrewing.addMix(Potions.INVISIBILITY, Items.INK_SAC, BabelPotions.INVISIBLE.get());
+            PotionBrewing.addMix(BabelPotions.INVISIBLE.get(), Items.REDSTONE, BabelPotions.LONG_INVISIBLE.get());
+            PotionBrewing.addMix(Potions.AWKWARD, Items.ENDER_EYE, BabelPotions.MAGIC_DODGE.get());
+            PotionBrewing.addMix(Potions.AWKWARD, Items.ENDER_PEARL, BabelPotions.PHYSICAL_DODGE.get());
+        });
     }
 }

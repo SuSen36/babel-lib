@@ -6,11 +6,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class GoldenChaliseBlockEntity extends BlockEntity {
+public class GoldenChaliceBlockEntity extends BlockEntity {
     private int amount;
 
-    public GoldenChaliseBlockEntity(BlockPos pos, BlockState state) {
-        super(BabelBlockEntities.GOLDEN_CHALISE.get(), pos, state);
+    public GoldenChaliceBlockEntity(BlockPos pos, BlockState state) {
+        super(BabelBlockEntities.GOLDEN_CHALICE.get(), pos, state);
     }
 
     public int getAmount() {

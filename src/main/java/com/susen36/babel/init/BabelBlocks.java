@@ -16,7 +16,7 @@ public class BabelBlocks {
     public static final RegistryObject<? extends Block> KING_PEDESTAL = REGISTRY.register("king_pedestal", KingPedestalBlock::new);
     public static final RegistryObject<? extends Block> BERRY_CAN = REGISTRY.register("berry_can", BerryCanBlock::new);
     public static final RegistryObject<? extends Block> ALLAY_BLOCK = REGISTRY.register("allay_block", AllayBlockBlock::new);
-    public static final RegistryObject<? extends Block> GOLDEN_CHALISE = REGISTRY.register("golden_chalise", GoldenChaliseBlock::new);
+    public static final RegistryObject<? extends Block> GOLDEN_CHALICE = REGISTRY.register("golden_chalice", GoldenChaliceBlock::new);
 
     private BabelBlocks() {
         throw new UnsupportedOperationException("Utility class");

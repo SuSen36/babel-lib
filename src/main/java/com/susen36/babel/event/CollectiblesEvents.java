@@ -15,6 +15,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -59,9 +60,15 @@ public class CollectiblesEvents {
                 }
             });
             if (player.tickCount % 20 == 0) {
+                CollectibleAttributes.reconcileRange(player);
                 applyRangeEffects(player);
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        CollectibleAttributes.clearRangeModifiers(event.getEntity());
     }
 
     private static void applyRangeEffects(Player player) {
@@ -95,6 +102,9 @@ public class CollectiblesEvents {
             rangedEntities.put(key, entities);
         }
         for (LivingEntity living : entities) {
+            if (living == player) {
+                continue;
+            }
             binding.effect().apply(binding.entityType().cast(living), player, layer);
         }
     }

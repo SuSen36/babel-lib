@@ -1,93 +1,93 @@
 {
   "variants": {
     "facing=east,waterlogged=false,blockstate=0": {
-      "model": "babel:block/golden_chalise",
+      "model": "babel:block/golden_chalice",
       "y": 90
     },
     "facing=east,waterlogged=false,blockstate=1": {
-      "model": "babel:block/golden_chalise_half",
+      "model": "babel:block/golden_chalice_half",
       "y": 90
     },
     "facing=east,waterlogged=false,blockstate=2": {
-      "model": "babel:block/golden_chalise_full",
+      "model": "babel:block/golden_chalice_full",
       "y": 90
     },
     "facing=east,waterlogged=true,blockstate=0": {
-      "model": "babel:block/golden_chalise",
+      "model": "babel:block/golden_chalice",
       "y": 90
     },
     "facing=east,waterlogged=true,blockstate=1": {
-      "model": "babel:block/golden_chalise_half",
+      "model": "babel:block/golden_chalice_half",
       "y": 90
     },
     "facing=east,waterlogged=true,blockstate=2": {
-      "model": "babel:block/golden_chalise_full",
+      "model": "babel:block/golden_chalice_full",
       "y": 90
     },
     "facing=north,waterlogged=false,blockstate=0": {
-      "model": "babel:block/golden_chalise"
+      "model": "babel:block/golden_chalice"
     },
     "facing=north,waterlogged=false,blockstate=1": {
-      "model": "babel:block/golden_chalise_half"
+      "model": "babel:block/golden_chalice_half"
     },
     "facing=north,waterlogged=false,blockstate=2": {
-      "model": "babel:block/golden_chalise_full"
+      "model": "babel:block/golden_chalice_full"
     },
     "facing=north,waterlogged=true,blockstate=0": {
-      "model": "babel:block/golden_chalise"
+      "model": "babel:block/golden_chalice"
     },
     "facing=north,waterlogged=true,blockstate=1": {
-      "model": "babel:block/golden_chalise_half"
+      "model": "babel:block/golden_chalice_half"
     },
     "facing=north,waterlogged=true,blockstate=2": {
-      "model": "babel:block/golden_chalise_full"
+      "model": "babel:block/golden_chalice_full"
     },
     "facing=south,waterlogged=false,blockstate=0": {
-      "model": "babel:block/golden_chalise",
+      "model": "babel:block/golden_chalice",
       "y": 180
     },
     "facing=south,waterlogged=false,blockstate=1": {
-      "model": "babel:block/golden_chalise_half",
+      "model": "babel:block/golden_chalice_half",
       "y": 180
     },
     "facing=south,waterlogged=false,blockstate=2": {
-      "model": "babel:block/golden_chalise_full",
+      "model": "babel:block/golden_chalice_full",
       "y": 180
     },
     "facing=south,waterlogged=true,blockstate=0": {
-      "model": "babel:block/golden_chalise",
+      "model": "babel:block/golden_chalice",
       "y": 180
     },
     "facing=south,waterlogged=true,blockstate=1": {
-      "model": "babel:block/golden_chalise_half",
+      "model": "babel:block/golden_chalice_half",
       "y": 180
     },
     "facing=south,waterlogged=true,blockstate=2": {
-      "model": "babel:block/golden_chalise_full",
+      "model": "babel:block/golden_chalice_full",
       "y": 180
     },
     "facing=west,waterlogged=false,blockstate=0": {
-      "model": "babel:block/golden_chalise",
+      "model": "babel:block/golden_chalice",
       "y": 270
     },
     "facing=west,waterlogged=false,blockstate=1": {
-      "model": "babel:block/golden_chalise_half",
+      "model": "babel:block/golden_chalice_half",
       "y": 270
     },
     "facing=west,waterlogged=false,blockstate=2": {
-      "model": "babel:block/golden_chalise_full",
+      "model": "babel:block/golden_chalice_full",
       "y": 270
     },
     "facing=west,waterlogged=true,blockstate=0": {
-      "model": "babel:block/golden_chalise",
+      "model": "babel:block/golden_chalice",
       "y": 270
     },
     "facing=west,waterlogged=true,blockstate=1": {
-      "model": "babel:block/golden_chalise_half",
+      "model": "babel:block/golden_chalice_half",
       "y": 270
     },
     "facing=west,waterlogged=true,blockstate=2": {
-      "model": "babel:block/golden_chalise_full",
+      "model": "babel:block/golden_chalice_full",
       "y": 270
     }
   }

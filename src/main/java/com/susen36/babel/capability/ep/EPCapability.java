@@ -206,11 +206,24 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
     }
 
     public void syncDirty() {
-        if (entity == null) return;
-        CompoundTag nbt = serializeSyncNBT();
-        if (!nbt.isEmpty()) {
-            BabelNetwork.sendToTrackingAndSelf(entity, new EPSyncMessage(entity.getId(), nbt));
+        if (entity != null && isDirty()) {
+            CompoundTag nbt = serializeSyncNBT();
+            if (!nbt.isEmpty()) {
+                BabelNetwork.sendToTrackingAndSelf(entity, new EPSyncMessage(entity.getId(), nbt));
+            }
         }
+    }
+
+    public boolean isDirty() {
+        if (underBreakDirty) {
+            return true;
+        }
+        for (AbstractEPCapability ep : EP_TYPES.values()) {
+            if (ep.isDirty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

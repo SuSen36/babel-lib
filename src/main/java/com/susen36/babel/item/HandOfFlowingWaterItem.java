@@ -8,13 +8,12 @@ import com.susen36.babel.init.BabelCollectible;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -23,7 +22,7 @@ public class HandOfFlowingWaterItem extends CollectibleItem.CustomCollectibleIte
     private static final int BUFF_DURATION_TICKS = 160;
     private static final int MAX_STACKS = 4;
 
-    private static final Map<Player, Buff> ACTIVE_BUFFS = new WeakHashMap<>();
+    private static final Map<Player, Buff> ACTIVE_BUFFS = Collections.synchronizedMap(new WeakHashMap<>());
 
     private record Buff(int stacks, int expireTick) {
     }
@@ -50,11 +49,6 @@ public class HandOfFlowingWaterItem extends CollectibleItem.CustomCollectibleIte
     public static int activeStacks(Player player) {
         Buff buff = ACTIVE_BUFFS.get(player);
         return buff != null && player.tickCount < buff.expireTick() ? buff.stacks() : 0;
-    }
-
-    // gameTime 经时间同步包在两端保持一致，实体 ID 由服务端分配后同步；种子确定，两端各自掷骰结论必然相同
-    public static boolean rollArrowPreservation(Player player, Level level) {
-        return RandomSource.create(level.getGameTime() * 31L + player.getId()).nextBoolean();
     }
 
     @Override

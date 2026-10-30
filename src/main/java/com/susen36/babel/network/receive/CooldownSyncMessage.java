@@ -1,6 +1,5 @@
 package com.susen36.babel.network.receive;
 
-import com.susen36.babel.BabelMod;
 import com.susen36.babel.network.ClientPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -12,8 +11,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class CooldownSyncMessage {
-
-    public static final ResourceLocation ID = new ResourceLocation(BabelMod.MODID, "cooldown_sync");
 
     @Nullable
     public final ResourceLocation id;

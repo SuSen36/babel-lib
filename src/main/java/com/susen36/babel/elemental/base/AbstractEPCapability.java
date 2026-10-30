@@ -3,11 +3,7 @@ package com.susen36.babel.elemental.base;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.ep.EPCapability;
-import com.susen36.babel.elemental.BurnInjury;
-import com.susen36.babel.elemental.CorrosionInjury;
-import com.susen36.babel.elemental.FrenzyInjury;
-import com.susen36.babel.elemental.NecrosisInjury;
-import com.susen36.babel.elemental.NervousInjury;
+import com.susen36.babel.elemental.*;
 import com.susen36.babel.init.BabelAttributes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -158,6 +154,10 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
         boolean wasDirty = dirty;
         dirty = false;
         return wasDirty;
+    }
+
+    public boolean isDirty() {
+        return dirty;
     }
 
     public int getMaxValue() {

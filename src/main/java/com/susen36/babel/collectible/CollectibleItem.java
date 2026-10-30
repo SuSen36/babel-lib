@@ -16,6 +16,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
@@ -28,9 +29,11 @@ import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiPredicate;
 
 public final class CollectibleItem extends Item implements CollectibleLike {
     private final CollectibleEffect effect;
@@ -401,6 +404,45 @@ public final class CollectibleItem extends Item implements CollectibleLike {
 
         public final List<RangeBinding<?>> getRangeEffects() {
             return this.rangeEffects;
+        }
+
+        /** 范围属性修饰符绑定：修饰符 ID 按收藏品 + 属性 + 后缀派生，金额不随层数变化；ownerFilter 非空时仅对判定通过的实体生效。 */
+        public record RangeAttributeBonus(Class<? extends LivingEntity> entityType, double range, Attribute attribute, double amount, AttributeModifier.Operation operation, @Nullable BiPredicate<LivingEntity, Player> ownerFilter, String idSuffix) {
+            public RangeAttributeBonus(Class<? extends LivingEntity> entityType, double range, Attribute attribute, double amount, AttributeModifier.Operation operation, @Nullable BiPredicate<LivingEntity, Player> ownerFilter) {
+                this(entityType, range, attribute, amount, operation, ownerFilter, "");
+            }
+
+            public RangeAttributeBonus(Class<? extends LivingEntity> entityType, double range, Attribute attribute, double amount, AttributeModifier.Operation operation) {
+                this(entityType, range, attribute, amount, operation, null, "");
+            }
+        }
+
+        /** 归属过滤：仅命中 OwnableEntity 且主人为持有者本人的实体；原版 getOwner 只解析玩家 UUID，驯服者若非玩家会返回 null。 */
+        public static final BiPredicate<LivingEntity, Player> OWNED_BY_PLAYER = (entity, player) -> entity instanceof OwnableEntity ownable && ownable.getOwner() == player;
+
+        private final List<RangeAttributeBonus> rangeAttributeBonuses = new ArrayList<>();
+
+        /** 注册范围属性修饰符：由 CollectibleAttributes 每 20 tick 对账增删，实体离开范围、收藏品失效或玩家登出后自动移除。 */
+        protected final <T extends LivingEntity> void addRangeAttributeModifier(Class<T> entityType, double range, Attribute attribute, double amount, AttributeModifier.Operation operation) {
+            this.rangeAttributeBonuses.add(new RangeAttributeBonus(entityType, range, attribute, amount, operation));
+        }
+
+        /** 注册范围属性修饰符（带归属过滤，默认 MONSTER_RANGE）：仅对 ownerFilter 判定通过的实体生效。 */
+        protected final <T extends LivingEntity> void addRangeAttributeModifier(Class<T> entityType, Attribute attribute, double amount, AttributeModifier.Operation operation, BiPredicate<LivingEntity, Player> ownerFilter) {
+            this.rangeAttributeBonuses.add(new RangeAttributeBonus(entityType, MONSTER_RANGE, attribute, amount, operation, ownerFilter));
+        }
+
+        /** 注册范围属性修饰符（带归属过滤与 ID 后缀）：同一收藏品对同一属性声明多条 bonus 时用后缀区分修饰符，避免互相覆盖。 */
+        protected final <T extends LivingEntity> void addRangeAttributeModifier(Class<T> entityType, Attribute attribute, double amount, AttributeModifier.Operation operation, BiPredicate<LivingEntity, Player> ownerFilter, String idSuffix) {
+            this.rangeAttributeBonuses.add(new RangeAttributeBonus(entityType, MONSTER_RANGE, attribute, amount, operation, ownerFilter, idSuffix));
+        }
+
+        protected final <T extends LivingEntity> void addRangeAttributeModifier(Class<T> entityType, Attribute attribute, double amount, AttributeModifier.Operation operation) {
+            this.addRangeAttributeModifier(entityType, MONSTER_RANGE, attribute, amount, operation);
+        }
+
+        public final List<RangeAttributeBonus> getRangeAttributeBonuses() {
+            return this.rangeAttributeBonuses;
         }
 
         /** LivingHurtEvent 阶段回调；事件可能已取消、直接伤害来源可能是持有者本人，需要时由实现自行判定。 */

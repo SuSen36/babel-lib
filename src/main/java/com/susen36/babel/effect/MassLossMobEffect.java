@@ -12,8 +12,4 @@ public class MassLossMobEffect extends MobEffect {
         this.addAttributeModifier(ForgeMod.ENTITY_GRAVITY.get(), "5f9a3c7e-1d2b-4c8a-9e0f-000000000016", -0.2, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(Attributes.KNOCKBACK_RESISTANCE, "5f9a3c7e-1d2b-4c8a-9e0f-000000000017", -0.2, AttributeModifier.Operation.ADDITION);
     }
-    @Override
-    public boolean isDurationEffectTick(int duration, int amplifier) {
-        return true;
-    }
 }

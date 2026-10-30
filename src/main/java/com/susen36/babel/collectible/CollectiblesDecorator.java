@@ -32,7 +32,6 @@ public class CollectiblesDecorator implements IItemDecorator {
         float progress = (lastTicks + partialTick) / (float) maxTicks;
         progress = Mth.clamp(progress, 0.0F, 1.0F);
 
-        // render overlay
         int color = 0x80FFFFFF;
         int height = Math.round(16.0F * progress);
         int topY = y + (16 - height);

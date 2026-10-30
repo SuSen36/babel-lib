@@ -2,6 +2,7 @@ package com.susen36.babel.entity;
 
 import com.susen36.babel.collectible.CollectibleLike;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.init.BabelCollectible;
 import com.susen36.babel.init.BabelItems;
 import com.susen36.babel.menu.CannotMenu;
@@ -122,6 +123,7 @@ public class CannotEntity extends AbstractVillager {
                 return InteractionResult.sidedSuccess(this.level().isClientSide);
             } else {
                 if (!this.level().isClientSide) {
+                    this.updateSpecialPrices(player);
                     this.setTradingPlayer(player);
                     this.openTradingScreen(player, this.getDisplayName(), 1);
                 }
@@ -130,6 +132,35 @@ public class CannotEntity extends AbstractVillager {
             }
         } else {
             return super.mobInteract(player, hand);
+        }
+    }
+
+    @Override
+    public void setTradingPlayer(@Nullable Player player) {
+        boolean closing = this.getTradingPlayer() != null && player == null;
+        super.setTradingPlayer(player);
+        if (closing) {
+            this.stopTrading();
+        }
+    }
+
+    @Override
+    protected void stopTrading() {
+        super.stopTrading();
+        this.resetSpecialPrices();
+    }
+
+    private void resetSpecialPrices() {
+        for (MerchantOffer offer : this.getOffers()) {
+            offer.resetSpecialPriceDiff();
+        }
+    }
+
+    private void updateSpecialPrices(Player player) {
+        if (Collectibles.getData(player).isUsed(BabelCollectible.RUSTED_IRON_HAMMER.get())) {
+            for (MerchantOffer offer : this.getOffers()) {
+                offer.addToSpecialPriceDiff(-Math.max(offer.getBaseCostA().getCount() / 2, 1));
+            }
         }
     }
 

@@ -28,15 +28,14 @@ public class KingPedestalRenderer implements BlockEntityRenderer<KingPedestalBlo
     @Override
     public void render(KingPedestalBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
         ItemStack itemstack = blockEntity.getItem();
-        if (itemstack.isEmpty()) {
-            return;
+        if (!itemstack.isEmpty()) {
+            Direction facing = blockEntity.getBlockState().getValue(KingPedestalBlock.FACING);
+            poseStack.pushPose();
+            poseStack.translate(0.5, 0.71875, 0.5);
+            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - facing.toYRot()));
+            poseStack.scale(ITEM_SCALE, ITEM_SCALE, ITEM_SCALE);
+            this.itemRenderer.renderStatic(itemstack, ItemDisplayContext.FIXED, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer, blockEntity.getLevel(), 0);
+            poseStack.popPose();
         }
-        Direction facing = blockEntity.getBlockState().getValue(KingPedestalBlock.FACING);
-        poseStack.pushPose();
-        poseStack.translate(0.5, 0.71875, 0.5);
-        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - facing.toYRot()));
-        poseStack.scale(ITEM_SCALE, ITEM_SCALE, ITEM_SCALE);
-        this.itemRenderer.renderStatic(itemstack, ItemDisplayContext.FIXED, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer, blockEntity.getLevel(), 0);
-        poseStack.popPose();
     }
 }

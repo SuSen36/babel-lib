@@ -24,10 +24,8 @@ import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Collectibles implements INBTSerializable<ListTag> {
     @NotNull
@@ -128,10 +126,18 @@ public class Collectibles implements INBTSerializable<ListTag> {
         return getIdByItem(item.value());
     }
 
+    // 注册表冻结后 item 到 id 的映射不变；Item 为注册期懒创建，无法在注册时直填
+    private static final Map<Item, String> ITEM_ID_CACHE = new ConcurrentHashMap<>();
+
+    // 方法引用 Collectibles::resolveIdByItem 会因同名静态字段被解析为表达式，改用 lambda
     public static @NotNull String getIdByItem(@NotNull Item item) {
+        return ITEM_ID_CACHE.computeIfAbsent(item, target -> resolveIdByItem(target));
+    }
+
+    private static @NotNull String resolveIdByItem(@NotNull Item item) {
         ResourceLocation key = BuiltInRegistries.ITEM.getKey(item);
-        RegistryObject<Item> entry = key == null ? null : Collectibles.get(key.getPath());
-        if (entry != null && entry.getId().equals(key)) {
+        RegistryObject<Item> entry = Collectibles.get(key.getPath());
+        if (entry != null && entry.getId() != null && entry.getId().equals(key)) {
             return key.getPath();
         }
         LogUtils.getLogger().error("try to query {} in Collectibles, but not matched.", item);

@@ -2,9 +2,12 @@ package com.susen36.babel.collectible;
 
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.api.event.CollectibleEvent;
+import com.susen36.babel.api.event.OriginiumIngotDropEvent;
+import com.susen36.babel.item.SupremeRingItem;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -23,6 +26,13 @@ public class CollectiblesEventListener {
         if (level instanceof ServerLevel) {
             var cd = Collectibles.getCooldownData(player);
             cd.setCooldownEndTick(event.getItem(), level.getServer(), COLLECTIBLE_DURATION_TICKS);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onOriginiumIngotDrop(@NotNull OriginiumIngotDropEvent event) {
+        if (event.getKiller() instanceof Player player && SupremeRingItem.isUsed(player)) {
+            event.setMultiplier(event.getMultiplier() * 1.5F);
         }
     }
 

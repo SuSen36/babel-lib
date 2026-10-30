@@ -55,9 +55,6 @@ public class LifePointConsumeEvent extends LivingEvent {
         }
     }
 
-    /**
-     * 扣除并阻挡死亡后触发的事件，用于播放音效、粒子、药水、成就等模组专属效果。
-     */
     public static class Post extends LifePointConsumeEvent {
         public Post(Player player, DamageSource source, Type type, float amount) {
             super(player, source, type, amount);
@@ -75,7 +72,6 @@ public class LifePointConsumeEvent extends LivingEvent {
         MinecraftForge.EVENT_BUS.post(event);
     }
 
-    /** 实际被扣除的资源类型。 */
     public enum Type {
         SHIELD,
         LIVES

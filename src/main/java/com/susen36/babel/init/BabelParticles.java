@@ -16,6 +16,8 @@ public class BabelParticles {
     public static final DeferredRegister<ParticleType<?>> REGISTRY = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, BabelMod.MODID);
 
     public static final RegistryObject<SimpleParticleType> STUN = REGISTRY.register("stun", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> SLEEP = REGISTRY.register("sleep", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> COBWEB = REGISTRY.register("cobweb", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> PALSYING = REGISTRY.register("palsying", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> MUTING = REGISTRY.register("muting", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> MISS_PHYSICAL = REGISTRY.register("miss_physical", () -> new SimpleParticleType(false));
@@ -33,6 +35,8 @@ public class BabelParticles {
         @SubscribeEvent
         public static void registerParticles(RegisterParticleProvidersEvent event) {
             event.registerSpriteSet(BabelParticles.STUN.get(), StunParticle::provider);
+            event.registerSpriteSet(BabelParticles.SLEEP.get(), SleepParticle::provider);
+            event.registerSpriteSet(BabelParticles.COBWEB.get(), CobwebParticle::provider);
             event.registerSpriteSet(BabelParticles.PALSYING.get(), PalsyingParticle::provider);
             event.registerSpriteSet(BabelParticles.MUTING.get(), MutingParticle::provider);
             event.registerSpriteSet(BabelParticles.MISS_PHYSICAL.get(), MissParticle::provider);

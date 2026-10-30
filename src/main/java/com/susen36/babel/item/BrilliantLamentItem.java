@@ -3,16 +3,14 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
-import com.susen36.babel.event.EPEvents;
+import com.susen36.babel.util.DataUtils;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 
 public class BrilliantLamentItem extends CollectibleItem.CustomCollectibleItem {
@@ -33,7 +31,7 @@ public class BrilliantLamentItem extends CollectibleItem.CustomCollectibleItem {
                 && Math.abs(monster.getX() - player.getX()) <= MONSTER_RANGE
                 && Math.abs(monster.getY() - player.getY()) <= MONSTER_RANGE
                 && Math.abs(monster.getZ() - player.getZ()) <= MONSTER_RANGE
-                && EPEvents.isMagic(event.getSource())) {
+                && DataUtils.isMagic(event.getSource())) {
             event.setAmount(event.getAmount() * 1.4F);
         }
     }

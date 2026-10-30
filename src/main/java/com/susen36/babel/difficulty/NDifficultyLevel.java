@@ -10,7 +10,6 @@ import net.minecraft.util.Mth;
  *     <li>hard：游戏规则值为 19，困难模式，等级最高 19，多出来的1级不参与倍率计算。</li>
  * </ul>
  */
-//java小知识:类声明为final意味着该类不能被继承
 public final class NDifficultyLevel {
     private static final NDifficultyLevel EASY = new NDifficultyLevel(0);
 

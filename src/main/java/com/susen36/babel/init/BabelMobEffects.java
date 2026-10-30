@@ -12,6 +12,9 @@ public class BabelMobEffects {
 
     public static final RegistryObject<LessArmorMobEffect> LESS_ARMOR = REGISTRY.register("less_armor", LessArmorMobEffect::new);
     public static final RegistryObject<MobEffect> STUN = REGISTRY.register("stun", StunMobEffect::new);
+    public static final RegistryObject<MobEffect> SLEEP = REGISTRY.register("sleep", SleepingMobEffect::new);
+    public static final RegistryObject<MobEffect> BIND = REGISTRY.register("bind", BindingMobEffect::new);
+    public static final RegistryObject<MobEffect> INVISIBLE = REGISTRY.register("invisible", InvisibleMobEffect::new);
     public static final RegistryObject<FrozenMobEffect> FROZEN = REGISTRY.register("frozen", FrozenMobEffect::new);
     public static final RegistryObject<MobEffect> ESSENCE_RESISTANCE = REGISTRY.register("essence_resistance", EssenceResistanceMobEffect::new);
     public static final RegistryObject<PalsyMobEffect> PALSY = REGISTRY.register("palsy", PalsyMobEffect::new);

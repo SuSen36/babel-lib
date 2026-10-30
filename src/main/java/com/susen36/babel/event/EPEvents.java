@@ -12,16 +12,13 @@ import com.susen36.babel.init.BabelMobEffects;
 import com.susen36.babel.init.BabelParticles;
 import com.susen36.babel.init.BabelSounds;
 import com.susen36.babel.manager.EPManager;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import com.susen36.babel.util.DataUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -80,10 +77,10 @@ public class EPEvents {
     public static void onLivingDamagePreHigh(LivingDamageEvent event) {
         LivingEntity entity = event.getEntity();
         DamageSource source = event.getSource();
-        if (isNotReal(source)) {
+        if (DataUtils.isNotReal(source)) {
             float originalAmount = event.getAmount();
             float amount = originalAmount;
-            if (isMagic(source)) {
+            if (DataUtils.isMagic(source)) {
                 AttributeInstance magic = entity.getAttribute(BabelAttributes.MAGIC_RESISTANCE.get());
                 if (magic != null) {
                     double v = magic.getValue();
@@ -92,7 +89,7 @@ public class EPEvents {
                         amount *= (float) ((100.0 - Mth.clamp(v, 0.0, 100.0)) * 0.01);
                     }
                 }
-            } else if (isPhysical(source)) {
+            } else if (DataUtils.isPhysical(source)) {
                 AttributeInstance defense = entity.getAttribute(BabelAttributes.DEFENSE.get());
                 if (defense != null) {
                     double v = defense.getValue();
@@ -215,21 +212,5 @@ public class EPEvents {
                 fi.addFrenzyStack();
             }
         }
-    }
-
-    public static final TagKey<DamageType> FORGE_MAGIC = TagKey.create(
-            Registries.DAMAGE_TYPE, new ResourceLocation("forge", "is_magic"));
-
-    public static boolean isMagic(DamageSource source) {
-        return isNotReal(source) && !source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS) &&
-                (source.is(FORGE_MAGIC) || source.is(DamageTypeTags.BYPASSES_ARMOR) || source.is(DamageTypeTags.WITCH_RESISTANT_TO));
-    }
-
-    public static boolean isNotReal(DamageSource source) {
-        return !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !source.is(DamageTypeTags.BYPASSES_EFFECTS);
-    }
-
-    public static boolean isPhysical(DamageSource source) {
-        return isNotReal(source) && !isMagic(source) && !source.is(DamageTypeTags.BYPASSES_RESISTANCE);
     }
 }

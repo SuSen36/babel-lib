@@ -15,11 +15,11 @@ public abstract class ThrownTridentMixin {
     @Redirect(method = "onHitEntity",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isThundering()Z"))
     private boolean allowRainForChanneling(Level level) {
-        if (level.isThundering()) {
-            return true;
+        if (!level.isThundering()) {
+            Entity owner = ((ThrownTrident) (Object) this).getOwner();
+            return level.isRaining() && owner instanceof ServerPlayer player
+                    && Collectibles.getData(player).isUsed(BabelCollectible.HAND_OF_DIFFUSION.get());
         }
-        Entity owner = ((ThrownTrident) (Object) this).getOwner();
-        return level.isRaining() && owner instanceof ServerPlayer player
-                && Collectibles.getData(player).isUsed(BabelCollectible.HAND_OF_DIFFUSION.get());
+        return true;
     }
 }

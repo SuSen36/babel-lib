@@ -21,21 +21,19 @@ public class LifePointUtils {
     }
 
     public static void setLifePoint(Entity entity, int value) {
-        if (value < 1) {
-            return;
+        if (value >= 1) {
+            HealthCapability capability = get(entity);
+            capability.setLives(value);
+            capability.sync();
         }
-        HealthCapability capability = get(entity);
-        capability.setLives(value);
-        capability.sync();
     }
 
     public static void addLifePoint(Entity entity, int delta) {
-        if (delta == 0) {
-            return;
+        if (delta != 0) {
+            HealthCapability capability = get(entity);
+            capability.setLives(capability.getLives() + delta);
+            capability.sync();
         }
-        HealthCapability capability = get(entity);
-        capability.setLives(capability.getLives() + delta);
-        capability.sync();
     }
 
     public static int getMaxLifePoint(Entity entity) {
@@ -43,12 +41,11 @@ public class LifePointUtils {
     }
 
     public static void setMaxLifePoint(Entity entity, int value) {
-        if (value < 1) {
-            return;
+        if (value >= 1) {
+            HealthCapability capability = get(entity);
+            capability.setMaxLives(value);
+            capability.sync();
         }
-        HealthCapability capability = get(entity);
-        capability.setMaxLives(value);
-        capability.sync();
     }
 
     public static int getShieldPoint(Entity entity) {
@@ -56,20 +53,18 @@ public class LifePointUtils {
     }
 
     public static void setShieldPoint(Entity entity, int value) {
-        if (value < 0) {
-            return;
+        if (value >= 0) {
+            HealthCapability capability = get(entity);
+            capability.setShield(value);
+            capability.sync();
         }
-        HealthCapability capability = get(entity);
-        capability.setShield(value);
-        capability.sync();
     }
 
     public static void addShieldPoint(Entity entity, int delta) {
-        if (delta == 0) {
-            return;
+        if (delta != 0) {
+            HealthCapability capability = get(entity);
+            capability.setShield(capability.getShield() + delta);
+            capability.sync();
         }
-        HealthCapability capability = get(entity);
-        capability.setShield(capability.getShield() + delta);
-        capability.sync();
     }
 }
