@@ -15,7 +15,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.Rarity;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 public class HandOfSnatcherItem extends CollectibleItem.CustomCollectibleItem {
@@ -23,7 +22,7 @@ public class HandOfSnatcherItem extends CollectibleItem.CustomCollectibleItem {
     private static final double EMERALD_CHANCE = 0.1;
 
     public HandOfSnatcherItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 25, false, CollectibleTiers.ADVANCED,
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)

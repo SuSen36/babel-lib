@@ -16,14 +16,13 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-public class HandSpeedItem extends CollectibleItem.CustomCollectibleItem {
+public class HandOfSpeedItem extends CollectibleItem.CustomCollectibleItem {
 
-    public HandSpeedItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 25, false, CollectibleTiers.ADVANCED,
+    public HandOfSpeedItem() {
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
@@ -51,7 +50,7 @@ public class HandSpeedItem extends CollectibleItem.CustomCollectibleItem {
 
     private static boolean isMiningAlone(Player player) {
         boolean alone = false;
-        if (Collectibles.getData(player).isUsed(BabelCollectible.HAND_SPEED.get())
+        if (Collectibles.getData(player).isUsed(BabelCollectible.HAND_OF_SPEED.get())
                 && player.getMainHandItem().is(ItemTags.PICKAXES)) {
             AABB area = AABB.ofSize(new Vec3(player.getX(), player.getY(), player.getZ()), 8, 8, 8);
             alone = true;

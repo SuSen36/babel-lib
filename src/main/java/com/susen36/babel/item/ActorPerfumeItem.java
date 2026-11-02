@@ -7,12 +7,11 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 
 public class ActorPerfumeItem extends CollectibleItem.CustomCollectibleItem {
 
     public ActorPerfumeItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON), 25, false, CollectibleTiers.NORMAL,
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.RARE,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
@@ -23,11 +22,11 @@ public class ActorPerfumeItem extends CollectibleItem.CustomCollectibleItem {
 
     @Override
     public boolean shouldApplyEffectTickThisTick(int tickCount, int layer) {
-        return tickCount % 20 == 0;
+        return tickCount % 100 == 0;
     }
 
     @Override
     public void applyEffectTick(Player player, int layer) {
-        player.heal(player.getMaxHealth() * 0.01F);
+        player.heal(Math.max(player.getMaxHealth() * 0.05F, 1.0F));
     }
 }

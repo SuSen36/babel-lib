@@ -11,7 +11,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.UseAnim;
 
 import java.util.Map;
@@ -30,7 +29,7 @@ public class RockHornItem extends CollectibleItem.CustomCollectibleItem {
     private static final Map<Player, Scan> NEARBY_SCANS = new WeakHashMap<>();
 
     public RockHornItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON), 25, false, CollectibleTiers.NORMAL,
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.NORMAL,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(0).value(), 16F, 1F)

@@ -10,12 +10,11 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 
 public class SecondEconomicReformActItem extends CollectibleItem.CustomCollectibleItem {
     public SecondEconomicReformActItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 25, false, CollectibleTiers.RARE,
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.VILLAGER_YES, 2F, 1F)
@@ -27,7 +26,7 @@ public class SecondEconomicReformActItem extends CollectibleItem.CustomCollectib
     @Override
     public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
         if (!level.isClientSide()) {
-            player.addEffect(new MobEffectInstance(MobEffects.HERO_OF_THE_VILLAGE, 5400, 0));
+            player.addEffect(new MobEffectInstance(MobEffects.HERO_OF_THE_VILLAGE, 6000, 0));
         }
     }
 }

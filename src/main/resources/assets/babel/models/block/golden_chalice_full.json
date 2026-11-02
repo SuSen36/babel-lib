@@ -1,6 +1,11 @@
 {
   "format_version": "1.9.0",
   "credit": "Made with Blockbench",
+  "textures": {
+    "0": "babel:block/golden_chalice_empty",
+    "1": "babel:block/golden_chalice_full",
+    "particle": "babel:block/golden_chalice_empty"
+  },
   "texture_size": [
     32,
     32

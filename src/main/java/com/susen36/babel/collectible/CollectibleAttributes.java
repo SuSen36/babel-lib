@@ -5,6 +5,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.AABB;
@@ -85,11 +86,11 @@ public final class CollectibleAttributes {
                                 hitIds.add(living.getUUID());
                                 AttributeModifier existing = instance.getModifier(modifierId);
                                 if (existing == null || existing.getAmount() != bonus.amount()) {
-                                    if (existing != null) {
-                                        instance.removeModifier(modifierId);
-                                    }
+                                    double oldMax = instance.getValue();
+                                    instance.removeModifier(modifierId);
                                     instance.addTransientModifier(new AttributeModifier(
                                             modifierId, identity.name(), bonus.amount(), bonus.operation()));
+                                    syncHealth(living, bonus.attribute(), oldMax);
                                 }
                             }
                         }
@@ -134,8 +135,19 @@ public final class CollectibleAttributes {
         if (level.getEntity(entityId) instanceof LivingEntity living) {
             AttributeInstance instance = living.getAttribute(attribute);
             if (instance != null) {
+                double oldMax = instance.getValue();
                 instance.removeModifier(modifierId);
+                syncHealth(living, attribute, oldMax);
             }
+        }
+    }
+
+    /** 生命上限被修饰符改变后，按比例同步当前生命 */
+    private static void syncHealth(LivingEntity living, Attribute attribute, double oldMax) {
+        AttributeInstance instance = living.getAttribute(Attributes.MAX_HEALTH);
+        if (attribute == Attributes.MAX_HEALTH && instance != null && instance.getValue() != oldMax) {
+            double newMax = instance.getValue();
+            living.setHealth((float) Math.min(living.getHealth() * newMax / oldMax, newMax));
         }
     }
 

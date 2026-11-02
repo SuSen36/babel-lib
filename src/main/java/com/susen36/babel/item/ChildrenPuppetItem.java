@@ -8,13 +8,12 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 
 public class ChildrenPuppetItem extends CollectibleItem.CustomCollectibleItem {
 
     public ChildrenPuppetItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON), 25, false, CollectibleTiers.RARE,
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.ENCHANTMENT_TABLE_USE, 2F, 1F)

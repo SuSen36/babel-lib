@@ -4,6 +4,7 @@ import com.susen36.babel.effect.InvisibleMobEffect;
 import com.susen36.babel.init.BabelMobEffects;
 import com.susen36.babel.item.DreamingEssenceItem;
 import com.susen36.babel.item.HandOfFlowingWaterItem;
+import com.susen36.babel.item.VanillaSodaItem;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -75,17 +76,25 @@ public abstract class LivingEntityMixin {
     }
 
     @ModifyVariable(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z",
-            at = @At("HEAD"), argsOnly = true, index = 1)
+            at = @At("HEAD"), argsOnly = true)
     private MobEffectInstance boostBeneficialEffectDuration(MobEffectInstance effect) {
         LivingEntity self = (LivingEntity) (Object) this;
         MobEffectInstance result = effect;
-        // 返回副本而非原地修改，避免污染调用方持有的实例导致时长连乘
         if (self instanceof Player player
-                && DreamingEssenceItem.isUsed(player)
                 && effect.getEffect().getCategory() == MobEffectCategory.BENEFICIAL
-                && effect.getDuration() > 0) {
-            result = new MobEffectInstance(effect.getEffect(), (int) (effect.getDuration() * 1.5F),
-                    effect.getAmplifier(), effect.isAmbient(), effect.isVisible(), effect.showIcon());
+                && effect.getDuration() > 1) {
+            // 多收藏品来源按乘法叠加，仅生成一次副本，避免污染调用方持有的实例导致时长连乘
+            float multiplier = 1.0F;
+            if (DreamingEssenceItem.isUsed(player)) {
+                multiplier *= 1.5F;
+            }
+            if (VanillaSodaItem.isUsed(player)) {
+                multiplier *= 1.2F;
+            }
+            if (multiplier != 1.0F) {
+                result = new MobEffectInstance(effect.getEffect(), (int) (effect.getDuration() * multiplier),
+                        effect.getAmplifier(), effect.isAmbient(), effect.isVisible(), effect.showIcon());
+            }
         }
         return result;
     }

@@ -53,9 +53,7 @@ public class ClientPacketHandler {
         if (mc.level != null) {
             Entity entity = mc.level.getEntity(message.playerId);
             if (entity instanceof Player player) {
-                Collectibles.deserializeUsed(player, message.data.getList("used", Tag.TAG_STRING));
-                Collectibles.deserializeLayer(player, message.data.getCompound("layer"));
-                Collectibles.deserializeCooldown(player, message.data.getCompound("cooldown"));
+                Collectibles.deserializeStates(player, message.data.getList("states", Tag.TAG_COMPOUND));
             }
         }
     }
@@ -68,12 +66,6 @@ public class ClientPacketHandler {
     }
 
     public static void handle(CooldownSyncMessage message) {
-        if (message.id != null) {
-            Item item = ForgeRegistries.ITEMS.getValue(message.id);
-            if (item != null) {
-                CooldownUtils.setLastMaxCooldownTick(item, message.maxTick);
-            }
-        }
         CooldownUtils.setServerCurrentTick(message.currentTick);
     }
 

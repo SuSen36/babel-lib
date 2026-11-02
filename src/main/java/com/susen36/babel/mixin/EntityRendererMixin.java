@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * 冰壳不依赖实体模型，故挂在 {@link EntityRenderer#render} 上，可同时覆盖原版活体渲染器与 GeckoLib 等第三方渲染器。
+ * 挂在 {@link EntityRenderer#render} 上，可同时覆盖原版活体渲染器与 GeckoLib 等第三方渲染器。
  */
 @Mixin(EntityRenderer.class)
 public abstract class EntityRendererMixin {

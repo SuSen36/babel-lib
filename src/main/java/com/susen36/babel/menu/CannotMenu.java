@@ -28,9 +28,9 @@ public class CannotMenu extends AbstractContainerMenu {
     private static final int INV_SLOT_END = 29;
     private static final int USE_ROW_SLOT_START = 29;
     private static final int USE_ROW_SLOT_END = 38;
-    private static final int PAYMENT_SLOT_X = 162;
-    private static final int RESULT_SLOT_X = 220;
-    private static final int SLOT_Y = 37;
+    private static final int PAYMENT_SLOT_X = 163;
+    private static final int RESULT_SLOT_X = 221;
+    private static final int SLOT_Y = 38;
     private final Merchant trader;
     private final MerchantContainer tradeContainer;
     @Nullable

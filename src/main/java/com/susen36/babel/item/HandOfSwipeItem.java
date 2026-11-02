@@ -12,17 +12,16 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-public class HandSwipeItem extends CollectibleItem.CustomCollectibleItem {
+public class HandOfSwipeItem extends CollectibleItem.CustomCollectibleItem {
 
-    public HandSwipeItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 25, false, CollectibleTiers.ADVANCED,
+    public HandOfSwipeItem() {
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
@@ -38,7 +37,7 @@ public class HandSwipeItem extends CollectibleItem.CustomCollectibleItem {
 
     @Override
     public void applyEffectTick(Player player, int layer) {
-        if (player.getOffhandItem().is(Items.BRUSH) && player.hasEffect(MobEffects.REGENERATION)) {
+        if (player.getOffhandItem().is(Items.BRUSH) || player.hasEffect(MobEffects.REGENERATION)) {
             Level level = player.level();
             Vec3 center = new Vec3(player.getX(), player.getY(), player.getZ());
             List<Monster> monsters = level.getEntitiesOfClass(Monster.class,

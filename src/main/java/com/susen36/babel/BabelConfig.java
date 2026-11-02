@@ -14,7 +14,7 @@ public class BabelConfig {
             .define("ep_icon_style", false);
 
     public static final ForgeConfigSpec.BooleanValue BAN_ADVANCED_COLLECTIBLES = BUILDER
-            .comment("禁用高级（ADVANCED）收藏品：无法激活")
+            .comment("禁用高稀有度（ADVANCED）收藏品：无法激活")
             .define("ban_advanced_collectibles", false);
 
     public static final ForgeConfigSpec.DoubleValue COLLECTIBLE_LOOT_CHANCE = BUILDER

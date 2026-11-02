@@ -2,6 +2,7 @@ package com.susen36.babel.collectible;
 
 import com.susen36.babel.BabelConfig;
 import com.susen36.babel.api.event.CollectibleEvent;
+import com.susen36.babel.api.event.ElementEvent;
 import com.susen36.babel.api.event.LifePointConsumeEvent;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.ChatFormatting;
@@ -89,9 +90,12 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     }
 
     /**
-     * 等级 → 基础稀有度；高级为 EPIC，稀有为 RARE，其余为 COMMON（诅咒另染红）。
+     * 等级 → 原版稀有度：高稀有度（ADVANCED）为 EPIC，稀有为 RARE，诅咒对齐原版诅咒附魔书为 UNCOMMON，其余为 COMMON（诅咒另染红）。
      */
     private static Rarity rarityForTier(CollectibleTiers tier) {
+        if (tier == CollectibleTiers.CURSED) {
+            return Rarity.UNCOMMON;
+        }
         if (tier == CollectibleTiers.RARE) {
             return Rarity.RARE;
         }
@@ -152,7 +156,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     }
 
     /**
-     * 高级收藏品被游戏规则禁用时，视为不可使用。
+     * 高稀有度收藏品被配置 ban_advanced_relics 禁用时，视为不可使用。
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean isBanned() {
@@ -191,9 +195,9 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             @NotNull Level level,
             @NotNull LivingEntity livingEntity
     ) {
-        if (livingEntity instanceof Player player && level instanceof ServerLevel serverLevel) {
-            var cd = Collectibles.getCooldownData(player);
-            if (canAlwaysUse || (!isBanned() && cd.isReady(this, serverLevel.getServer()))) {
+        if (livingEntity instanceof Player player && level instanceof ServerLevel) {
+            // 冷却中可重复使用：每次使用重新触发完整激活流程，冷却由 Used 事件监听器统一重置
+            if (canAlwaysUse || !isBanned()) {
                 activate(level, player, stack, this);
                 return consumeSelf(stack);
             } else {
@@ -243,7 +247,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         );
     }
 
-    private void activate(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack, @NotNull Item item) {
+    void activate(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack, @NotNull Item item) {
         var data = Collectibles.getData(player);
         data.markUsed(item);
         CollectibleEvent.onUsed(player, item);
@@ -268,7 +272,6 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, level, entity, slot, selected);
         if (activation.autoUseOnGain() && entity instanceof Player player && entity.tickCount % 10 == 0) {
-            // 每0.5秒尝试一次自动使用
             var data = Collectibles.getData(player);
             Item item = stack.getItem();
             if (!data.isUsed(item) && !isBanned()) {
@@ -297,7 +300,8 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         private final List<AttributeBonus> attributeBonuses = new ArrayList<>();
 
         public CustomCollectibleItem(Properties properties, int useTicks, boolean canAlwaysUse, CollectibleTiers tier, Levels levels, CollectibleActivation activation) {
-            super(properties);
+            // 稀有度统一由等级映射，覆盖调用方在 Properties 中手动设置的原版稀有度
+            super(properties.rarity(rarityForTier(tier)));
             this.useTicks = useTicks;
             this.canAlwaysUse = canAlwaysUse;
             this.tier = tier;
@@ -464,6 +468,10 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         public void onMobHurt(LivingDamageEvent event, Player player, int layer) {
         }
 
+        /** 持有者受到元素损伤（ElementEvent.PostHurt 阶段）；仅损伤结算成功时分发，爆发伤害走 onMobHurt。 */
+        public void onElementalHurt(ElementEvent.PostHurt event, Player player, int layer) {
+        }
+
         /** 持有者失去生命值或护盾（LifePointConsumeEvent 阶段）；type 为扣除的资源类型，amount 为扣除量，事件只读。 */
         public void onLifePointLoss(LifePointConsumeEvent event, Player player, int layer) {
         }
@@ -541,7 +549,6 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         final public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slot, boolean selected) {
             super.inventoryTick(stack, level, entity, slot, selected);
             if (activation.autoUseOnGain() && entity instanceof Player player && entity.tickCount % 10 == 0) {
-                // 每0.5秒尝试一次自动使用
                 var data = Collectibles.getData(player);
                 Item item = stack.getItem();
                 if (!data.isUsed(item) && !isBanned()) {
@@ -583,7 +590,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             );
         }
 
-        private void activate(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack, @NotNull Item item) {
+        void activate(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack, @NotNull Item item) {
             var data = Collectibles.getData(player);
             data.markUsed(item);
             CollectibleEvent.onUsed(player, item);
@@ -596,7 +603,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         }
 
         /**
-         * 高级收藏品被游戏规则禁用时，视为不可使用。
+         * 高稀有度收藏品被配置 ban_advanced_relics 禁用时，视为不可使用。
          */
         @SuppressWarnings("BooleanMethodIsAlwaysInverted")
         private boolean isBanned() {
@@ -648,9 +655,9 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                 @NotNull Level level,
                 @NotNull LivingEntity livingEntity
         ) {
-            if (livingEntity instanceof Player player && level instanceof ServerLevel serverLevel) {
-                var cd = Collectibles.getCooldownData(player);
-                if (canAlwaysUse || (!isBanned() && cd.isReady(this, serverLevel.getServer()))) {
+            if (livingEntity instanceof Player player && level instanceof ServerLevel) {
+                // 冷却中可重复使用：每次使用重新触发完整激活流程，冷却由 Used 事件监听器统一重置
+                if (canAlwaysUse || !isBanned()) {
                     activate(level, player, stack, this);
                     return consumeSelf(stack, player);
                 } else {

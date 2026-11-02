@@ -3,9 +3,9 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
-import com.susen36.babel.init.BabelSounds;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -14,16 +14,15 @@ import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 
 
 public class OddFluteItem extends CollectibleItem.CustomCollectibleItem {
 	public OddFluteItem() {
-		super(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON), 40, false, CollectibleTiers.RARE, new CollectibleItem.Levels(0, 1, 0),
+		super(new Item.Properties().stacksTo(1), 40, false, CollectibleTiers.RARE, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
-						.sound(BabelSounds.FLUTESONG.get(), 2F, 1F)
+						.sound(SoundEvents.NOTE_BLOCK_BANJO.value(), 2F, 1F)
 						.particle(ParticleTypes.NOTE, 72)
 						.showOverlay(true)
 						.build());

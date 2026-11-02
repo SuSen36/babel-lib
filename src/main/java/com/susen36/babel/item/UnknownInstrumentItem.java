@@ -8,12 +8,11 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 
 public class UnknownInstrumentItem extends CollectibleItem.CustomCollectibleItem {
 
     public UnknownInstrumentItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 25, false, CollectibleTiers.RARE,
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.AMETHYST_BLOCK_RESONATE, 2F, 1F)

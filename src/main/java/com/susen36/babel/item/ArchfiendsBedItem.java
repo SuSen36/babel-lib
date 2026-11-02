@@ -6,11 +6,10 @@ import com.susen36.babel.collectible.CollectibleTiers;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 
 public class ArchfiendsBedItem extends CollectibleItem.CustomCollectibleItem {
 	public ArchfiendsBedItem() {
-		super(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON), 25, false, CollectibleTiers.ADVANCED, new CollectibleItem.Levels(0, 1, 0),
+		super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.RARE, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.TOTEM_USE, 2F, 1F)
 						.particle(ParticleTypes.DRIPPING_LAVA, 72)

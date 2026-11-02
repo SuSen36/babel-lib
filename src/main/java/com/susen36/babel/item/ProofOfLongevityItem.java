@@ -11,12 +11,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 
 public class ProofOfLongevityItem extends CollectibleItem.CustomCollectibleItem {
 	public ProofOfLongevityItem() {
-		super(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
+		super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.AMBIENT_WARPED_FOREST_MOOD.value(), 3.5F, 1F)
 						.particle(ParticleTypes.HAPPY_VILLAGER, 72)

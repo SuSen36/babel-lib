@@ -1,5 +1,9 @@
 {
   "credit": "Made with Blockbench",
+  "textures": {
+    "0": "babel:block/stoenalley",
+    "particle": "babel:block/stoenalley"
+  },
   "texture_size": [
     28,
     26

@@ -16,7 +16,6 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
@@ -27,7 +26,7 @@ public class FristonPItem extends CollectibleItem.CustomCollectibleItem {
     private static final double ATTACK_SPEED_PER_LAYER = 0.1D;
 
     public FristonPItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 25, false, CollectibleTiers.RARE,
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.RARE,
                 new CollectibleItem.Levels(0, MAX_LAYERS, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)

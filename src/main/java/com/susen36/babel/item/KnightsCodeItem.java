@@ -11,12 +11,11 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 
 public class KnightsCodeItem extends CollectibleItem.CustomCollectibleItem {
 
     public KnightsCodeItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON), 25, false, CollectibleTiers.ADVANCED,
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.RARE,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)

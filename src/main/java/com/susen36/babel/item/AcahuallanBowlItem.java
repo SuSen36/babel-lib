@@ -9,12 +9,11 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 
 public class AcahuallanBowlItem extends CollectibleItem.CustomCollectibleItem {
 	public AcahuallanBowlItem() {
-		super(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
+		super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
 						.particle(ParticleTypes.HAPPY_VILLAGER, 72)

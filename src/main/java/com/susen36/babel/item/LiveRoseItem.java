@@ -7,13 +7,12 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 
 public class LiveRoseItem extends CollectibleItem.CustomCollectibleItem {
 
     public LiveRoseItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON), 25, false, CollectibleTiers.NORMAL,
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.NORMAL,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)

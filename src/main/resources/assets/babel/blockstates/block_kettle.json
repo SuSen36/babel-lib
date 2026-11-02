@@ -16,7 +16,7 @@
       "y": 270
     },
     "facing=north,blockstate=1": {
-      "model": "babel:block/boiling_kettle_blockstate_0"
+      "model": "babel:block/block_kettle_lay"
     },
     "facing=east,blockstate=1": {
       "model": "babel:block/block_kettle_lay",

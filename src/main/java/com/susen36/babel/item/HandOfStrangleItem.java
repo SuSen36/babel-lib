@@ -15,15 +15,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 
-public class HandStrangleItem extends CollectibleItem.CustomCollectibleItem {
+public class HandOfStrangleItem extends CollectibleItem.CustomCollectibleItem {
 
-    public HandStrangleItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 25, false, CollectibleTiers.ADVANCED,
+    public HandOfStrangleItem() {
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)

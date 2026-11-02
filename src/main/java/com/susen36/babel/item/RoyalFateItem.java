@@ -13,7 +13,6 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -24,7 +23,7 @@ import net.minecraft.world.phys.HitResult;
 
 public class RoyalFateItem extends CollectibleItem.CustomCollectibleItem {
 	public RoyalFateItem() {
-		super(new Item.Properties().stacksTo(2).fireResistant().rarity(Rarity.EPIC), 25, false, CollectibleTiers.RARE, new CollectibleItem.Levels(0, 1, 0),
+		super(new Item.Properties().stacksTo(2).fireResistant(), 25, false, CollectibleTiers.RARE, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.WARDEN_DEATH, 2F, 1F)
 						.particle(ParticleTypes.END_ROD, 72)

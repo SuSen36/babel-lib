@@ -1,8 +1,10 @@
 package com.susen36.babel.collectible;
 
 import com.susen36.babel.BabelMod;
+import com.susen36.babel.api.event.CollectibleDropEvent;
 import com.susen36.babel.api.event.CollectibleEvent;
 import com.susen36.babel.api.event.OriginiumIngotDropEvent;
+import com.susen36.babel.item.FourLeafCloverFossilItem;
 import com.susen36.babel.item.SupremeRingItem;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.server.level.ServerLevel;
@@ -33,6 +35,13 @@ public class CollectiblesEventListener {
     public static void onOriginiumIngotDrop(@NotNull OriginiumIngotDropEvent event) {
         if (event.getKiller() instanceof Player player && SupremeRingItem.isUsed(player)) {
             event.setMultiplier(event.getMultiplier() * 1.5F);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onCollectibleDrop(@NotNull CollectibleDropEvent event) {
+        if (event.getKiller() instanceof Player player && FourLeafCloverFossilItem.isUsed(player)) {
+            event.setChance(event.getChance() * 2.0F);
         }
     }
 

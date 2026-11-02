@@ -16,17 +16,16 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 
-public class HandThornsItem extends CollectibleItem.CustomCollectibleItem {
+public class HandOfThornsItem extends CollectibleItem.CustomCollectibleItem {
 
     private static final TagKey<DamageType> IGNORES_THORN_REBOUND = TagKey.create(
             Registries.DAMAGE_TYPE, new ResourceLocation(BabelMod.MODID, "ignores_thorn_rebound"));
 
-    public HandThornsItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 25, false, CollectibleTiers.ADVANCED,
+    public HandOfThornsItem() {
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)

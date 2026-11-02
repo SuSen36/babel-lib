@@ -1,5 +1,9 @@
 {
   "credit": "Made with Blockbench",
+  "textures": {
+    "0": "babel:block/cannedberry",
+    "particle": "babel:block/cannedberry"
+  },
   "texture_size": [
     34,
     18

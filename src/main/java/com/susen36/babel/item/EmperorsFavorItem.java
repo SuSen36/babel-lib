@@ -8,13 +8,12 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 
 public class EmperorsFavorItem extends CollectibleItem.CustomCollectibleItem {
 
     public EmperorsFavorItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON), 25, false, CollectibleTiers.NORMAL,
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.NORMAL,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)

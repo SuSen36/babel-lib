@@ -11,7 +11,6 @@ import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public class EmptyFowlbeastItem extends CollectibleItem.CustomCollectibleItem {
 
 
     public EmptyFowlbeastItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 25, false, CollectibleTiers.RARE,
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.ALLAY_ITEM_GIVEN, 2F, 1F)

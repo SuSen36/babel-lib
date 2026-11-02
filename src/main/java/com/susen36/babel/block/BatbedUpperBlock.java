@@ -3,16 +3,16 @@ package com.susen36.babel.block;
 import com.susen36.babel.init.BabelBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -92,22 +92,5 @@ public class BatbedUpperBlock extends Block {
     @Override
     public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
         return new ItemStack(BabelBlocks.BLOCK_BATBED.get());
-    }
-
-    private void breakUpperbed(LevelAccessor world, double x, double y, double z) {
-        world.destroyBlock(BlockPos.containing(x + getFacing(world.getBlockState(BlockPos.containing(x, y, z))).getStepX(), y + getFacing(world.getBlockState(BlockPos.containing(x, y, z))).getStepY(), z + getFacing(world.getBlockState(BlockPos.containing(x, y, z))).getStepZ()), false);
-    }
-
-    @Override
-    public boolean onDestroyedByPlayer(BlockState blockstate, Level world, BlockPos pos, Player entity, boolean willHarvest, FluidState fluid) {
-        boolean retval = super.onDestroyedByPlayer(blockstate, world, pos, entity, willHarvest, fluid);
-        breakUpperbed(world, pos.getX(), pos.getY(), pos.getZ());
-        return retval;
-    }
-
-    @Override
-    public void wasExploded(Level world, BlockPos pos, Explosion e) {
-        super.wasExploded(world, pos, e);
-        breakUpperbed(world, pos.getX(), pos.getY(), pos.getZ());
     }
 }

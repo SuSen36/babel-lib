@@ -19,14 +19,14 @@ public class BabelCollectible {
     public static RegistryObject<Item> KETTLE;
     public static RegistryObject<Item> BAT_BED;
     public static RegistryObject<Item> RAINBOW_CANDY;
-    public static RegistryObject<Item> HAND_FERTILITY;
-    public static RegistryObject<Item> HAND_THORNS;
-    public static RegistryObject<Item> HAND_STRANGLE;
-    public static RegistryObject<Item> HAND_SPEED;
-    public static RegistryObject<Item> HAND_FIREWORK;
-    public static RegistryObject<Item> HAND_SWIPE;
+    public static RegistryObject<Item> HAND_OF_BUCKLER;
+    public static RegistryObject<Item> HAND_OF_THORNS;
+    public static RegistryObject<Item> HAND_OF_STRANGLE;
+    public static RegistryObject<Item> HAND_OF_SPEED;
+    public static RegistryObject<Item> HAND_OF_FIREWORK;
+    public static RegistryObject<Item> HAND_OF_SWIPE;
     public static RegistryObject<Item> HAND_OF_BARREN;
-    public static RegistryObject<Item> HAND_SWORD;
+    public static RegistryObject<Item> HAND_OF_SWORD;
     public static RegistryObject<Item> HAND_OF_ENGRAVE;
     public static RegistryObject<Item> HAND_OF_SNATCHER;
     public static RegistryObject<Item> HAND_OF_DIFFUSION;
@@ -57,6 +57,7 @@ public class BabelCollectible {
     public static RegistryObject<Item> UNKNOWN_INSTRUMENT;
     public static RegistryObject<Item> SUPREME_RING;
     public static RegistryObject<Item> FLAWLESS_JADESTONE;
+    public static RegistryObject<Item> ACTORS_JEWELRY_BOX;
 
     public static RegistryObject<Item> LEGEND_CHITIN;
     public static RegistryObject<Item> KING_CROWN;
@@ -68,7 +69,7 @@ public class BabelCollectible {
     public static RegistryObject<Item> ROYAL_ALLIANCE_TREATY;
     public static RegistryObject<Item> SEAGRASS_SALAD;
     public static RegistryObject<Item> ACAHUALLAN_BOWL;
-    public static RegistryObject<Item> GUARDIAN_STARE;
+    public static RegistryObject<Item> BANSHEE_KISS;
     public static RegistryObject<Item> PROOF_OF_LONGEVITY;
     public static RegistryObject<Item> HEMOST;
     public static RegistryObject<Item> SOLO_MUSIC_BOX;
@@ -132,6 +133,15 @@ public class BabelCollectible {
     public static RegistryObject<Item> EMPERORS_FAVOR;
     public static RegistryObject<Item> FROZEN_CLAW;
     public static RegistryObject<Item> LAKEBED_AEGIS;
+    public static RegistryObject<Item> SPINACH_PACK;
+    public static RegistryObject<Item> WRATH_OF_SIRACUSANS;
+    public static RegistryObject<Item> GLASS_BIRD;
+    public static RegistryObject<Item> RED_BOW_TIE;
+    public static RegistryObject<Item> FOUR_LEAF_CLOVER_FOSSIL;
+    public static RegistryObject<Item> ANCIENT_TREE_FRUIT;
+    public static RegistryObject<Item> ANTIQUE_CASTING;
+    public static RegistryObject<Item> UNLEASHINGS;
+    public static RegistryObject<Item> DREAMBIND_CASTLE_MODEL;
 
     public static final ArrayList<RegistryObject<Item>> BABEL_COLLECTIBLES = new ArrayList<>();
 
@@ -144,14 +154,14 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(KETTLE = REGISTRY.registerCollectible("kettle", KettleItem::new));
         BABEL_COLLECTIBLES.add(BAT_BED = REGISTRY.registerCollectible("bat_bed", BatBedItem::new));
         BABEL_COLLECTIBLES.add(RAINBOW_CANDY = REGISTRY.registerCollectible("rainbow_candy", RainbowCandyItem::new));
-        BABEL_COLLECTIBLES.add(HAND_FERTILITY = REGISTRY.registerCollectible("hand_fertility", HandFertilityItem::new));
-        BABEL_COLLECTIBLES.add(HAND_THORNS = REGISTRY.registerCollectible("hand_thorns", HandThornsItem::new));
-        BABEL_COLLECTIBLES.add(HAND_STRANGLE = REGISTRY.registerCollectible("hand_strangle", HandStrangleItem::new));
-        BABEL_COLLECTIBLES.add(HAND_SPEED = REGISTRY.registerCollectible("hand_speed", HandSpeedItem::new));
-        BABEL_COLLECTIBLES.add(HAND_FIREWORK = REGISTRY.registerCollectible("hand_firework", HandFireworkItem::new));
-        BABEL_COLLECTIBLES.add(HAND_SWIPE = REGISTRY.registerCollectible("hand_swipe", HandSwipeItem::new));
+        BABEL_COLLECTIBLES.add(HAND_OF_BUCKLER = REGISTRY.registerCollectible("hand_of_buckler", HandOfBucklerItem::new));
+        BABEL_COLLECTIBLES.add(HAND_OF_THORNS = REGISTRY.registerCollectible("hand_of_thorns", HandOfThornsItem::new));
+        BABEL_COLLECTIBLES.add(HAND_OF_STRANGLE = REGISTRY.registerCollectible("hand_of_strangle", HandOfStrangleItem::new));
+        BABEL_COLLECTIBLES.add(HAND_OF_SPEED = REGISTRY.registerCollectible("hand_of_speed", HandOfSpeedItem::new));
+        BABEL_COLLECTIBLES.add(HAND_OF_FIREWORK = REGISTRY.registerCollectible("hand_of_firework", HandOfFireworkItem::new));
+        BABEL_COLLECTIBLES.add(HAND_OF_SWIPE = REGISTRY.registerCollectible("hand_of_swipe", HandOfSwipeItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_BARREN = REGISTRY.registerCollectible("hand_of_barren", HandOfBarrenItem::new));
-        BABEL_COLLECTIBLES.add(HAND_SWORD = REGISTRY.registerCollectible("hand_sword", HandSwordItem::new));
+        BABEL_COLLECTIBLES.add(HAND_OF_SWORD = REGISTRY.registerCollectible("hand_of_sword", HandOfSwordItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_ENGRAVE = REGISTRY.registerCollectible("hand_of_engrave", HandOfEngraveItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_SNATCHER = REGISTRY.registerCollectible("hand_of_snatcher", HandOfSnatcherItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_DIFFUSION = REGISTRY.registerCollectible("hand_of_diffusion", HandOfDiffusionItem::new));
@@ -162,7 +172,7 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(WHITE_FLOWER_CROWN = REGISTRY.registerCollectible("white_flower_crown", WhiteFlowerCrownItem::new));
         BABEL_COLLECTIBLES.add(NECKLACE_OF_PRESENCE = REGISTRY.registerCollectible("necklace_of_presence", NecklaceOfPresenceItem::new));
         BABEL_COLLECTIBLES.add(REVOLVER_CYLINDER = REGISTRY.registerCollectible("revolver_cylinder", RevolverCylinderItem::new));
-        BABEL_COLLECTIBLES.add(LEITHANIAN_MEDAL_OF_HONOR = REGISTRY.registerCollectible("leithanian_medal_of_honor", LeithanianMedalOfHonorItem::new));
+        BABEL_COLLECTIBLES.add(LEITHANIAN_MEDAL_OF_HONOR = REGISTRY.registerCollectible("leithanian_honor_medal", LeithanianMedalOfHonorItem::new));
         BABEL_COLLECTIBLES.add(CONVAL_EXPERIENCE_CARD = REGISTRY.registerCollectible("conval_experience_card", ConvalExperienceCardItem::new));
         BABEL_COLLECTIBLES.add(RUSTED_IRON_HAMMER = REGISTRY.registerCollectible("rusted_iron_hammer", RustedIronHammerItem::new));
         BABEL_COLLECTIBLES.add(CONVAL_PRIME_MEMBERSHIP = REGISTRY.registerCollectible("conval_prime_membership", ConvalPrimeMembershipItem::new));
@@ -192,7 +202,7 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(ROYAL_ALLIANCE_TREATY = REGISTRY.registerCollectible("royal_alliance_treaty", RoyalAllianceTreatyItem::new));
         BABEL_COLLECTIBLES.add(SEAGRASS_SALAD = REGISTRY.registerCollectible("seagrass_salad", SeagrassSaladItem::new));
         BABEL_COLLECTIBLES.add(ACAHUALLAN_BOWL = REGISTRY.registerCollectible("acahuallan_bowl", AcahuallanBowlItem::new));
-        BABEL_COLLECTIBLES.add(GUARDIAN_STARE = REGISTRY.registerCollectible("guardian_stare", GuardianStareItem::new));
+        BABEL_COLLECTIBLES.add(BANSHEE_KISS = REGISTRY.registerCollectible("banshees_kiss", BansheeKissItem::new));
         BABEL_COLLECTIBLES.add(PROOF_OF_LONGEVITY = REGISTRY.registerCollectible("proof_of_longevity", ProofOfLongevityItem::new));
         BABEL_COLLECTIBLES.add(HEMOST = REGISTRY.registerCollectible("hemost", SmellyHemostaticItem::new));
         BABEL_COLLECTIBLES.add(SOLO_MUSIC_BOX = REGISTRY.registerCollectible("solo_music_box", SoloMusicBoxItem::new));
@@ -232,6 +242,7 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(GODMOTHERS_TOKEN = REGISTRY.registerCollectible("godmothers_token", GodmothersTokenItem::new));
         BABEL_COLLECTIBLES.add(DIVINE_CONCH = REGISTRY.registerCollectible("divine_conch", DivineConchItem::new));
         BABEL_COLLECTIBLES.add(FLAWLESS_JADESTONE = REGISTRY.registerCollectible("flawless_jadestone", FlawlessJadestoneItem::new));
+        BABEL_COLLECTIBLES.add(ACTORS_JEWELRY_BOX = REGISTRY.registerCollectible("actors_jewelry_box", ActorsJewelryBoxItem::new));
         BABEL_COLLECTIBLES.add(SCOUTS_SCOPE = REGISTRY.registerCollectible("scouts_scope", ScoutsScopeItem::new));
         BABEL_COLLECTIBLES.add(SEA_TERROR_JERKY = REGISTRY.registerCollectible("sea_terror_jerky", SeaTerrorJerkyItem::new));
         BABEL_COLLECTIBLES.add(COBBLESTONE_ALTAR = REGISTRY.registerCollectible("cobblestone_altar", CobblestoneAltarItem::new));
@@ -255,6 +266,15 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(EMPERORS_FAVOR = REGISTRY.registerCollectible("emperors_favor", EmperorsFavorItem::new));
         BABEL_COLLECTIBLES.add(FROZEN_CLAW = REGISTRY.registerCollectible("frozen_claw", FrozenClawItem::new));
         BABEL_COLLECTIBLES.add(LAKEBED_AEGIS = REGISTRY.registerCollectible("lakebed_aegis", LakebedAegisItem::new));
+        BABEL_COLLECTIBLES.add(SPINACH_PACK = REGISTRY.registerCollectible("spinach_pack", SpinachPackItem::new));
+        BABEL_COLLECTIBLES.add(WRATH_OF_SIRACUSANS = REGISTRY.registerCollectible("wrath_of_siracusans", WrathOfSiracusansItem::new));
+        BABEL_COLLECTIBLES.add(GLASS_BIRD = REGISTRY.registerCollectible("glass_bird", GlassBirdItem::new));
+        BABEL_COLLECTIBLES.add(RED_BOW_TIE = REGISTRY.registerCollectible("red_bow_tie", RedBowTieItem::new));
+        BABEL_COLLECTIBLES.add(FOUR_LEAF_CLOVER_FOSSIL = REGISTRY.registerCollectible("four_leaf_clover_fossil", FourLeafCloverFossilItem::new));
+        BABEL_COLLECTIBLES.add(ANCIENT_TREE_FRUIT = REGISTRY.registerCollectible("ancient_tree_fruit", AncientTreeFruitItem::new));
+        BABEL_COLLECTIBLES.add(ANTIQUE_CASTING = REGISTRY.registerCollectible("antique_casting", AntiqueCastingItem::new));
+        BABEL_COLLECTIBLES.add(UNLEASHINGS = REGISTRY.registerCollectible("unleashings", UnleashingsItem::new));
+        BABEL_COLLECTIBLES.add(DREAMBIND_CASTLE_MODEL = REGISTRY.registerCollectible("dreambind_castle_model", DreambindCastleModelItem::new));
     }
 
     private BabelCollectible() {

@@ -1,5 +1,9 @@
 {
   "credit": "Made with Blockbench",
+  "textures": {
+    "0": "babel:block/kettle",
+    "particle": "babel:block/kettle"
+  },
   "texture_size": [
     64,
     32

@@ -1,6 +1,10 @@
 {
   "format_version": "1.9.0",
   "credit": "Made with Blockbench",
+  "textures": {
+    "0": "babel:block/golden_chalice_half",
+    "particle": "babel:block/golden_chalice_half"
+  },
   "texture_size": [
     32,
     32

@@ -14,14 +14,13 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 
 public class AlleySculptureItem extends CollectibleItem.CustomCollectibleItem {
 	public AlleySculptureItem() {
-		super(new Item.Properties().stacksTo(1).rarity(Rarity.COMMON), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
+		super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.ALLAY_AMBIENT_WITH_ITEM, 3.5F, 1F)
 						.particle(ParticleTypes.RAIN, 72)

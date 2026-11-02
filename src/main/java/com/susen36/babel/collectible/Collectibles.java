@@ -6,7 +6,9 @@ import com.susen36.babel.BabelMod;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -14,6 +16,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -31,9 +34,31 @@ public class Collectibles implements INBTSerializable<ListTag> {
     @NotNull
     public static final HashBiMap<String, RegistryObject<Item>> Collectibles = HashBiMap.create();
 
-    private final HashSet<Item> UsedCollectibles = new HashSet<>();
+    private static final String ID = "id";
+    private static final String USED = "used";
+    private static final String LAYER = "layer";
+    private static final String COOLDOWN = "cooldown";
+    private static final String DURATION = "duration";
 
-    Collectibles() {
+    // 激活、层数与冷却必须同步生命周期，同源存储避免平行数据不同步
+    private final HashMap<Item, CollectibleState> states = new HashMap<>();
+    final Layer layer;
+    final Cooldown cooldown;
+
+    public static class CollectibleState {
+        boolean used;
+        int layer;
+        long cooldownEndTick;
+        long cooldownDuration;
+
+        CollectibleState(int layer) {
+            this.layer = layer;
+        }
+    }
+
+    Collectibles(@Nullable ServerPlayer player) {
+        this.layer = new Layer(this);
+        this.cooldown = new Cooldown(this, player);
     }
 
     public static void register(IEventBus modBus) {
@@ -80,7 +105,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
     }
 
     public static @NotNull Collectibles getData(@NotNull Player player) {
-        return CollectibleCapability.of(player).getUsed();
+        return CollectibleCapability.of(player).getCollectibles();
     }
 
     public static @NotNull Collectibles.Layer getLayerData(@NotNull Player player) {
@@ -91,6 +116,14 @@ public class Collectibles implements INBTSerializable<ListTag> {
         return CollectibleCapability.of(player).getCooldown();
     }
 
+    public static Tag serializeStates(@NotNull Player player) {
+        return getData(player).serializeNBT();
+    }
+
+    public static void deserializeStates(@NotNull Player player, @NotNull ListTag tag) {
+        getData(player).deserializeNBT(tag);
+    }
+
     public static void addLayerAndSync(@NotNull Player player, @NotNull Item item, int delta) {
         if (!player.level().isClientSide) {
             getLayerData(player).addLayer(item, delta);
@@ -98,28 +131,95 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
     }
 
-    public static Tag serializeUsed(@NotNull Player player) {
-        return getData(player).serializeNBT();
+    /**
+     * 指令等场景的激活入口，复用完整激活流程但不消耗物品；层数沿用当前值（未设置时为默认层数）。
+     */
+    public static void activateAndSync(@NotNull Player player, @NotNull Item item) {
+        if (item instanceof CollectibleItem collectible) {
+            collectible.activate(player.level(), player, new ItemStack(collectible), collectible);
+        } else if (item instanceof CollectibleItem.CustomCollectibleItem collectible) {
+            collectible.activate(player.level(), player, new ItemStack(collectible), collectible);
+        }
     }
 
-    public static void deserializeUsed(@NotNull Player player, @NotNull ListTag tag) {
-        getData(player).deserializeNBT(tag);
+    /**
+     * 整条移除收藏品状态；unmarkUsed 仅取消激活，层与冷却数据保留。
+     */
+    public static void deactivateAndSync(@NotNull Player player, @NotNull Item item) {
+        if (!player.level().isClientSide) {
+            getData(player).remove(item);
+            BabelNetwork.syncCollectibles(player);
+        }
     }
 
-    public static Tag serializeLayer(@NotNull Player player) {
-        return getLayerData(player).serializeNBT();
+    public static void expireUsedCollectibles(@NotNull Player player) {
+        if (!player.level().isClientSide) {
+            Collectibles data = getData(player);
+            long currentTick = player.level().getServer().overworld().getGameTime();
+            boolean changed = false;
+            for (Item item : new ArrayList<>(data.getUsed())) {
+                long endTick = getCooldownData(player).getCooldownEndTick(item);
+                // endTick 为 0 表示从未设置冷却，这类数据不判定过期
+                if (endTick > 0 && currentTick > endTick) {
+                    data.remove(item);
+                    changed = true;
+                }
+            }
+            if (changed) {
+                BabelNetwork.syncCollectibles(player);
+            }
+        }
     }
 
-    public static void deserializeLayer(@NotNull Player player, @NotNull CompoundTag tag) {
-        getLayerData(player).deserializeNBT(tag);
+    public boolean isUsed(@NotNull Holder<Item> item) {
+        return isUsed(item.value());
     }
 
-    public static Tag serializeCooldown(@NotNull Player player) {
-        return getCooldownData(player).serializeNBT();
+    public boolean isUsed(@NotNull Item item) {
+        CollectibleState state = states.get(item);
+        return state != null && state.used;
     }
 
-    public static void deserializeCooldown(@NotNull Player player, @NotNull CompoundTag tag) {
-        getCooldownData(player).deserializeNBT(tag);
+    public void markUsed(@NotNull Holder<Item> item) {
+        markUsed(item.value());
+    }
+
+    public void markUsed(@NotNull Item item) {
+        ensureState(item).used = true;
+    }
+
+    public void unmarkUsed(@NotNull Holder<Item> item) {
+        unmarkUsed(item.value());
+    }
+
+    public void unmarkUsed(@NotNull Item item) {
+        CollectibleState state = states.get(item);
+        if (state != null) {
+            state.used = false;
+        }
+    }
+
+    public @NotNull HashSet<Item> getUsed() {
+        var used = new HashSet<Item>();
+        for (var entry : states.entrySet()) {
+            if (entry.getValue().used) {
+                used.add(entry.getKey());
+            }
+        }
+        return used;
+    }
+
+    public void remove(@NotNull Item item) {
+        states.remove(item);
+    }
+
+    private @NotNull CollectibleState ensureState(@NotNull Item item) {
+        return states.computeIfAbsent(item, key -> {
+            if (key instanceof CollectibleLike collectible) {
+                return new CollectibleState(collectible.defaultLevel());
+            }
+            return new CollectibleState(0);
+        });
     }
 
     public static @NotNull String getIdByItem(@NotNull Holder<Item> item) {
@@ -144,123 +244,71 @@ public class Collectibles implements INBTSerializable<ListTag> {
         return "null";
     }
 
-    public boolean isUsed(@NotNull Holder<Item> item) {
-        return isUsed(item.value());
-    }
-
-    public boolean isUsed(@NotNull Item item) {
-        return UsedCollectibles.contains(item);
-    }
-
-    public void markUsed(@NotNull Holder<Item> item) {
-        markUsed(item.value());
-    }
-
-    public void markUsed(@NotNull Item item) {
-        UsedCollectibles.add(item);
-    }
-
-    public void unmarkUsed(@NotNull Holder<Item> item) {
-        unmarkUsed(item.value());
-    }
-
-    public void unmarkUsed(@NotNull Item item) {
-        UsedCollectibles.remove(item);
-    }
-
-    public @NotNull HashSet<Item> getUsed() {
-        return UsedCollectibles;
-    }
-
-    public static void expireUsedCollectibles(@NotNull Player player) {
-        if (!player.level().isClientSide) {
-            var usedCollectibles = getData(player);
-            var cooldown = getCooldownData(player);
-            var layers = getLayerData(player);
-            long currentTick = player.level().getServer().overworld().getGameTime();
-            boolean changed = false;
-            for (Item item : new ArrayList<>(usedCollectibles.getUsed())) {
-                long endTick = cooldown.getCooldownEndTick(item);
-                // endTick 为 0 表示冷却附件里没有该物品的记录，这类数据不判定过期
-                if (endTick > 0 && currentTick > endTick) {
-                    usedCollectibles.unmarkUsed(item);
-                    layers.removeLayer(item);
-                    changed = true;
-                }
-            }
-            if (changed) {
-                BabelNetwork.syncCollectibles(player);
-            }
+    private static @Nullable Item resolveItem(@NotNull String id) {
+        RegistryObject<Item> entry = Collectibles.get(id);
+        if (entry != null && entry.get() != null) {
+            return entry.get();
         }
-    }
-
-    private @NotNull HashSet<String> getUsedCollectibleIds() {
-        var ids = new HashSet<String>();
-        for (var item : UsedCollectibles) {
-            ids.add(Objects.requireNonNull(getIdByItem(item)));
-        }
-        return ids;
-    }
-
-    private @NotNull HashSet<Item> getUsedCollectibleFormIds(@NotNull HashSet<String> ids) {
-        var uc = new HashSet<Item>();
-        for (var id : ids) {
-            RegistryObject<Item> entry = Collectibles.get(id);
-            if (entry != null && entry.get() != null) {
-                uc.add(entry.get());
-            } else {
-                BabelMod.LOGGER.warn("Skipping unknown collectible id in saved data: {}", id);
-            }
-        }
-        return uc;
+        return null;
     }
 
     @Override
     public ListTag serializeNBT() {
         var list = new ListTag();
-        for (String collectiblesId : getUsedCollectibleIds()) {
-            list.add(StringTag.valueOf(collectiblesId));
+        for (var entry : states.entrySet()) {
+            var tag = new CompoundTag();
+            CollectibleState state = entry.getValue();
+            tag.putString(ID, getIdByItem(entry.getKey()));
+            tag.putBoolean(USED, state.used);
+            tag.putInt(LAYER, state.layer);
+            tag.putLong(COOLDOWN, state.cooldownEndTick);
+            tag.putLong(DURATION, state.cooldownDuration);
+            list.add(tag);
         }
         return list;
     }
 
     @Override
     public void deserializeNBT(@NotNull ListTag list) {
-        var ids = new HashSet<String>();
-        for (var id : list) {
-            ids.add(id.getAsString());
+        states.clear();
+        for (Tag element : list) {
+            if (element instanceof CompoundTag tag) {
+                Item item = resolveItem(tag.getString(ID));
+                if (item == null) {
+                    BabelMod.LOGGER.warn("Skipping unknown collectible id in saved data: {}", tag.getString(ID));
+                    continue;
+                }
+                CollectibleState state = new CollectibleState(item instanceof CollectibleLike collectible ? collectible.defaultLevel() : 0);
+                state.used = tag.getBoolean(USED);
+                int minLevel = 0;
+                int maxLevel = 1;
+                if (item instanceof CollectibleLike collectible) {
+                    minLevel = collectible.minLevel();
+                    maxLevel = collectible.maxLevel();
+                }
+                state.layer = Mth.clamp(tag.getInt(LAYER), minLevel, maxLevel);
+                state.cooldownEndTick = tag.getLong(COOLDOWN);
+                state.cooldownDuration = tag.getLong(DURATION);
+                states.put(item, state);
+            }
         }
-        UsedCollectibles.clear();
-        UsedCollectibles.addAll(getUsedCollectibleFormIds(ids));
     }
 
-    public static class Layer implements INBTSerializable<CompoundTag> {
-        private static final String KEY = "key";
-        private static final String VALUE = "value";
-        public final HashMap<String, Integer> layer = new HashMap<>();
+    public static class Layer {
+        private final Collectibles owner;
 
-        Layer() {
-        }
-
-        public HashMap<String, Integer> getLayer() {
-            return layer;
+        Layer(Collectibles owner) {
+            this.owner = owner;
         }
 
         public int getLayer(@NotNull Holder<Item> item) {
-            Integer layer = this.layer.get(getIdByItem(item));
-            if (layer != null) {
-                return layer;
-            }
-            if (item.value() instanceof CollectibleLike collectible) {
-                return collectible.defaultLevel();
-            }
-            return 0;
+            return getLayer(item.value());
         }
 
         public int getLayer(@NotNull Item item) {
-            Integer layer = this.layer.get(getIdByItem(item));
-            if (layer != null) {
-                return layer;
+            CollectibleState state = owner.states.get(item);
+            if (state != null) {
+                return state.layer;
             }
             if (item instanceof CollectibleLike collectible) {
                 return collectible.defaultLevel();
@@ -269,13 +317,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
 
         public void setLayer(@NotNull Holder<Item> item, @NotNull Integer layer) {
-            int minLevel = 0;
-            int maxLevel = 1;
-            if (item.value() instanceof CollectibleLike collectible) {
-                minLevel = collectible.minLevel();
-                maxLevel = collectible.maxLevel();
-            }
-            this.layer.put(getIdByItem(item), Mth.clamp(layer, minLevel, maxLevel));
+            setLayer(item.value(), layer);
         }
 
         public void setLayer(@NotNull Item item, @NotNull Integer layer) {
@@ -285,7 +327,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
                 minLevel = collectible.minLevel();
                 maxLevel = collectible.maxLevel();
             }
-            this.layer.put(getIdByItem(item), Mth.clamp(layer, minLevel, maxLevel));
+            owner.ensureState(item).layer = Mth.clamp(layer, minLevel, maxLevel);
         }
 
         public void addLayer(@NotNull Item item, @NotNull Integer layer) {
@@ -297,79 +339,23 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
 
         public void removeLayer(@NotNull Item item) {
-            this.layer.remove(getIdByItem(item));
+            CollectibleState state = owner.states.get(item);
+            if (state != null) {
+                state.layer = item instanceof CollectibleLike collectible ? collectible.defaultLevel() : 0;
+            }
         }
 
         public void removeLayer(@NotNull Holder<Item> item) {
-            this.layer.remove(getIdByItem(item));
-        }
-
-        @Override
-        public CompoundTag serializeNBT() {
-            var root = new CompoundTag();
-            var keys = new ListTag();
-            var values = new IntArrayTag(new ArrayList<>(layer.values()));
-            for (var entry : layer.entrySet()) {
-                keys.add(StringTag.valueOf(entry.getKey()));
-            }
-            root.put(KEY, keys);
-            root.put(VALUE, values);
-            return root;
-        }
-
-        @Override
-        public void deserializeNBT(@NotNull CompoundTag root) {
-            var tempKeys = root.get(KEY);
-            var tempValues = root.get(VALUE);
-            if (!root.contains(KEY) || !root.contains(VALUE)) {
-                BabelMod.LOGGER.error("Missing keys or values in Layer NBT");
-            } else if (tempKeys instanceof ListTag keys && tempValues instanceof IntArrayTag values) {
-                if (keys.size() == values.size()) {
-                    layer.clear();
-
-                    for (int i = 0; i < keys.size(); i++) {
-                        String key = keys.getString(i);
-
-                        int value;
-                        var tag = values.get(i);
-                        if (tag == null) {
-                            BabelMod.LOGGER.error("found a null in values{}.", values);
-                            continue;
-                        }
-                        if (tag.getId() == IntTag.TAG_INT) {
-                            value = tag.getAsInt();
-                        } else {
-                            BabelMod.LOGGER.error("Unexpected tag type in Layer values: {}", tag.getClass().getCanonicalName());
-                            continue;
-                        }
-
-                        if (Collectibles.get(key) == null) {
-                            BabelMod.LOGGER.warn("Dropping invalid collectible id in Layer NBT: {}", key);
-                            continue;
-                        }
-                        if (!layer.containsKey(key)) {
-                            layer.put(key, value);
-                        } else {
-                            layer.put(key, value);
-                            BabelMod.LOGGER.error("Duplicate keypair found in Layer NBT: ({}, {}), Overrided old.", key, value);
-                        }
-                    }
-                } else
-                    BabelMod.LOGGER.error("the size of keys and values are not equals : keys: {}, values: {}", keys.size(), values.size());
-            } else {
-                BabelMod.LOGGER.error("wanted (ListTag, IntArrayTag), matched: ({}, {})", tempKeys == null ? "null" : tempKeys.getClass().getCanonicalName(), tempValues == null ? "null" : tempValues.getClass().getCanonicalName());
-            }
+            removeLayer(item.value());
         }
     }
 
-    public static class Cooldown implements INBTSerializable<CompoundTag> {
-        private static final String KEY = "key";
-        private static final String VALUE = "value";
+    public static class Cooldown {
+        private final Collectibles owner;
+        private final @Nullable ServerPlayer player;
 
-        private final HashMap<String, Long> cooldown = new HashMap<>();
-        private @Nullable ServerPlayer player;
-
-        Cooldown(@Nullable ServerPlayer player) {
+        Cooldown(Collectibles owner, @Nullable ServerPlayer player) {
+            this.owner = owner;
             this.player = player;
         }
 
@@ -378,7 +364,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
 
         private void setCooldownEndTick(Item item, Long endTick) {
-            cooldown.put(getIdByItem(item), endTick);
+            owner.ensureState(item).cooldownEndTick = endTick;
         }
 
         private void setCooldownEndTick(Holder<Item> item, Long endTick) {
@@ -386,10 +372,10 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
 
         public void setCooldownEndTick(Item item, MinecraftServer server, Long offsetTicks) {
-            setCooldownEndTick(item, server.overworld().getGameTime() + offsetTicks);
-            ServerPlayer syncTarget = Objects.requireNonNull(getPlayer());
-            BabelNetwork.syncCollectibles(syncTarget);
-            BabelNetwork.syncCooldown(syncTarget, item, offsetTicks, server.overworld().getGameTime());
+            CollectibleState state = owner.ensureState(item);
+            state.cooldownEndTick = server.overworld().getGameTime() + offsetTicks;
+            state.cooldownDuration = offsetTicks;
+            BabelNetwork.syncCollectibles(Objects.requireNonNull(getPlayer()));
         }
 
         public void setCooldownEndTick(Holder<Item> item, MinecraftServer server, Long offsetTicks) {
@@ -403,6 +389,8 @@ public class Collectibles implements INBTSerializable<ListTag> {
             } else {
                 setCooldownEndTick(item, lastTick + addToEndTick);
             }
+            CollectibleState state = owner.ensureState(item);
+            state.cooldownDuration = state.cooldownDuration + addToEndTick;
         }
 
         private void addCooldownEndTick(Holder<Item> item, Long currentTick, Long addToEndTick) {
@@ -411,6 +399,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
 
         public void addCooldownEndTick(Item item, MinecraftServer server, Long addToEndTick) {
             addCooldownEndTick(item, server.overworld().getGameTime(), addToEndTick);
+            BabelNetwork.syncCollectibles(Objects.requireNonNull(getPlayer()));
         }
 
         public void addCooldownEndTick(Holder<Item> item, MinecraftServer server, Long addToEndTick) {
@@ -418,11 +407,35 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
 
         public long getCooldownEndTick(Item item) {
-            return cooldown.getOrDefault(getIdByItem(item), 0L);
+            CollectibleState state = owner.states.get(item);
+            if (state != null) {
+                return state.cooldownEndTick;
+            }
+            return 0L;
         }
 
         public long getCooldownEndTick(Holder<Item> item) {
             return getCooldownEndTick(item.value());
+        }
+
+        public long getCooldownDuration(Item item) {
+            CollectibleState state = owner.states.get(item);
+            if (state != null) {
+                return state.cooldownDuration;
+            }
+            return 0L;
+        }
+
+        public long getCooldownDuration(Holder<Item> item) {
+            return getCooldownDuration(item.value());
+        }
+
+        public void removeCooldown(Item item) {
+            CollectibleState state = owner.states.get(item);
+            if (state != null) {
+                state.cooldownEndTick = 0L;
+                state.cooldownDuration = 0L;
+            }
         }
 
         private long getLastTicks(Item item, Long currentTick) {
@@ -455,66 +468,6 @@ public class Collectibles implements INBTSerializable<ListTag> {
 
         public boolean isReady(Holder<Item> item, MinecraftServer server) {
             return isReady(item.value(), server);
-        }
-
-        @Override
-        public CompoundTag serializeNBT() {
-            var root = new CompoundTag();
-            var keys = new ListTag();
-            var values = new LongArrayTag(new ArrayList<>(cooldown.values()));
-
-            for (var entry : cooldown.entrySet()) {
-                keys.add(StringTag.valueOf(entry.getKey()));
-            }
-
-            root.put(KEY, keys);
-            root.put(VALUE, values);
-            return root;
-        }
-
-        @Override
-        public void deserializeNBT(@NotNull CompoundTag root) {
-            var tempKeys = root.get(KEY);
-            var tempValues = root.get(VALUE);
-            if (!root.contains(KEY) || !root.contains(VALUE)) {
-                BabelMod.LOGGER.error("Missing keys or values in Cooldown NBT");
-            } else if (tempKeys instanceof ListTag keys && tempValues instanceof LongArrayTag values) {
-                if (keys.size() != values.size()) {
-                    BabelMod.LOGGER.error("the size of keys and values are not equals : keys: {}, values: {}", keys.size(), values.size());
-                } else {
-                    cooldown.clear();
-
-                    for (int i = 0; i < keys.size(); i++) {
-                        String key = keys.getString(i);
-
-                        long value;
-                        Tag tag = values.get(i);
-                        if (tag == null) {
-                            BabelMod.LOGGER.error("found a null in values{}.", values);
-                            continue;
-                        }
-                        if (tag instanceof LongTag longTag) {
-                            value = longTag.getAsLong();
-                        } else {
-                            BabelMod.LOGGER.error("Unexpected tag type in Cooldown values: {}", tag.getClass().getCanonicalName());
-                            continue;
-                        }
-
-                        if (Collectibles.get(key) == null) {
-                            BabelMod.LOGGER.warn("Dropping invalid collectible id in Cooldown NBT: {}", key);
-                            continue;
-                        }
-                        if (!cooldown.containsKey(key)) {
-                            cooldown.put(key, value);
-                        } else {
-                            cooldown.put(key, value);
-                            BabelMod.LOGGER.error("Duplicate keypair found in Cooldown NBT: ({}, {}), Overrided old.", key, value);
-                        }
-                    }
-                }
-            } else {
-                BabelMod.LOGGER.error("wanted (ListTag, LongArrayTag), matched: ({}, {})", tempKeys == null ? "null" : tempKeys.getClass().getCanonicalName(), tempValues == null ? "null" : tempValues.getClass().getCanonicalName());
-            }
         }
     }
 }

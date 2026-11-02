@@ -16,16 +16,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 
-public class HandFertilityItem extends CollectibleItem.CustomCollectibleItem {
+public class HandOfBucklerItem extends CollectibleItem.CustomCollectibleItem {
 
     private static final TagKey<Item> MINECRAFT_HOES = ItemTags.create(new ResourceLocation("minecraft:hoes"));
 
-    public HandFertilityItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), 25, false, CollectibleTiers.ADVANCED,
+    public HandOfBucklerItem() {
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)

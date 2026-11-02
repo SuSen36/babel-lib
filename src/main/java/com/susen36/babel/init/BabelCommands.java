@@ -2,6 +2,7 @@ package com.susen36.babel.init;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.susen36.babel.BabelMod;
+import com.susen36.babel.command.CollectibleCommand;
 import com.susen36.babel.command.EPCommand;
 import com.susen36.babel.command.LifeCommand;
 import net.minecraft.commands.CommandSourceStack;
@@ -17,5 +18,6 @@ public class BabelCommands {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
         dispatcher.register(EPCommand.get());
         dispatcher.register(LifeCommand.get());
+        dispatcher.register(CollectibleCommand.get());
     }
 }

@@ -1,5 +1,6 @@
 package com.susen36.babel.mixin;
 
+import com.susen36.babel.init.BabelDamageTypes;
 import com.susen36.babel.init.BabelMobEffects;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -18,6 +19,7 @@ public abstract class EntityMixin {
         Entity self = (Entity) (Object) this;
         if (self instanceof LivingEntity living
                 && living.hasEffect(BabelMobEffects.SLEEP.get())
+                && !source.is(BabelDamageTypes.CAN_HURT_SLEEPING)
                 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)
                 && !source.isCreativePlayer()) {
             cir.setReturnValue(true);

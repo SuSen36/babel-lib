@@ -1,5 +1,9 @@
 {
   "credit": "Made with Blockbench",
+  "textures": {
+    "0": "babel:block/batbed",
+    "particle": "babel:block/batbed"
+  },
   "texture_size": [
     64,
     48

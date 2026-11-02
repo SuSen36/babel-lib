@@ -10,11 +10,10 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 
 public class ArchfiendsArtifactItem extends CollectibleItem.CustomCollectibleItem {
 	public ArchfiendsArtifactItem() {
-		super(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC), 25, false, CollectibleTiers.ADVANCED, new CollectibleItem.Levels(0, 1, 0),
+		super(new Item.Properties().stacksTo(1).fireResistant(), 25, false, CollectibleTiers.RARE, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.TOTEM_USE, 2F, 1F)
 						.particle(ParticleTypes.DRIPPING_LAVA, 72)

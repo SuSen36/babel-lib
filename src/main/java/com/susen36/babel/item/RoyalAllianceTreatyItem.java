@@ -18,7 +18,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 
@@ -30,7 +29,7 @@ public class RoyalAllianceTreatyItem extends CollectibleItem.CustomCollectibleIt
 			Registries.ENTITY_TYPE, new ResourceLocation("forge:bosses"));
 
 	public RoyalAllianceTreatyItem() {
-		super(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC), 25, false, CollectibleTiers.ADVANCED, new CollectibleItem.Levels(0, 1, 0),
+		super(new Item.Properties().stacksTo(1).fireResistant(), 25, false, CollectibleTiers.ADVANCED, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
 						.particle(ParticleTypes.FLAME, 72)

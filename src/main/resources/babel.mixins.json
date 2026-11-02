@@ -2,6 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.susen36.babel.mixin",
+  "refmap": "babel.refmap.json",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "BowItemMixin",
@@ -10,6 +11,7 @@
     "EntityMixin",
     "LivingEntityMixin",
     "LootModifierManagerMixin",
+    "PlayerMixin",
     "ThrownTridentMixin"
   ],
   "client": [

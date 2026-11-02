@@ -1,6 +1,7 @@
 package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
+import com.susen36.babel.api.event.ElementEvent;
 import com.susen36.babel.api.event.LifePointConsumeEvent;
 import com.susen36.babel.collectible.CollectibleAttributes;
 import com.susen36.babel.collectible.CollectibleItem;
@@ -134,6 +135,15 @@ public class CollectiblesEvents {
         if (event.getEntity() instanceof Player player) {
             forEachUsedCollectible(player, (collectible, owner, layer) ->
                     collectible.onMobHurt(event, owner, layer));
+        }
+    }
+
+    /** 仅在损伤结算成功（未 failed）时分发；损伤爆发造成的 HP 伤害另走 LivingDamageEvent，不在此重复。 */
+    @SubscribeEvent
+    public static void onElementalHurtPost(ElementEvent.PostHurt event) {
+        if (event.getEntity() instanceof Player player && !event.getHurtResult().failed()) {
+            forEachUsedCollectible(player, (collectible, owner, layer) ->
+                    collectible.onElementalHurt(event, owner, layer));
         }
     }
 

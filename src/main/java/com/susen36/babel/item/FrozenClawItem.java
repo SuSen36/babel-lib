@@ -12,7 +12,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 
 import java.util.function.BiPredicate;
 
@@ -22,7 +21,7 @@ public class FrozenClawItem extends CollectibleItem.CustomCollectibleItem {
             entity.getType().is(BabelEntityTypeTags.FORGE_BOSSES);
 
     public FrozenClawItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 25, false, CollectibleTiers.CURSED,
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.CURSED,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.AMBIENT_SOUL_SAND_VALLEY_MOOD.value(), 2F, 1F)

@@ -10,7 +10,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 
 public class BlazeChainsawItem extends CollectibleItem.CustomCollectibleItem {
@@ -18,7 +17,7 @@ public class BlazeChainsawItem extends CollectibleItem.CustomCollectibleItem {
     private static final float MAX_RANGE = 16.0F;
 
     public BlazeChainsawItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON), 25, false, CollectibleTiers.ADVANCED, new CollectibleItem.Levels(0, 1, 0),
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED, new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)

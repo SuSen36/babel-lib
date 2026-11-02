@@ -16,7 +16,6 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -24,7 +23,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class RainbowCandyItem extends CollectibleItem.CustomCollectibleItem {
     public RainbowCandyItem() {
-        super(new Item.Properties().stacksTo(64).rarity(Rarity.EPIC).food(new FoodProperties.Builder().nutrition(6).saturationMod(0.5f).alwaysEat().build()), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
+        super(new Item.Properties().stacksTo(64).food(new FoodProperties.Builder().nutrition(6).saturationMod(0.5f).alwaysEat().build()), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)

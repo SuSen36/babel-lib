@@ -3,6 +3,7 @@ package com.susen36.babel.collectible;
 import com.susen36.babel.BabelMod;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,31 +18,25 @@ public class CollectibleCapability implements ICapabilitySerializable<CompoundTa
     public static final Capability<CollectibleCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
     private static final ResourceLocation KEY = new ResourceLocation(BabelMod.MODID, "collectible_cap");
 
-    private static final String USED = "used";
-    private static final String LAYER = "layer";
-    private static final String COOLDOWN = "cooldown";
+    private static final String STATES = "states";
 
     private final LazyOptional<CollectibleCapability> self = LazyOptional.of(() -> this);
-    private final Collectibles used;
-    private final Collectibles.Layer layer;
-    private final Collectibles.Cooldown cooldown;
+    private final Collectibles collectibles;
 
     public CollectibleCapability(Player owner) {
-        this.used = new Collectibles();
-        this.layer = new Collectibles.Layer();
-        this.cooldown = new Collectibles.Cooldown(owner instanceof ServerPlayer serverPlayer ? serverPlayer : null);
+        this.collectibles = new Collectibles(owner instanceof ServerPlayer serverPlayer ? serverPlayer : null);
     }
 
-    public Collectibles getUsed() {
-        return used;
+    public Collectibles getCollectibles() {
+        return collectibles;
     }
 
     public Collectibles.Layer getLayer() {
-        return layer;
+        return collectibles.layer;
     }
 
     public Collectibles.Cooldown getCooldown() {
-        return cooldown;
+        return collectibles.cooldown;
     }
 
     public static ResourceLocation getKey() {
@@ -68,22 +63,15 @@ public class CollectibleCapability implements ICapabilitySerializable<CompoundTa
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag root = new CompoundTag();
-        root.put(USED, used.serializeNBT());
-        root.put(LAYER, layer.serializeNBT());
-        root.put(COOLDOWN, cooldown.serializeNBT());
+        root.put(STATES, collectibles.serializeNBT());
         return root;
     }
 
     @Override
     public void deserializeNBT(CompoundTag root) {
-        if (root.contains(USED)) {
-            used.deserializeNBT(root.getList(USED, Tag.TAG_STRING));
-        }
-        if (root.contains(LAYER)) {
-            layer.deserializeNBT(root.getCompound(LAYER));
-        }
-        if (root.contains(COOLDOWN)) {
-            cooldown.deserializeNBT(root.getCompound(COOLDOWN));
+        if (root.contains(STATES)) {
+            ListTag states = root.getList(STATES, Tag.TAG_COMPOUND);
+            collectibles.deserializeNBT(states);
         }
     }
 }

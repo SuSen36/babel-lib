@@ -13,7 +13,6 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,7 +22,7 @@ import net.minecraft.world.phys.HitResult;
 
 public class OmniKeyItem extends CollectibleItem.CustomCollectibleItem {
     public OmniKeyItem() {
-        super(new Item.Properties().durability(64).rarity(Rarity.UNCOMMON), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
+        super(new Item.Properties().durability(64), 25, false, CollectibleTiers.RARE, new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)
