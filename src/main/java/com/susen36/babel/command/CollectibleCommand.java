@@ -33,15 +33,13 @@ public class CollectibleCommand {
                                     .executes(ctx -> give(ctx, 0))
                                     .then(Commands.argument("layer", IntegerArgumentType.integer(0))
                                             .executes(ctx -> give(ctx, IntegerArgumentType.getInteger(ctx, "layer")))))))
-            .then(Commands.literal("remove").requires(s -> s.hasPermission(2))
+            .then(Commands.literal("clear").requires(s -> s.hasPermission(2))
                     .then(Commands.argument("targets", EntityArgument.players())
+                            .executes(CollectibleCommand::clearCollectibles)
                             .then(Commands.argument("collectible", StringArgumentType.word())
                                     .suggests((ctx, builder) ->
                                             SharedSuggestionProvider.suggest(Collectibles.Collectibles.keySet(), builder))
-                                    .executes(CollectibleCommand::removeCollectible))))
-            .then(Commands.literal("clear").requires(s -> s.hasPermission(2))
-                    .then(Commands.argument("targets", EntityArgument.players())
-                            .executes(CollectibleCommand::clearCollectibles)));
+                                    .executes(CollectibleCommand::clearCollectible))));
 
     public static LiteralArgumentBuilder<CommandSourceStack> get() {
         return command;
@@ -69,7 +67,7 @@ public class CollectibleCommand {
         return targets.size();
     }
 
-    private static int removeCollectible(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+    private static int clearCollectible(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         Item item = resolveCollectible(ctx);
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "targets");
         for (ServerPlayer player : targets) {

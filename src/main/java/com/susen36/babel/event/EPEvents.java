@@ -73,6 +73,16 @@ public class EPEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onLivingDamageResetRegen(LivingDamageEvent event) {
+        if (event.getAmount() > 0) {
+            EPCapability ep = cachedEP(event.getEntity());
+            if (ep != null) {
+                ep.resetRegenDelay();
+            }
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onLivingDamagePreHigh(LivingDamageEvent event) {
         LivingEntity entity = event.getEntity();

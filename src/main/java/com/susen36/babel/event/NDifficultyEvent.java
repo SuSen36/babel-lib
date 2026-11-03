@@ -6,6 +6,7 @@ import com.susen36.babel.init.BabelEntityTypeTags;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,11 +17,11 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 /**
  * 难度（探索等级）通用实体应用逻辑。
@@ -55,6 +56,18 @@ public class NDifficultyEvent {
                         boat.hurt(entity.damageSources().generic(), 20);
                     }
                 }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLivingExperienceDrop(LivingExperienceDropEvent event) {
+        LivingEntity living = event.getEntity();
+        EntityType<?> type = living.getType();
+        if (!type.is(BYPASSES_DIFFICULTY) && (type.is(APPLIES_DIFFICULTY) || living instanceof Monster)) {
+            int level = NDifficulty.difficultyLevel(living.level()).value();
+            if (level > 0) {
+                event.setDroppedExperience(Mth.ceil(event.getDroppedExperience() * (1.0D + 0.08D * level)));
             }
         }
     }

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "babel:block/vampires_bed_upper"
+    },
+    "facing=east": {
+      "model": "babel:block/vampires_bed_upper",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "babel:block/vampires_bed_upper",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "babel:block/vampires_bed_upper",
+      "y": 270
+    }
+  }
+}

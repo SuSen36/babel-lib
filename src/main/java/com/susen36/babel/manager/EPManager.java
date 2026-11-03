@@ -45,7 +45,7 @@ public class EPManager {
         if (attackerEntity instanceof ElementalAttacker attacker) {
             type = attacker.getElementalType();
             rate = attacker.getElementalRate();
-            injuryDamage = attacker.getElementalInjuryDamage();
+            injuryDamage = attacker.getElementalInjuryDamage(entity);
         }
         if (attackerEntity == null) {
             return new ElementalAttackConfig(type, rate, injuryDamage);

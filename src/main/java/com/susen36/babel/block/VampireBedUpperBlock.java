@@ -17,10 +17,10 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class BatbedUpperBlock extends Block {
+public class VampireBedUpperBlock extends Block {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
-    public BatbedUpperBlock() {
+    public VampireBedUpperBlock() {
         super(BlockBehaviour.Properties.of().sound(SoundType.WOOD).strength(0.5f, 1f).jumpFactor(1.3f).noOcclusion().isRedstoneConductor((bs, br, bp) -> false));
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
@@ -79,7 +79,7 @@ public class BatbedUpperBlock extends Block {
             int x = pos.getX();
             int y = pos.getY();
             int z = pos.getZ();
-            return world.getBlockState(BlockPos.containing((double) x + getFacing(blockstate).getStepX(), y, (double) z + getFacing(blockstate).getStepZ())).getBlock() == BabelBlocks.BLOCK_BATBED.get();
+            return world.getBlockState(BlockPos.containing((double) x + getFacing(blockstate).getStepX(), y, (double) z + getFacing(blockstate).getStepZ())).getBlock() == BabelBlocks.VAMPIRES_BED.get();
         }
         return super.canSurvive(blockstate, worldIn, pos);
     }
@@ -91,6 +91,6 @@ public class BatbedUpperBlock extends Block {
 
     @Override
     public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
-        return new ItemStack(BabelBlocks.BLOCK_BATBED.get());
+        return new ItemStack(BabelBlocks.VAMPIRES_BED.get());
     }
 }

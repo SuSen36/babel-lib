@@ -11,9 +11,9 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.AABB;
@@ -29,8 +29,8 @@ public class HandOfSpeedItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.CLOUD, 72)
                         .showOverlay(true)
                         .build());
-        addConditionalAttributeModifier(Attributes.ATTACK_SPEED, 0.6, AttributeModifier.Operation.ADDITION,
-                (player, self) -> isMiningAlone(player) ? 1 : 0);
+        addConditionalAttributeModifier(Attributes.ATTACK_SPEED, 1.8, AttributeModifier.Operation.ADDITION,
+                (player, self) -> isAlone(player) ? 1 : 0);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class HandOfSpeedItem extends CollectibleItem.CustomCollectibleItem {
 
     @Override
     public void applyEffectTick(Player player, int layer) {
-        if (!player.level().isClientSide() && isMiningAlone(player)) {
+        if (!player.level().isClientSide() && player.getMainHandItem().is(ItemTags.PICKAXES) && isAlone(player)) {
             MobEffectInstance haste = player.getEffect(MobEffects.DIG_SPEED);
             if (haste == null || haste.getAmplifier() < 2) {
                 player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 20, 2));
@@ -48,14 +48,14 @@ public class HandOfSpeedItem extends CollectibleItem.CustomCollectibleItem {
         }
     }
 
-    private static boolean isMiningAlone(Player player) {
+    private static boolean isAlone(Player player) {
         boolean alone = false;
-        if (Collectibles.getData(player).isUsed(BabelCollectible.HAND_OF_SPEED.get())
-                && player.getMainHandItem().is(ItemTags.PICKAXES)) {
+        if (Collectibles.getData(player).isUsed(BabelCollectible.HAND_OF_SPEED.get())) {
             AABB area = AABB.ofSize(new Vec3(player.getX(), player.getY(), player.getZ()), 8, 8, 8);
             alone = true;
             for (LivingEntity nearby : player.level().getEntitiesOfClass(LivingEntity.class, area)) {
-                if (nearby != player && (nearby instanceof Player || nearby instanceof Animal)) {
+                if (nearby != player && (nearby instanceof Player
+                        || nearby instanceof OwnableEntity ownable && ownable.getOwner() instanceof Player)) {
                     alone = false;
                     break;
                 }

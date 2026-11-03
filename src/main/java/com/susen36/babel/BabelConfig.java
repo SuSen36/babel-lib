@@ -14,7 +14,7 @@ public class BabelConfig {
             .define("ep_icon_style", false);
 
     public static final ForgeConfigSpec.BooleanValue BAN_ADVANCED_COLLECTIBLES = BUILDER
-            .comment("禁用高稀有度（ADVANCED）收藏品：无法激活")
+            .comment("禁用高级（ADVANCED）收藏品：无法激活")
             .define("ban_advanced_collectibles", false);
 
     public static final ForgeConfigSpec.DoubleValue COLLECTIBLE_LOOT_CHANCE = BUILDER
@@ -73,6 +73,14 @@ public class BabelConfig {
             .comment("护盾值渲染y轴偏移，注意为相对目标生命UI的偏移")
             .defineInRange("shield_y_offset", 0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
+    public static final ForgeConfigSpec.BooleanValue WITHER_ELEMENTAL_DAMAGE = BUILDER
+            .comment("凋灵的攻击造成的凋零药水效果替换为凋亡坏死元素损伤")
+            .define("wither_elemental_damage", true);
+
+    public static final ForgeConfigSpec.BooleanValue COLD_TO_FROZEN = BUILDER
+            .comment("两段式寒冷转化：首次冻结伤害仅标记寒冷（原版冻结计时），寒冷期间再次受到冻结伤害时转为冰冻药水效果，时长取寒冷剩余时间。关闭后冻结伤害保持原版行为")
+            .define("cold_to_frozen", true);
+
     static final ForgeConfigSpec SPEC = BUILDER.build();
     public static boolean epBarStyle;
     public static boolean banAdvancedCollectibles;
@@ -91,6 +99,8 @@ public class BabelConfig {
     public static List<? extends String> handFireworkRecognizable;
     public static List<? extends String> handEngraveRecognizable;
     public static List<? extends String> royalAllianceTreatyRecognizable;
+    public static boolean witherElementalDamage;
+    public static boolean coldToFrozen;
 
     @SubscribeEvent
     public static void onLoad(final ModConfigEvent.Loading event) {
@@ -110,6 +120,8 @@ public class BabelConfig {
         handFireworkRecognizable = HAND_FIREWORK_RECOGNIZABLE.get();
         handEngraveRecognizable = HAND_ENGRAVE_RECOGNIZABLE.get();
         royalAllianceTreatyRecognizable = ROYAL_ALLIANCE_TREATY_RECOGNIZABLE.get();
+        witherElementalDamage = WITHER_ELEMENTAL_DAMAGE.get();
+        coldToFrozen = COLD_TO_FROZEN.get();
     }
 
     public static void onReloading(final ModConfigEvent.Reloading event) {
@@ -129,5 +141,7 @@ public class BabelConfig {
         handFireworkRecognizable = HAND_FIREWORK_RECOGNIZABLE.get();
         handEngraveRecognizable = HAND_ENGRAVE_RECOGNIZABLE.get();
         royalAllianceTreatyRecognizable = ROYAL_ALLIANCE_TREATY_RECOGNIZABLE.get();
+        witherElementalDamage = WITHER_ELEMENTAL_DAMAGE.get();
+        coldToFrozen = COLD_TO_FROZEN.get();
     }
 }

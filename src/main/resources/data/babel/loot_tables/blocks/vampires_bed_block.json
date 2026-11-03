@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "babel:bat_bed"
+          "name": "babel:vampires_bed_block"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "babel:blocks/block_batbed"
+  "random_sequence": "babel:blocks/vampires_bed_block"
 }

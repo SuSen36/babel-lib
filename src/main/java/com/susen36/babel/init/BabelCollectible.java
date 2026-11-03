@@ -17,7 +17,7 @@ public class BabelCollectible {
     public static RegistryObject<Item> GOLD_EXPEDITION;
     public static RegistryObject<Item> PIGLIN_DIARY;
     public static RegistryObject<Item> KETTLE;
-    public static RegistryObject<Item> BAT_BED;
+    public static RegistryObject<Item> VAMPIRES_BED;
     public static RegistryObject<Item> RAINBOW_CANDY;
     public static RegistryObject<Item> HAND_OF_BUCKLER;
     public static RegistryObject<Item> HAND_OF_THORNS;
@@ -31,6 +31,8 @@ public class BabelCollectible {
     public static RegistryObject<Item> HAND_OF_SNATCHER;
     public static RegistryObject<Item> HAND_OF_DIFFUSION;
     public static RegistryObject<Item> HAND_OF_FLOWING_WATER;
+    public static RegistryObject<Item> HAND_OF_PULVERIZATION;
+    public static RegistryObject<Item> HAND_OF_PROTRACTION;
     public static RegistryObject<Item> CHITINOUS_RIPPER;
     public static RegistryObject<Item> FEARLESS_BLADE;
     public static RegistryObject<Item> DEVOTION;
@@ -59,11 +61,9 @@ public class BabelCollectible {
     public static RegistryObject<Item> FLAWLESS_JADESTONE;
     public static RegistryObject<Item> ACTORS_JEWELRY_BOX;
 
-    public static RegistryObject<Item> LEGEND_CHITIN;
     public static RegistryObject<Item> KING_CROWN;
     public static RegistryObject<Item> SARKAZ_KING_BED;
 
-    public static RegistryObject<Item> VAMPIRES_BED;
     public static RegistryObject<Item> SARKAZ_KING_BANNER;
     public static RegistryObject<Item> SARKAZ_KING_ARTIFACT;
     public static RegistryObject<Item> ROYAL_ALLIANCE_TREATY;
@@ -84,7 +84,6 @@ public class BabelCollectible {
     public static RegistryObject<Item> KING_SPEAR;
     public static RegistryObject<Item> KING_EXTENSION;
     public static RegistryObject<Item> KING_CRYSTAL;
-    public static RegistryObject<Item> RELIC_CROWN;
     public static RegistryObject<Item> KING_STAFF;
     public static RegistryObject<Item> KING_FELLOWSHIP;
     public static RegistryObject<Item> KING_BUCKLER;
@@ -152,7 +151,7 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(GOLD_EXPEDITION = REGISTRY.registerCollectible("gold_expedition", GoldExpeditionItem::new));
         BABEL_COLLECTIBLES.add(PIGLIN_DIARY = REGISTRY.registerCollectible("piglin_diary", PiglinDiaryItem::new));
         BABEL_COLLECTIBLES.add(KETTLE = REGISTRY.registerCollectible("kettle", KettleItem::new));
-        BABEL_COLLECTIBLES.add(BAT_BED = REGISTRY.registerCollectible("bat_bed", BatBedItem::new));
+        BABEL_COLLECTIBLES.add(VAMPIRES_BED = REGISTRY.registerCollectible("vampires_bed", VampireBedItem::new));
         BABEL_COLLECTIBLES.add(RAINBOW_CANDY = REGISTRY.registerCollectible("rainbow_candy", RainbowCandyItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_BUCKLER = REGISTRY.registerCollectible("hand_of_buckler", HandOfBucklerItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_THORNS = REGISTRY.registerCollectible("hand_of_thorns", HandOfThornsItem::new));
@@ -166,6 +165,8 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(HAND_OF_SNATCHER = REGISTRY.registerCollectible("hand_of_snatcher", HandOfSnatcherItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_DIFFUSION = REGISTRY.registerCollectible("hand_of_diffusion", HandOfDiffusionItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_FLOWING_WATER = REGISTRY.registerCollectible("hand_of_flowing_water", HandOfFlowingWaterItem::new));
+        BABEL_COLLECTIBLES.add(HAND_OF_PULVERIZATION = REGISTRY.registerCollectible("hand_of_pulverization", HandOfPulverizationItem::new));
+        BABEL_COLLECTIBLES.add(HAND_OF_PROTRACTION = REGISTRY.registerCollectible("hand_of_protraction", HandOfProtractionItem::new));
         BABEL_COLLECTIBLES.add(CHITINOUS_RIPPER = REGISTRY.registerCollectible("chitinous_ripper", ChitinousRipperItem::new));
         BABEL_COLLECTIBLES.add(FEARLESS_BLADE = REGISTRY.registerCollectible("fearless_blade", FearlessBladeItem::new));
         BABEL_COLLECTIBLES.add(DEVOTION = REGISTRY.registerCollectible("devotion", DevotionItem::new));
@@ -192,11 +193,8 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(UNKNOWN_INSTRUMENT = REGISTRY.registerCollectible("unknown_instrument", UnknownInstrumentItem::new));
         BABEL_COLLECTIBLES.add(SUPREME_RING = REGISTRY.registerCollectible("supreme_ring", SupremeRingItem::new));
 
-        LEGEND_CHITIN = REGISTRY.registerCollectible("legend_chitin", LegendChitinItem::new);
-        KING_CROWN = REGISTRY.registerCollectible("king_crown", KingCrownItem::new);
         SARKAZ_KING_BED = REGISTRY.registerCollectible("sarkaz_king_bed", SarkazKingBedItem::new);
 
-        BABEL_COLLECTIBLES.add(VAMPIRES_BED = REGISTRY.registerCollectible("vampires_bed", ArchfiendsBedItem::new));
         BABEL_COLLECTIBLES.add(SARKAZ_KING_BANNER = REGISTRY.registerCollectible("sarkaz_king_banner", ArchfiendsBannerItem::new));
         BABEL_COLLECTIBLES.add(SARKAZ_KING_ARTIFACT = REGISTRY.registerCollectible("sarkaz_king_artifact", ArchfiendsArtifactItem::new));
         BABEL_COLLECTIBLES.add(ROYAL_ALLIANCE_TREATY = REGISTRY.registerCollectible("royal_alliance_treaty", RoyalAllianceTreatyItem::new));
@@ -216,7 +214,7 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(KING_SPEAR = REGISTRY.registerCollectible("king_spear", KingsSpearItem::new));
         BABEL_COLLECTIBLES.add(KING_EXTENSION = REGISTRY.registerCollectible("king_extension", KingsExtensionItem::new));
         BABEL_COLLECTIBLES.add(KING_CRYSTAL = REGISTRY.registerCollectible("king_crystal", KingsCrystalItem::new));
-        BABEL_COLLECTIBLES.add(RELIC_CROWN = REGISTRY.registerCollectible("relic_crown", RelicCrownItem::new));
+        BABEL_COLLECTIBLES.add(KING_CROWN = REGISTRY.registerCollectible("king_crown", KingCrownItem::new));
         BABEL_COLLECTIBLES.add(KING_STAFF = REGISTRY.registerCollectible("king_staff", KingsStaffItem::new));
         BABEL_COLLECTIBLES.add(KING_FELLOWSHIP = REGISTRY.registerCollectible("king_fellowship", KingsFellowshipItem::new));
         BABEL_COLLECTIBLES.add(KING_BUCKLER = REGISTRY.registerCollectible("king_buckler", KingsBucklerItem::new));

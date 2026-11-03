@@ -22,8 +22,8 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class BatBedItem extends CollectibleItem.CustomCollectibleItem {
-    public BatBedItem() {
+public class VampireBedItem extends CollectibleItem.CustomCollectibleItem {
+    public VampireBedItem() {
         super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.RARE, new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.ALLAY_AMBIENT_WITHOUT_ITEM, 3.5F, 1F)
@@ -41,10 +41,10 @@ public class BatBedItem extends CollectibleItem.CustomCollectibleItem {
     @Override
     protected InteractionResultHolder<ItemStack> onSneakUse(Level level, Player player, InteractionHand hand) {
         BlockHitResult hitResult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
-        ItemStack blockStack = new ItemStack(BabelBlocks.BLOCK_BATBED.get());
+        ItemStack blockStack = new ItemStack(BabelBlocks.VAMPIRES_BED.get());
         BlockPlaceContext context = new BlockPlaceContext(player, hand, blockStack, hitResult);
         InteractionResult placeResult = InteractionResult.FAIL;
-        if (BabelItems.BLOCK_BATBED.get() instanceof BlockItem blockItem) {
+        if (BabelItems.BLOCK_VAMPIRES_BED.get() instanceof BlockItem blockItem) {
             placeResult = blockItem.place(context);
         }
         ItemStack self = player.getItemInHand(hand);

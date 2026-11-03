@@ -28,7 +28,8 @@ public final class FrozenIceRenderer {
     }
 
     public static void render(LivingEntity entity, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
-        RANDOM.setSeed(entity.getId()  * entity.getId() * 3121L + entity.getId() * 45238971L);
+        long id = entity.getId();
+        RANDOM.setSeed(id * id * 3121L + id * 45238971L);
         float width = entity.getBbWidth();
         float height = entity.getBbHeight();
         int cubeCount = Mth.floor(height / CUBE_HEIGHT) + 2;
@@ -43,7 +44,8 @@ public final class FrozenIceRenderer {
             poseStack.mulPose(Axis.YP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
             poseStack.mulPose(Axis.ZP.rotationDegrees(RANDOM.nextFloat() * 360.0F));
             poseStack.translate(-0.5F, -0.5F, -0.5F);
-            Minecraft.getInstance().getBlockRenderer().renderSingleBlock(ICE_BLOCK, poseStack, buffer, packedLight, OverlayTexture.NO_OVERLAY, ModelData.EMPTY, RenderType.translucentMovingBlock());
+            Minecraft.getInstance().getBlockRenderer().renderSingleBlock(ICE_BLOCK, poseStack, buffer, packedLight,
+                    OverlayTexture.NO_OVERLAY, ModelData.EMPTY, RenderType.translucentMovingBlock());
             poseStack.popPose();
         }
     }

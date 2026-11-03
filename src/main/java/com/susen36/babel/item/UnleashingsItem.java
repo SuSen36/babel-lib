@@ -16,7 +16,6 @@ import java.util.List;
 
 public class UnleashingsItem extends CollectibleItem.CustomCollectibleItem {
 
-    /** 药水延长时长上限：5 分钟 = 6000 tick */
     private static final int MAX_EFFECT_DURATION_TICKS = 6000;
     private static final int EXTEND_TICKS = 20;
     private static final float CHANCE_FOOD = 0.25F;

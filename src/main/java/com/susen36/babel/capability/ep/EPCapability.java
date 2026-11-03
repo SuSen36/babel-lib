@@ -22,8 +22,14 @@ import java.util.function.Consumer;
 public class EPCapability implements INBTSerializable<CompoundTag> {
     private final LivingEntity entity;
     private final Map<AbstractEPCapability.EPType, AbstractEPCapability> EP_TYPES = new HashMap<>();
+     private static final int REGEN_DELAY_TICKS = 200;
+    private static final int REGEN_INTERVAL_TICKS = 60;
+    private static final int REGEN_AMOUNT = 3;
+
     private int underBreakTick;
     private boolean underBreakDirty;
+    private int regenDelayTick;
+    private int regenIntervalTick;
 
     public static final ResourceLocation ID = new ResourceLocation(BabelMod.MODID, "ep_cap");
 
@@ -82,6 +88,9 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
             AbstractEPCapability.HurtResult result = ep.hurtAndBurst(pSource, pAmount);
             ElementEvent.afterElementalHurt(entity, pType, pSource, result);
             if (!result.failed()) {
+                if (result.damage() > 0) {
+                    this.resetRegenDelay();
+                }
                 if (result.shouldBurst()) {
                     ElementEvent.onElementalBurst(entity, pType, pSource);
                     doOnBurst();
@@ -118,6 +127,11 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
         }
     }
 
+    public void resetRegenDelay() {
+        this.regenDelayTick = REGEN_DELAY_TICKS;
+        this.regenIntervalTick = 0;
+    }
+
     public boolean tick() {
         boolean burstJustEnded = false;
         for (AbstractEPCapability ep : EP_TYPES.values()) {
@@ -129,6 +143,15 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
         }
         if (burstJustEnded) {
             forEachEPType(AbstractEPCapability::restoreValue);
+        }
+        if (regenDelayTick > 0) {
+            regenDelayTick--;
+        } else {
+            regenIntervalTick++;
+            if (regenIntervalTick >= REGEN_INTERVAL_TICKS) {
+                regenIntervalTick = 0;
+                forEachEPType(ep -> ep.heal(REGEN_AMOUNT));
+            }
         }
         if (underBreakTick > 0) {
             underBreakTick--;

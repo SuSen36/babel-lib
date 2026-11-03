@@ -7,10 +7,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
 public class DivineConchItem extends CollectibleItem.CustomCollectibleItem {
 
@@ -22,9 +19,5 @@ public class DivineConchItem extends CollectibleItem.CustomCollectibleItem {
                         .showOverlay(true)
                         .build());
         addAttributeModifier(Attributes.MAX_HEALTH, 0.06, AttributeModifier.Operation.MULTIPLY_BASE);
-    }
-
-    @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
     }
 }

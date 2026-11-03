@@ -18,8 +18,8 @@ public class BabelItems {
     public static final RegistryObject<? extends Item> ORIGINIUM_INGOT = REGISTRY.register("originium_ingot", () -> new Item(new Item.Properties().stacksTo(64).rarity(Rarity.COMMON)));
     public static final RegistryObject<ForgeSpawnEggItem> CANNOT_SPAWN_EGG = REGISTRY.register("cannot_spawn_egg", () -> new ForgeSpawnEggItem(BabelEntities.CANNOT, 0x2B2B2B, 0x8A8A8A, new Item.Properties()));
     public static final RegistryObject<? extends Item> BLOCK_KETTLE = block(BabelBlocks.BLOCK_KETTLE);
-    public static final RegistryObject<? extends Item> BLOCK_BATBED = block(BabelBlocks.BLOCK_BATBED);
-    public static final RegistryObject<? extends Item> BATBED_UPPER = block(BabelBlocks.BATBED_UPPER);
+    public static final RegistryObject<? extends Item> BLOCK_VAMPIRES_BED = block(BabelBlocks.VAMPIRES_BED);
+    public static final RegistryObject<? extends Item> VAMPIRES_BED_UPPER = block(BabelBlocks.VAMPIRES_BED_UPPER);
     public static final RegistryObject<? extends Item> KING_PEDESTAL = block(BabelBlocks.KING_PEDESTAL);
     public static final RegistryObject<? extends Item> BERRY_CAN = block(BabelBlocks.BERRY_CAN);
     public static final RegistryObject<? extends Item> ALLAY_BLOCK = block(BabelBlocks.ALLAY_BLOCK);

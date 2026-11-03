@@ -12,8 +12,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-import net.minecraft.world.entity.ai.village.poi.PoiManager;
-import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.NaturalSpawner;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -65,11 +63,11 @@ public class CannotSpawner {
 
     private static boolean spawnCannot(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
-        BlockPos anchor = findMeetingPoint(level, player.blockPosition());
+        BlockPos anchor = player.blockPosition();
         BlockPos spawnPos = findSpawnPositionNear(level, anchor, player);
         boolean spawned = false;
-        if (player.getRandom().nextInt(10) == 0
-                && !hasNearbyCannot(player)
+        if (/* player.getRandom().nextInt(10) == 0
+                && */ !hasNearbyCannot(player)
                 && spawnPos != null
                 && hasEnoughSpace(level, spawnPos)
                 && !level.getBiome(spawnPos).is(BiomeTags.WITHOUT_WANDERING_TRADER_SPAWNS)) {
@@ -87,12 +85,6 @@ public class CannotSpawner {
         return player.level().getNearestEntity(CannotEntity.class, TargetingConditions.DEFAULT,
                 player, player.getX(), player.getY(), player.getZ(),
                 player.getBoundingBox().inflate(DEDUP_RADIUS)) != null;
-    }
-
-    private static BlockPos findMeetingPoint(ServerLevel level, BlockPos center) {
-        PoiManager poiManager = level.getPoiManager();
-        return poiManager.find(type -> type.is(PoiTypes.MEETING), pos -> true, center, SEARCH_RADIUS, PoiManager.Occupancy.ANY)
-                .orElse(center);
     }
 
     @Nullable

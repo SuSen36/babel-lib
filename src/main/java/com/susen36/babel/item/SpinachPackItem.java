@@ -4,8 +4,6 @@ import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -14,7 +12,6 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 
 public class SpinachPackItem extends CollectibleItem.CustomCollectibleItem {
@@ -33,8 +30,5 @@ public class SpinachPackItem extends CollectibleItem.CustomCollectibleItem {
 			player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 3600, 0));
 			player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 400, 0));
 		}
-		Item emptyCan = BuiltInRegistries.ITEM.get(new ResourceLocation("caerula_arbor", "empty_can"));
-		ItemStack setstack = new ItemStack(emptyCan).copy();
-		ItemHandlerHelper.giveItemToPlayer(player, setstack);
 	}
 }

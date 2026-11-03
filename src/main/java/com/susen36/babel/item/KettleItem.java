@@ -8,12 +8,10 @@ import com.susen36.babel.init.BabelBlocks;
 import com.susen36.babel.init.BabelItems;
 import com.susen36.babel.util.LifePointUtils;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
@@ -38,10 +36,7 @@ public class KettleItem extends CollectibleItem.CustomCollectibleItem {
     @Override
     public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
         LifePointUtils.setLifePoint(player, LifePointUtils.getLifePoint(player) + 1);
-        for (int index0 = 0; index0 < 2; index0++) {
-            if (level instanceof ServerLevel serverLevel)
-                serverLevel.addFreshEntity(new ExperienceOrb(serverLevel, player.getX(), player.getY(), player.getZ(), 4));
-        }
+        player.giveExperienceLevels(1);
     }
 
     @Override

@@ -6,6 +6,8 @@ import com.susen36.babel.collectible.CollectibleTiers;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -18,9 +20,8 @@ import java.util.WeakHashMap;
 
 public class RockHornItem extends CollectibleItem.CustomCollectibleItem {
 
-    /** 以玩家为中心的 16×16×16 立方体半边长。 */
-    private static final double PLAYER_RANGE = 8.0D;
-    private static final int MAX_PLAYERS = 10;
+    private static final double ALLY_RANGE = 8.0D;
+    private static final int MAX_ALLIES = 10;
 
     /** 以扫描所在的 server tick 为键，同一周期内的回调累计计数，进入下一周期自动重置。 */
     private record Scan(int tick, int count) {
@@ -36,20 +37,23 @@ public class RockHornItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.NOTE, 72)
                         .showOverlay(true)
                         .build());
-        addRangeEffect(Player.class, PLAYER_RANGE, (nearby, player, layer) -> {
-            Scan scan = NEARBY_SCANS.get(player);
-            int count = scan != null && scan.tick() == player.tickCount ? scan.count() : 0;
-            NEARBY_SCANS.put(player, new Scan(player.tickCount, count + 1));
+        addRangeEffect(LivingEntity.class, ALLY_RANGE, (nearby, player, layer) -> {
+            boolean ally = nearby instanceof Player || nearby instanceof OwnableEntity ownable && ownable.getOwner() == player;
+            if (ally) {
+                Scan scan = NEARBY_SCANS.get(player);
+                int count = scan != null && scan.tick() == player.tickCount ? scan.count() : 0;
+                NEARBY_SCANS.put(player, new Scan(player.tickCount, count + 1));
+            }
         });
         addConditionalAttributeModifier(Attributes.ATTACK_DAMAGE, 0.2, AttributeModifier.Operation.MULTIPLY_BASE,
-                (player, self) -> nearbyPlayerStacks(player));
+                (player, self) -> nearbyAllyStacks(player));
     }
 
-    private static int nearbyPlayerStacks(Player player) {
+    private static int nearbyAllyStacks(Player player) {
         Scan scan = NEARBY_SCANS.get(player);
         int stacks = 0;
         if (scan != null && player.tickCount - scan.tick() <= 20) {
-            stacks = Mth.clamp(scan.count(), 0, MAX_PLAYERS);
+            stacks = Mth.clamp(scan.count(), 0, MAX_ALLIES);
         }
         return stacks;
     }

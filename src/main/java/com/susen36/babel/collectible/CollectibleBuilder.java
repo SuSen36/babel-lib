@@ -60,6 +60,11 @@ public class CollectibleBuilder {
     }
 
     private RegistryObject<Item> save(String name, RegistryObject<Item> item) {
+        RegistryObject<Item> existing = Collectibles.Collectibles.get(name);
+        if (existing != null) {
+            throw new IllegalStateException("Adding duplicate collectible '" + name
+                    + "' to collectible registry, conflicting: '" + existing.getId() + "' and '" + item.getId() + "'");
+        }
         Collectibles.Collectibles.put(name, item);
         return item;
     }

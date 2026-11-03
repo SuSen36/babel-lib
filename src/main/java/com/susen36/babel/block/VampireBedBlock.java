@@ -31,10 +31,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import java.util.Comparator;
 import java.util.List;
 
-public class BlockBatbedBlock extends Block {
+public class VampireBedBlock extends Block {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
-    public BlockBatbedBlock() {
+    public VampireBedBlock() {
         super(BlockBehaviour.Properties.of().sound(SoundType.WOOD).strength(0.5f, 1f).jumpFactor(1.3f).noOcclusion().pushReaction(PushReaction.DESTROY).isRedstoneConductor((bs, br, bp) -> false));
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
@@ -96,7 +96,7 @@ public class BlockBatbedBlock extends Block {
             int y = pos.getY();
             int z = pos.getZ();
             return world.getBlockState(BlockPos.containing((double) x + getFacing(blockstate).getOpposite().getStepX(), y, (double) z + getFacing(blockstate).getOpposite().getStepZ())).canBeReplaced()
-                    || world.getBlockState(BlockPos.containing((double) x + getFacing(blockstate).getOpposite().getStepX(), y, (double) z + getFacing(blockstate).getOpposite().getStepZ())).getBlock() == BabelBlocks.BATBED_UPPER.get();
+                    || world.getBlockState(BlockPos.containing((double) x + getFacing(blockstate).getOpposite().getStepX(), y, (double) z + getFacing(blockstate).getOpposite().getStepZ())).getBlock() == BabelBlocks.VAMPIRES_BED_UPPER.get();
         }
         return super.canSurvive(blockstate, worldIn, pos);
     }
@@ -114,7 +114,7 @@ public class BlockBatbedBlock extends Block {
         double y = pos.getY();
         double z = pos.getZ();
         if (world.getBlockState(BlockPos.containing(x + getFacing(blockstate).getOpposite().getStepX(), y, z + getFacing(blockstate).getOpposite().getStepZ())).canBeReplaced()) {
-            world.setBlock(BlockPos.containing(x + getFacing(blockstate).getOpposite().getStepX(), y, z + getFacing(blockstate).getOpposite().getStepZ()), BabelBlocks.BATBED_UPPER.get().defaultBlockState().setValue(FACING, getFacing(blockstate)), 3);
+            world.setBlock(BlockPos.containing(x + getFacing(blockstate).getOpposite().getStepX(), y, z + getFacing(blockstate).getOpposite().getStepZ()), BabelBlocks.VAMPIRES_BED_UPPER.get().defaultBlockState().setValue(FACING, getFacing(blockstate)), 3);
         }
     }
 
@@ -124,7 +124,7 @@ public class BlockBatbedBlock extends Block {
         double x = pos.getX();
         double y = pos.getY();
         double z = pos.getZ();
-        if (world.getBlockState(BlockPos.containing(x + getFacing(world.getBlockState(pos)).getOpposite().getStepX(), y, z + getFacing(world.getBlockState(pos)).getOpposite().getStepZ())).getBlock() != BabelBlocks.BATBED_UPPER.get()) {
+        if (world.getBlockState(BlockPos.containing(x + getFacing(world.getBlockState(pos)).getOpposite().getStepX(), y, z + getFacing(world.getBlockState(pos)).getOpposite().getStepZ())).getBlock() != BabelBlocks.VAMPIRES_BED_UPPER.get()) {
             BlockPos blockPos = BlockPos.containing(x, y, z);
             dropResources(world.getBlockState(blockPos), world, BlockPos.containing(x, y, z), null);
             world.destroyBlock(blockPos, false);

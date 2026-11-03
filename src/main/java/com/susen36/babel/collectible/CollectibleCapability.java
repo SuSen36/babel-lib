@@ -51,10 +51,6 @@ public class CollectibleCapability implements ICapabilitySerializable<CompoundTa
         return LazyOptional.empty();
     }
 
-    public void invalidate() {
-        self.invalidate();
-    }
-
     public static CollectibleCapability of(Player player) {
         return player.getCapability(CAPABILITY).orElseThrow(() ->
                 new IllegalStateException("collectible capability is not attached to " + player));

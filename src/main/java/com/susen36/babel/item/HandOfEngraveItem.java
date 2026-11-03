@@ -54,7 +54,7 @@ public class HandOfEngraveItem extends CollectibleItem.CustomCollectibleItem {
         if (layer >= 0 && layer < 99
                 && (victim instanceof Monster || victim instanceof Mob mob && mob.getTarget() == player)) {
             ItemStack mainHandItem = player.getMainHandItem();
-            boolean validWeapon = mainHandItem.is(Items.TRIDENT) || mainHandItem.is(FORGE_TRIDENTS) || event.getSource().is(DamageTypes.TRIDENT)
+            boolean validWeapon = mainHandItem.is(Items.TRIDENT) || mainHandItem.is(FORGE_TRIDENTS) || mainHandItem.is(ItemTags.AXES) || event.getSource().is(DamageTypes.TRIDENT)
                     || matchesConfigured(BabelConfig.handEngraveRecognizable,
                             BuiltInRegistries.ITEM.getKey(mainHandItem.getItem()).toString());
             if (validWeapon) {

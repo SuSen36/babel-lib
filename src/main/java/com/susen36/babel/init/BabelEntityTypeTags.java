@@ -19,7 +19,7 @@ public final class BabelEntityTypeTags {
     /** 精英生物标签，datagen 内置原版精锐敌怪，依赖模组可继续追加。 */
     public static final TagKey<EntityType<?>> ELITE = create("elite");
 
-    /** forge 生态通用的首领生物标签。 */
+    /** forge 生态通用的Boss生物标签。 */
     public static final TagKey<EntityType<?>> FORGE_BOSSES = TagKey.create(
             Registries.ENTITY_TYPE, new ResourceLocation("forge", "bosses"));
 

@@ -47,7 +47,9 @@ public class FristonPItem extends CollectibleItem.CustomCollectibleItem {
             boolean owned = victim instanceof Monster || (victim instanceof Mob mob ? mob.getTarget() : null) == player;
             boolean emergency = victim.getType().is(BabelEntityTypeTags.ELITE) || victim.getType().is(BabelEntityTypeTags.FORGE_BOSSES);
             if (owned && (emergency || Math.random() < STACK_CHANCE)) {
-                Collectibles.addLayerAndSync(player, this, 1);
+                if (player != null) {
+                    Collectibles.addLayerAndSync(player, this, 1);
+                }
                 if (victim.level() instanceof ServerLevel serverLevel) {
                     serverLevel.sendParticles(ParticleTypes.WAX_ON, victim.getX(), victim.getY(), victim.getZ(), 48, 0.7, 1.5, 0.7, 0.2);
                 }

@@ -123,6 +123,9 @@ dependencies {
     implementation fg.deobf("curse.maven:jade-324717:${jade_version}")
 
     runtimeOnly fg.deobf("curse.maven:spark-361579:4738952")
+
+    // 伤害数字显示
+    runtimeOnly fg.deobf("curse.maven:damage-numbers-floating-damage-indicators-crits-1754205:9369101")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

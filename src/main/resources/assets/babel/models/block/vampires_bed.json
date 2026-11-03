@@ -1,8 +1,8 @@
 {
   "credit": "Made with Blockbench",
   "textures": {
-    "0": "babel:block/batbed",
-    "particle": "babel:block/batbed"
+    "0": "babel:block/vampires_bed",
+    "particle": "babel:block/vampires_bed"
   },
   "texture_size": [
     64,

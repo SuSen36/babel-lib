@@ -89,7 +89,6 @@ public class Collectibles implements INBTSerializable<ListTag> {
         if (event.getObject() instanceof Player player) {
             CollectibleCapability cap = new CollectibleCapability(player);
             event.addCapability(CollectibleCapability.getKey(), cap);
-            event.addListener(cap::invalidate);
         }
     }
 

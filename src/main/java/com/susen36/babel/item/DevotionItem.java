@@ -17,7 +17,7 @@ import java.util.List;
 public class DevotionItem extends CollectibleItem.CustomCollectibleItem {
 
     private static final double EFFECT_RANGE = 12.0;
-    private static final float MAGIC_DAMAGE = 5.0F;
+    private static final float MAGIC_DAMAGE = 3.0F;
 
     public DevotionItem() {
         super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.RARE,

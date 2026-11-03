@@ -169,7 +169,7 @@ public class CannotEntity extends AbstractVillager {
         if (!this.level().isClientSide) {
             NetworkHooks.openScreen((ServerPlayer) player, new SimpleMenuProvider((id, inventory, p) -> new CannotMenu(id, inventory, this, -1), name), buf -> buf.writeVarInt(this.getId()));
             AbstractContainerMenu menu = player.containerMenu;
-            if (menu != null && !this.getOffers().isEmpty()) {
+            if (!this.getOffers().isEmpty()) {
                 BabelNetwork.sendTo(new MerchantOffersMessage(menu.containerId, this.getOffers().createTag()), (ServerPlayer) player);
             }
         }
