@@ -37,10 +37,10 @@ public class BabelMod {
         BabelPotions.REGISTRY.register(modEventBus);
         BabelParticles.REGISTRY.register(modEventBus);
         BabelSounds.REGISTRY.register(modEventBus);
+        BabelTabs.REGISTRY.register(modEventBus);
         Collectibles.register(modEventBus);
         BabelCapability.register(modEventBus);
         BabelCollectible.register(modEventBus);
-        BabelTabs.REGISTRY.register(modEventBus);
         BabelGameRules.init();
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BabelConfig.SPEC);
     }

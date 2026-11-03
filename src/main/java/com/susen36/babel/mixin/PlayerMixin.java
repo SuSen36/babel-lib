@@ -19,7 +19,6 @@ public abstract class PlayerMixin {
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/damagesource/DamageSources;playerAttack(Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/damagesource/DamageSource;"))
     private DamageSource dreambindRetag(DamageSources sources, Player attacker, Entity target) {
-        // 缠梦古堡模型：对沉睡单位的攻击改用可命中沉睡目标的伤害类型
         if (target instanceof LivingEntity living
                 && living.hasEffect(BabelMobEffects.SLEEP.get())
                 && DreambindCastleModelItem.isUsed(attacker)) {
