@@ -25,7 +25,6 @@ public class BabelCollectible {
     public static RegistryObject<Item> HAND_OF_SPEED;
     public static RegistryObject<Item> HAND_OF_FIREWORK;
     public static RegistryObject<Item> HAND_OF_SWIPE;
-    public static RegistryObject<Item> HAND_OF_BARREN;
     public static RegistryObject<Item> HAND_OF_SWORD;
     public static RegistryObject<Item> HAND_OF_ENGRAVE;
     public static RegistryObject<Item> HAND_OF_SNATCHER;
@@ -159,7 +158,6 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(HAND_OF_SPEED = REGISTRY.registerCollectible("hand_of_speed", HandOfSpeedItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_FIREWORK = REGISTRY.registerCollectible("hand_of_firework", HandOfFireworkItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_SWIPE = REGISTRY.registerCollectible("hand_of_swipe", HandOfSwipeItem::new));
-        BABEL_COLLECTIBLES.add(HAND_OF_BARREN = REGISTRY.registerCollectible("hand_of_barren", HandOfBarrenItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_SWORD = REGISTRY.registerCollectible("hand_of_sword", HandOfSwordItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_ENGRAVE = REGISTRY.registerCollectible("hand_of_engrave", HandOfEngraveItem::new));
         BABEL_COLLECTIBLES.add(HAND_OF_SNATCHER = REGISTRY.registerCollectible("hand_of_snatcher", HandOfSnatcherItem::new));
