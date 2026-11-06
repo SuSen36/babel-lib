@@ -6,22 +6,37 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 
-/**
- * babel 库提供的实体类型标签常量。
- * <p>
- * 这些标签只负责“表达某实体属于哪一类”，供 {@code entity.getType().is(...)} 判断；
- * 标签数据由依赖模组（如 caerula_arbor）通过 datagen 填充。
- */
 public final class BabelEntityTypeTags {
     private BabelEntityTypeTags() {
     }
 
-    /** 精英生物标签，datagen 内置原版精锐敌怪，依赖模组可继续追加。 */
-    public static final TagKey<EntityType<?>> ELITE = create("elite");
-
-    /** forge 生态通用的Boss生物标签。 */
+    /** Boss。 */
     public static final TagKey<EntityType<?>> FORGE_BOSSES = TagKey.create(
             Registries.ENTITY_TYPE, new ResourceLocation("forge", "bosses"));
+
+    /** 精英怪。 */
+    public static final TagKey<EntityType<?>> ELITE = create("elite");
+
+    /** 感染生物*/
+    public static final TagKey<EntityType<?>> INFECTED_CREATURE = create("infected_creature");
+
+    /** 海嗣*/
+    public static final TagKey<EntityType<?>> SEABORN = create("seaborn");
+
+    /** 源石造物 */
+    public static final TagKey<EntityType<?>> ORIGINIUM_CREATION = create("originium_creation");
+
+    /** 坍缩体*/
+    public static final TagKey<EntityType<?>> COLLAPSAL = create("collapsal");
+
+    /** 机械*/
+    public static final TagKey<EntityType<?>> MACHINA = create("machina");
+
+    /** 萨卡兹*/
+    public static final TagKey<EntityType<?>> SARKAZ = create("sarkaz");
+
+    /** 化物*/
+    public static final TagKey<EntityType<?>> APPARITION = create("apparition");
 
     private static TagKey<EntityType<?>> create(String path) {
         return TagKey.create(Registries.ENTITY_TYPE,

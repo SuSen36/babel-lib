@@ -1,13 +1,19 @@
 package com.susen36.babel.effect;
 
+import com.susen36.babel.init.BabelMobEffects;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.Brain;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.monster.Blaze;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.MagmaCube;
@@ -24,19 +30,48 @@ public class FrozenMobEffect extends MobEffect {
         this.addAttributeModifier(Attributes.KNOCKBACK_RESISTANCE, "5f9a3c7e-1d2b-4c8a-9e0f-00000000000f", 0.5, AttributeModifier.Operation.ADDITION);
         this.addAttributeModifier(ForgeMod.STEP_HEIGHT_ADDITION.get(), "5f9a3c7e-1d2b-4c8a-9e0f-000000000010", -1, AttributeModifier.Operation.MULTIPLY_BASE);
     }
+    @Override
+    public void addAttributeModifiers(LivingEntity entity, AttributeMap attributeMap, int amplifier) {
+        if (entity instanceof Mob mob) {
+            mob.targetSelector.disableControlFlag(Goal.Flag.TARGET);
+            mob.setTarget(null);
+            mob.getNavigation().stop();
+        }
+        super.addAttributeModifiers(entity, attributeMap, amplifier);
+    }
+
+    @Override
+    public void removeAttributeModifiers(LivingEntity entity, AttributeMap attributeMap, int amplifier) {
+        if (entity instanceof Mob mob && !entity.hasEffect(BabelMobEffects.STUN.get()) && !entity.hasEffect(BabelMobEffects.SLEEP.get())) {
+            mob.targetSelector.enableControlFlag(Goal.Flag.TARGET);
+        }
+        super.removeAttributeModifiers(entity, attributeMap, amplifier);
+    }
 
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
-        if (entity instanceof Creeper creeper) {
-            CompoundTag tag = new CompoundTag();
-            entity.saveWithoutId(tag);
-            tag.putBoolean("ignited", false);
-            entity.load(tag);
-            creeper.setSwellDir(0);
-        } else if (entity instanceof Blaze) {
-            entity.hurt(entity.level().damageSources().freeze(), 3);
-        } else if (entity instanceof MagmaCube) {
-            entity.hurt(entity.level().damageSources().freeze(), 1);
+        if (entity instanceof Mob mob) {
+            mob.setTarget(null);
+            mob.getNavigation().stop();
+            if (!mob.noPhysics) {
+                mob.setNoGravity(false);
+            }
+            Brain<?> brain = mob.getBrain();
+            brain.eraseMemory(MemoryModuleType.ATTACK_TARGET);
+            brain.eraseMemory(MemoryModuleType.ANGRY_AT);
+            brain.eraseMemory(MemoryModuleType.HURT_BY_ENTITY);
+
+            if (entity instanceof Creeper creeper) {
+                CompoundTag tag = new CompoundTag();
+                entity.saveWithoutId(tag);
+                tag.putBoolean("ignited", false);
+                entity.load(tag);
+                creeper.setSwellDir(0);
+            } else if (entity instanceof Blaze) {
+                entity.hurt(entity.level().damageSources().freeze(), 3);
+            } else if (entity instanceof MagmaCube) {
+                entity.hurt(entity.level().damageSources().freeze(), 1);
+            }
         }
         if (entity.level() instanceof ServerLevel level) {
             double halfHeight = entity.getBbHeight() * 0.5;

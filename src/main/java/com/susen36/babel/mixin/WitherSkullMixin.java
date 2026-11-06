@@ -12,8 +12,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(WitherSkull.class)
 public abstract class WitherSkullMixin {
 
-    @Redirect(method = "onHitEntity",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z"))
+    @Redirect(method = "onHitEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean skipWitherEffectWhenElemental(LivingEntity target, MobEffectInstance effect, Entity source) {
         WitherSkull skull = (WitherSkull) (Object) this;
         if (skull.isDangerous() || !BabelConfig.witherElementalDamage) {

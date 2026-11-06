@@ -4,7 +4,6 @@ import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.capability.health.HealthCapability;
 import com.susen36.babel.collectible.Collectibles;
-import com.susen36.babel.menu.CannotMenu;
 import com.susen36.babel.network.receive.*;
 import com.susen36.babel.util.CooldownUtils;
 import net.minecraft.client.Minecraft;
@@ -12,9 +11,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ClientPacketHandler {
@@ -73,16 +70,6 @@ public class ClientPacketHandler {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level != null) {
             mc.level.createFireworks(message.x, message.y, message.z, 0, 0, 0, message.fireworkNbt);
-        }
-    }
-
-    public static void handle(MerchantOffersMessage message) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.player != null) {
-            AbstractContainerMenu menu = mc.player.containerMenu;
-            if (menu != null && menu.containerId == message.containerId && menu instanceof CannotMenu cannotMenu) {
-                cannotMenu.setOffers(new MerchantOffers(message.offers));
-            }
         }
     }
 }

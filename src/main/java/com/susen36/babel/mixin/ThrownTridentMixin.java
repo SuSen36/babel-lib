@@ -12,8 +12,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ThrownTrident.class)
 public abstract class ThrownTridentMixin {
-    @Redirect(method = "onHitEntity",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isThundering()Z"))
+    @Redirect(method = "onHitEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isThundering()Z"))
     private boolean allowRainForChanneling(Level level) {
         if (!level.isThundering()) {
             Entity owner = ((ThrownTrident) (Object) this).getOwner();

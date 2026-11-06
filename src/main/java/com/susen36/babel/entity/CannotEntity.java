@@ -6,8 +6,6 @@ import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.init.BabelCollectible;
 import com.susen36.babel.init.BabelItems;
 import com.susen36.babel.menu.CannotMenu;
-import com.susen36.babel.network.BabelNetwork;
-import com.susen36.babel.network.receive.MerchantOffersMessage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -15,25 +13,23 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.AgeableMob;
-import net.minecraft.world.entity.AnimationState;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -43,13 +39,14 @@ import java.util.List;
 
 public class CannotEntity extends AbstractVillager {
     private static final int MIN_OFFER_COUNT = 7;
-    private static final int MAX_TRADE_USES = 12;
     private static final int PRICE_LOW_TIER = 8;
     private static final int PRICE_MID_TIER = 12;
     private static final int PRICE_HIGH_TIER = 16;
+    private static final float LOST_AND_FOUND_CHANCE = 0.75F;
 
     public final AnimationState idleAnimationState = new AnimationState();
     private int despawnDelay;
+    private boolean hasLostAndFound;
 
     public CannotEntity(EntityType<? extends CannotEntity> type, Level level) {
         super(type, level);
@@ -98,10 +95,25 @@ public class CannotEntity extends AbstractVillager {
         return this.despawnDelay;
     }
 
+    public boolean hasLostAndFound() {
+        return this.hasLostAndFound;
+    }
+
+    public void setHasLostAndFound(boolean hasLostAndFound) {
+        this.hasLostAndFound = hasLostAndFound;
+    }
+
+    @Nullable
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData groupData, @Nullable CompoundTag tag) {
+        this.setHasLostAndFound(this.random.nextFloat() < LOST_AND_FOUND_CHANCE);
+        return super.finalizeSpawn(level, difficulty, spawnType, groupData, tag);
+    }
+
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("DespawnDelay", this.despawnDelay);
+        tag.putBoolean("HasLostAndFound", this.hasLostAndFound);
     }
 
     @Nullable
@@ -167,11 +179,10 @@ public class CannotEntity extends AbstractVillager {
     @Override
     public void openTradingScreen(Player player, Component name, int containerId) {
         if (!this.level().isClientSide) {
-            NetworkHooks.openScreen((ServerPlayer) player, new SimpleMenuProvider((id, inventory, p) -> new CannotMenu(id, inventory, this, -1), name), buf -> buf.writeVarInt(this.getId()));
-            AbstractContainerMenu menu = player.containerMenu;
-            if (!this.getOffers().isEmpty()) {
-                BabelNetwork.sendTo(new MerchantOffersMessage(menu.containerId, this.getOffers().createTag()), (ServerPlayer) player);
-            }
+            NetworkHooks.openScreen((ServerPlayer) player, new SimpleMenuProvider((id, inventory, p) -> new CannotMenu(id, inventory, this, -1), name), buf -> {
+                buf.writeVarInt(this.getId());
+                buf.writeNbt(this.getOffers().createTag());
+            });
         }
     }
 
@@ -184,7 +195,7 @@ public class CannotEntity extends AbstractVillager {
         while (offerCount > 0 && !pool.isEmpty()) {
             RegistryObject<Item> entry = pool.remove(this.random.nextInt(pool.size()));
             CollectibleLike collectible = (CollectibleLike) entry.get();
-            offers.add(new MerchantOffer(new ItemStack(BabelItems.ORIGINIUM_INGOT.get(), priceForTier(collectible)), new ItemStack(entry.get()), MAX_TRADE_USES, 0, 0.0F));
+            offers.add(new MerchantOffer(new ItemStack(BabelItems.ORIGINIUM_INGOT.get(), priceForTier(collectible)), new ItemStack(entry.get()), 1, 0, 0.0F));
             offerCount--;
         }
     }
@@ -204,6 +215,9 @@ public class CannotEntity extends AbstractVillager {
         super.readAdditionalSaveData(tag);
         if (tag.contains("DespawnDelay", 99)) {
             this.despawnDelay = tag.getInt("DespawnDelay");
+        }
+        if (tag.contains("HasLostAndFound", 99)) {
+            this.hasLostAndFound = tag.getBoolean("HasLostAndFound");
         }
         this.setAge(Math.max(0, this.getAge()));
     }

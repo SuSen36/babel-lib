@@ -15,9 +15,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(Player.class)
 public abstract class PlayerMixin {
 
-    @Redirect(method = "attack",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/damagesource/DamageSources;playerAttack(Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/damagesource/DamageSource;"))
+    @Redirect(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/damagesource/DamageSources;playerAttack(Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/damagesource/DamageSource;"))
     private DamageSource dreambindRetag(DamageSources sources, Player attacker, Entity target) {
         if (target instanceof LivingEntity living
                 && living.hasEffect(BabelMobEffects.SLEEP.get())

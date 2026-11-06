@@ -2,6 +2,7 @@ package com.susen36.babel.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.susen36.babel.BabelMod;
+import com.susen36.babel.client.collectible.CollectiblesScreen;
 import com.susen36.babel.entity.CannotEntity;
 import com.susen36.babel.menu.CannotMenu;
 import net.minecraft.client.gui.Font;
@@ -20,9 +21,11 @@ import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.Nullable;
+
 @OnlyIn(Dist.CLIENT)
 public class CannotScreen extends AbstractContainerScreen<CannotMenu> {
-    private static final ResourceLocation GUI_LOCATION = new ResourceLocation(BabelMod.MODID, "textures/gui/container/cannot.png");
+    private static final ResourceLocation GUI_LOCATION = new ResourceLocation(BabelMod.MODID, "textures/gui/screen/cannot.png");
     private static final int TEXTURE_WIDTH = 512;
     private static final int TEXTURE_HEIGHT = 256;
     private static final int TRADE_BUTTON_X = 5;
@@ -38,8 +41,16 @@ public class CannotScreen extends AbstractContainerScreen<CannotMenu> {
     private static final int ENTITY_ANCHOR_X = 131;
     private static final int ENTITY_ANCHOR_Y = 77;
     private static final int ENTITY_SCALE = 25;
+    private static final int GEM_X = 190;
+    private static final int GEM_Y = 57;
+    private static final int GEM_WIDTH = 16;
+    private static final int GEM_HEIGHT = 16;
+    private static final ResourceLocation GEM_LOCATION = new ResourceLocation(BabelMod.MODID, "textures/gui/screen/cannot_gem.png");
+    private static final Component GEM_HINT = Component.translatable("gui.babel.cannot.gem");
     private int shopItem;
     private final CannotScreen.TradeOfferButton[] tradeOfferButtons = new CannotScreen.TradeOfferButton[NUMBER_OF_OFFER_BUTTONS];
+    @Nullable
+    private CannotScreen.GemButton gemButton;
     int scrollOff;
     private boolean isDragging;
     private float xMouse;
@@ -71,9 +82,11 @@ public class CannotScreen extends AbstractContainerScreen<CannotMenu> {
                 }
 
             }));
+            this.tradeOfferButtons[l].visible = l < this.menu.getOffers().size();
             k += 20;
         }
 
+        this.gemButton = this.addRenderableWidget(new CannotScreen.GemButton(i + GEM_X, j + GEM_Y, GEM_WIDTH, GEM_HEIGHT, b -> this.minecraft.setScreen(new CollectiblesScreen(this.minecraft.player, this.menu.containerId))));
     }
 
     @Override
@@ -99,6 +112,9 @@ public class CannotScreen extends AbstractContainerScreen<CannotMenu> {
         this.renderBackground(guiGraphics);
         this.xMouse = (float) mouseX;
         this.yMouse = (float) mouseY;
+        if (this.gemButton != null) {
+            this.gemButton.visible = this.menu.hasLostAndFound();
+        }
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         MerchantOffers merchantoffers = this.menu.getOffers();
         if (!merchantoffers.isEmpty()) {
@@ -147,6 +163,11 @@ public class CannotScreen extends AbstractContainerScreen<CannotMenu> {
         }
 
         this.renderTooltip(guiGraphics, mouseX, mouseY);
+        if (this.menu.hasLostAndFound()
+                && mouseX >= this.leftPos + GEM_X && mouseX < this.leftPos + GEM_X + GEM_WIDTH
+                && mouseY >= this.topPos + GEM_Y && mouseY < this.topPos + GEM_Y + GEM_HEIGHT) {
+            guiGraphics.renderTooltip(this.font, GEM_HINT, mouseX, mouseY);
+        }
     }
 
     private void renderButtonArrows(GuiGraphics guiGraphics, MerchantOffer offer, int x, int y) {
@@ -237,6 +258,21 @@ public class CannotScreen extends AbstractContainerScreen<CannotMenu> {
         }
 
         return super.mouseClicked(x, y, button);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    static class GemButton extends Button {
+        public GemButton(int x, int y, int width, int height, Button.OnPress onPress) {
+            super(x, y, width, height, CommonComponents.EMPTY, onPress, DEFAULT_NARRATION);
+        }
+
+        @Override
+        public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+            guiGraphics.blit(GEM_LOCATION, this.getX(), this.getY(), 0, 0, GEM_WIDTH, GEM_HEIGHT, GEM_WIDTH, GEM_HEIGHT);
+            if (this.isHovered) {
+                guiGraphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0x50FFFFFF);
+            }
+        }
     }
 
     @OnlyIn(Dist.CLIENT)

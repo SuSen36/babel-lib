@@ -24,8 +24,13 @@ public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
     private static final TagKey<EntityType<?>> APPLIES_DIFFICULTY = babelEntityTypeTag("applies_difficulty");
     private static final TagKey<EntityType<?>> BYPASSES_DIFFICULTY = babelEntityTypeTag("bypasses_difficulty");
     private static final TagKey<EntityType<?>> ELITE = babelEntityTypeTag("elite");
-    private static final TagKey<EntityType<?>> FORGE_BOSSES = TagKey.create(
-            Registries.ENTITY_TYPE, new ResourceLocation("forge", "bosses"));
+    private static final TagKey<EntityType<?>> FORGE_BOSSES = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("forge", "bosses"));
+    private static final TagKey<EntityType<?>> INFECTED_CREATURE = babelEntityTypeTag("infected_creature");
+    private static final TagKey<EntityType<?>> SEABORN = babelEntityTypeTag("seaborn");
+    private static final TagKey<EntityType<?>> ORIGINIUM_CREATION = babelEntityTypeTag("originium_creation");
+    private static final TagKey<EntityType<?>> COLLAPSAL = babelEntityTypeTag("collapsal");
+    private static final TagKey<EntityType<?>> MACHINA = babelEntityTypeTag("machina");
+    private static final TagKey<EntityType<?>> SARKAZ = babelEntityTypeTag("sarkaz");
 
     public EntityTypeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider,
                                   @Nullable ExistingFileHelper existingFileHelper) {
@@ -48,6 +53,13 @@ public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
                         entityTypeKey(EntityType.WITHER_SKELETON));
 
         tag(BYPASSES_DIFFICULTY);
+
+        tag(INFECTED_CREATURE);
+        tag(SEABORN);
+        tag(ORIGINIUM_CREATION);
+        tag(COLLAPSAL);
+        tag(MACHINA).add(entityTypeKey(EntityType.IRON_GOLEM));
+        tag(SARKAZ);
     }
 
     private static ResourceKey<EntityType<?>> entityTypeKey(EntityType<?> type) {

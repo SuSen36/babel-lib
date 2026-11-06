@@ -1,7 +1,12 @@
 package com.susen36.babel.menu;
 
+import com.susen36.babel.api.event.LostAndFoundEvent;
+import com.susen36.babel.collectible.CollectibleItem;
+import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.entity.CannotEntity;
 import com.susen36.babel.init.BabelMenus;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -10,19 +15,22 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.ClientSideMerchant;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MerchantContainer;
-import net.minecraft.world.inventory.MerchantResultSlot;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.Merchant;
 import net.minecraft.world.item.trading.MerchantOffers;
+import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CannotMenu extends AbstractContainerMenu {
     public static final int PAYMENT_SLOT = 0;
     public static final int RESULT_SLOT = 1;
+    // 交换按钮 id 需与交易选择 id (0..offers.size-1) 隔离
+    public static final int LOST_AND_FOUND_ID_BASE = 1000;
     private static final int RESULT_CONTAINER_SLOT = 2;
     private static final int INV_SLOT_START = 2;
     private static final int INV_SLOT_END = 29;
@@ -35,6 +43,7 @@ public class CannotMenu extends AbstractContainerMenu {
     private final MerchantContainer tradeContainer;
     @Nullable
     private final CannotEntity traderEntity;
+    private int hasLostAndFoundData;
 
     public CannotMenu(int containerId, Inventory playerInventory) {
         this(containerId, playerInventory, new ClientSideMerchant(playerInventory.player), -1);
@@ -42,6 +51,11 @@ public class CannotMenu extends AbstractContainerMenu {
 
     public CannotMenu(int containerId, Inventory playerInventory, FriendlyByteBuf extraData) {
         this(containerId, playerInventory, new ClientSideMerchant(playerInventory.player), extraData.readVarInt());
+        // 商品随 extraData 下发，构造时即应用，避免首帧商品未渲染
+        CompoundTag offersTag = extraData.readNbt();
+        if (offersTag != null) {
+            this.setOffers(new MerchantOffers(offersTag));
+        }
     }
 
     public CannotMenu(int containerId, Inventory playerInventory, Merchant trader, int traderEntityId) {
@@ -55,6 +69,15 @@ public class CannotMenu extends AbstractContainerMenu {
         this.tradeContainer = new MerchantContainer(trader);
         this.addSlot(new Slot(this.tradeContainer, PAYMENT_SLOT, PAYMENT_SLOT_X, SLOT_Y));
         this.addSlot(new MerchantResultSlot(playerInventory.player, trader, this.tradeContainer, RESULT_CONTAINER_SLOT, RESULT_SLOT_X, SLOT_Y));
+        this.addDataSlot(new DataSlot() {
+            public int get() {
+                return CannotMenu.this.traderEntity != null && CannotMenu.this.traderEntity.hasLostAndFound() ? 1 : 0;
+            }
+
+            public void set(int value) {
+                CannotMenu.this.hasLostAndFoundData = value;
+            }
+        });
 
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 9; ++j) {
@@ -77,11 +100,54 @@ public class CannotMenu extends AbstractContainerMenu {
         this.tradeContainer.setSelectionHint(index);
     }
 
+    public boolean hasLostAndFound() {
+        return this.hasLostAndFoundData > 0;
+    }
+
     @Override
-    public boolean clickMenuButton(Player player, int index) {
-        this.setSelectionHint(index);
-        this.tryMoveItems(index);
-        return true;
+    public boolean clickMenuButton(Player player, int id) {
+        boolean result;
+        if (id >= LOST_AND_FOUND_ID_BASE) {
+            result = this.lostAndFoundExchange(player, id - LOST_AND_FOUND_ID_BASE);
+        } else {
+            this.setSelectionHint(id);
+            this.tryMoveItems(id);
+            result = true;
+        }
+        return result;
+    }
+
+    // index 为已激活收藏品列表中的位置
+    private boolean lostAndFoundExchange(Player player, int index) {
+        boolean exchanged = false;
+        if (!player.level().isClientSide() && player instanceof ServerPlayer serverPlayer
+                && (this.traderEntity == null || this.traderEntity.hasLostAndFound())) {
+            Collectibles data = Collectibles.getData(player);
+            List<Item> used = new ArrayList<>();
+            List<Item> pool = new ArrayList<>();
+            for (RegistryObject<Item> entry : Collectibles.Collectibles.values()) {
+                Item candidate = entry.get();
+                if (data.isUsed(candidate)) {
+                    used.add(candidate);
+                } else if (!(candidate instanceof CollectibleItem collectible) || collectible.getTier() != CollectibleTiers.CURSED) {
+                    pool.add(candidate);
+                }
+            }
+            if (index >= 0 && index < used.size() && !pool.isEmpty()) {
+                Item lost = used.get(index);
+                Item gained = LostAndFoundEvent.onPre(serverPlayer, this.traderEntity, lost, pool.get(player.getRandom().nextInt(pool.size())));
+                if (gained != null) {
+                    Collectibles.deactivateAndSync(serverPlayer, lost);
+                    Collectibles.activateAndSync(serverPlayer, gained);
+                    if (this.traderEntity != null) {
+                        this.traderEntity.setHasLostAndFound(false);
+                    }
+                    LostAndFoundEvent.afterLostAndFound(serverPlayer, this.traderEntity, lost, gained);
+                    exchanged = true;
+                }
+            }
+        }
+        return exchanged;
     }
 
     @Override

@@ -140,6 +140,9 @@ public class BabelCollectible {
     public static RegistryObject<Item> ANTIQUE_CASTING;
     public static RegistryObject<Item> UNLEASHINGS;
     public static RegistryObject<Item> DREAMBIND_CASTLE_MODEL;
+    public static RegistryObject<Item> CONDENSED_SUPPRESSANT;
+    public static RegistryObject<Item> FOREST_NIGHT_WHISPERS;
+    public static RegistryObject<Item> CANNOT_MARK;
 
     public static final ArrayList<RegistryObject<Item>> BABEL_COLLECTIBLES = new ArrayList<>();
 
@@ -191,7 +194,7 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(UNKNOWN_INSTRUMENT = REGISTRY.registerCollectible("unknown_instrument", UnknownInstrumentItem::new));
         BABEL_COLLECTIBLES.add(SUPREME_RING = REGISTRY.registerCollectible("supreme_ring", SupremeRingItem::new));
 
-        SARKAZ_KING_BED = REGISTRY.registerCollectible("sarkaz_king_bed", SarkazKingBedItem::new);
+        BABEL_COLLECTIBLES.add(SARKAZ_KING_BED = REGISTRY.registerCollectible("sarkaz_king_bed", SarkazKingBedItem::new));
 
         BABEL_COLLECTIBLES.add(SARKAZ_KING_BANNER = REGISTRY.registerCollectible("sarkaz_king_banner", ArchfiendsBannerItem::new));
         BABEL_COLLECTIBLES.add(SARKAZ_KING_ARTIFACT = REGISTRY.registerCollectible("sarkaz_king_artifact", ArchfiendsArtifactItem::new));
@@ -271,6 +274,9 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(ANTIQUE_CASTING = REGISTRY.registerCollectible("antique_casting", AntiqueCastingItem::new));
         BABEL_COLLECTIBLES.add(UNLEASHINGS = REGISTRY.registerCollectible("unleashings", UnleashingsItem::new));
         BABEL_COLLECTIBLES.add(DREAMBIND_CASTLE_MODEL = REGISTRY.registerCollectible("dreambind_castle_model", DreambindCastleModelItem::new));
+        BABEL_COLLECTIBLES.add(CONDENSED_SUPPRESSANT = REGISTRY.registerCollectible("condensed_suppressant", CondensedSuppressantItem::new));
+        BABEL_COLLECTIBLES.add(FOREST_NIGHT_WHISPERS = REGISTRY.registerCollectible("forest_night_whispers", ForestNightWhispersItem::new));
+        BABEL_COLLECTIBLES.add(CANNOT_MARK = REGISTRY.registerCollectible("cannot_mark", CannotMarkItem::new));
     }
 
     private BabelCollectible() {
