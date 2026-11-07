@@ -23,6 +23,6 @@ public class PiglinDiaryItem extends CollectibleItem.CustomCollectibleItem {
 
     @Override
     public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-        LifePointUtils.setShieldPoint(player, LifePointUtils.getShieldPoint(player) + 4);
+        LifePointUtils.addShieldPoint(player,  4);
     }
 }

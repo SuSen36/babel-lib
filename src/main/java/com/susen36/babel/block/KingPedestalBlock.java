@@ -1,5 +1,6 @@
 package com.susen36.babel.block;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -49,7 +50,7 @@ public class KingPedestalBlock extends Block implements SimpleWaterloggedBlock, 
 
     @Override
     public void appendHoverText(ItemStack itemstack, BlockGetter context, List<Component> list, TooltipFlag flag) {
-        list.add(Component.translatable("block.babel.king_pedestal.description_0"));
+        list.add(Component.translatable("block.babel.king_pedestal.description_0").withStyle(ChatFormatting.AQUA));
     }
 
     @Override

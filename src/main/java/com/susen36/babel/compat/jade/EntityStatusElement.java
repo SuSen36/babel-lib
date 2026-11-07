@@ -10,8 +10,7 @@ import snownee.jade.api.theme.IThemeHelper;
 import snownee.jade.api.ui.Element;
 import snownee.jade.overlay.DisplayHelper;
 import snownee.jade.overlay.OverlayRenderer;
-
-public class MissNumbElement extends Element {
+public class EntityStatusElement extends Element {
     private final String physical;
     private final String magic;
     private final int style;
@@ -22,7 +21,7 @@ public class MissNumbElement extends Element {
     private static final ResourceLocation MISS_MAGIC_ICON = new ResourceLocation(BabelMod.MODID, "textures/gui/overlay/miss_magic.png");
     private static final ResourceLocation NUMB_ICON = new ResourceLocation(BabelMod.MODID, "textures/gui/overlay/numb.png");
 
-    public MissNumbElement(int physical, int magic, int numb) {
+    public EntityStatusElement(int physical, int magic, int numb) {
         this.physical = physical > 0 ? "" + physical : "";
         this.magic = magic > 0 ? "" + magic : "";
         this.style = numb;

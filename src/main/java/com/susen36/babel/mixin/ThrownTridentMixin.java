@@ -17,7 +17,7 @@ public abstract class ThrownTridentMixin {
         if (!level.isThundering()) {
             Entity owner = ((ThrownTrident) (Object) this).getOwner();
             return level.isRaining() && owner instanceof ServerPlayer player
-                    && Collectibles.getData(player).isUsed(BabelCollectible.HAND_OF_DIFFUSION.get());
+                    && Collectibles.isUsed(player, BabelCollectible.HAND_OF_DIFFUSION);
         }
         return true;
     }

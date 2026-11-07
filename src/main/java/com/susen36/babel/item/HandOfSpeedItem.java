@@ -50,7 +50,7 @@ public class HandOfSpeedItem extends CollectibleItem.CustomCollectibleItem {
 
     private static boolean isAlone(Player player) {
         boolean alone = false;
-        if (Collectibles.getData(player).isUsed(BabelCollectible.HAND_OF_SPEED.get())) {
+        if (Collectibles.isUsed(player, BabelCollectible.HAND_OF_SPEED)) {
             AABB area = AABB.ofSize(new Vec3(player.getX(), player.getY(), player.getZ()), 8, 8, 8);
             alone = true;
             for (LivingEntity nearby : player.level().getEntitiesOfClass(LivingEntity.class, area)) {

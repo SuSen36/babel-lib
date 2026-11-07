@@ -22,7 +22,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 public class HandOfEngraveItem extends CollectibleItem.CustomCollectibleItem {
@@ -42,11 +41,6 @@ public class HandOfEngraveItem extends CollectibleItem.CustomCollectibleItem {
         addLayerAttributeModifier(Attributes.ARMOR_TOUGHNESS, 0.01, AttributeModifier.Operation.MULTIPLY_BASE);
         addLayerAttributeModifier(BabelAttributes.MAGIC_RESISTANCE.get(), 0.25, AttributeModifier.Operation.ADDITION);
         addLayerAttributeModifier(Attributes.ARMOR, 0.01, AttributeModifier.Operation.MULTIPLY_BASE);
-    }
-
-    @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-        Collectibles.getLayerData(player).setLayer(this, 0);
     }
 
     @Override

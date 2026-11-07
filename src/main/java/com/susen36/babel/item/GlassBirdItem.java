@@ -25,6 +25,6 @@ public class GlassBirdItem extends CollectibleItem.CustomCollectibleItem {
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
 		player.giveExperienceLevels(4);
-		LifePointUtils.setShieldPoint(player, LifePointUtils.getShieldPoint(player) + 1);
+		LifePointUtils.addShieldPoint(player,1);
 	}
 }

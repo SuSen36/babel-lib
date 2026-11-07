@@ -39,8 +39,7 @@ public class AntiqueCastingItem extends CollectibleItem.CustomCollectibleItem {
                 if (enchanted >= ENCHANT_COUNT) {
                     break;
                 }
-                if (!candidate.isEmpty() && candidate.isEnchantable() && !candidate.isEnchanted()
-                        && enchantWithoutCurse(serverLevel, candidate)) {
+                if (!candidate.isEmpty() && candidate.isEnchantable() && !candidate.isEnchanted() && enchantWithoutCurse(serverLevel, candidate)) {
                     enchanted++;
                 }
             }

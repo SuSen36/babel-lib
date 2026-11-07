@@ -4,7 +4,6 @@ import com.susen36.babel.BabelConfig;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
-import com.susen36.babel.init.BabelItemTags;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -59,7 +58,6 @@ public class HandOfFireworkItem extends CollectibleItem.CustomCollectibleItem {
 
     private static boolean isFireworkWeapon(ItemStack stack, String registryName) {
         return stack.is(Tags.Items.TOOLS_BOWS) || stack.getItem() instanceof BowItem
-                || stack.is(BabelItemTags.FIREWORK_WEAPONS)
                 || matchesConfigured(BabelConfig.handFireworkRecognizable, registryName);
     }
 

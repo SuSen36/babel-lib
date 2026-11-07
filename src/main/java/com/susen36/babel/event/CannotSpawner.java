@@ -3,6 +3,7 @@ package com.susen36.babel.event;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.entity.CannotEntity;
 import com.susen36.babel.init.BabelEntities;
+import com.susen36.babel.robbery.RobberyCapability;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -38,7 +39,8 @@ public class CannotSpawner {
         if (event.phase == TickEvent.Phase.END) {
             for (ServerPlayer player : event.getServer().getPlayerList().getPlayers()) {
                 if (!player.isSpectator() && player.tickCount % 1200 == 0
-                        && player.level().getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) {
+                        && player.level().getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
+                        && !RobberyCapability.of(player).isRestricted(player.level().getGameTime())) {
                     CompoundTag data = player.getPersistentData();
                     if (!data.contains(SPAWN_DELAY_KEY, 99)) {
                         data.putInt(SPAWN_DELAY_KEY, SPAWN_DELAY);
@@ -66,8 +68,7 @@ public class CannotSpawner {
         BlockPos anchor = player.blockPosition();
         BlockPos spawnPos = findSpawnPositionNear(level, anchor, player);
         boolean spawned = false;
-        if (/* player.getRandom().nextInt(10) == 0
-                && */ !hasNearbyCannot(player)
+        if (!hasNearbyCannot(player)
                 && spawnPos != null
                 && hasEnoughSpace(level, spawnPos)
                 && !level.getBiome(spawnPos).is(BiomeTags.WITHOUT_WANDERING_TRADER_SPAWNS)) {
@@ -82,7 +83,7 @@ public class CannotSpawner {
     }
 
     private static boolean hasNearbyCannot(ServerPlayer player) {
-        return player.level().getNearestEntity(CannotEntity.class, TargetingConditions.DEFAULT,
+        return player.level().getNearestEntity(CannotEntity.class, TargetingConditions.forNonCombat(),
                 player, player.getX(), player.getY(), player.getZ(),
                 player.getBoundingBox().inflate(DEDUP_RADIUS)) != null;
     }

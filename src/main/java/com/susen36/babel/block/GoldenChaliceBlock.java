@@ -1,6 +1,7 @@
 package com.susen36.babel.block;
 
 import com.susen36.babel.init.BabelSounds;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -50,10 +51,10 @@ public class GoldenChaliceBlock extends Block implements SimpleWaterloggedBlock,
 
     @Override
     public void appendHoverText(ItemStack itemstack, BlockGetter context, List<Component> list, TooltipFlag flag) {
-        list.add(Component.translatable("block.babel.golden_chalice.description_0"));
-        list.add(Component.translatable("block.babel.golden_chalice.description_1"));
-        list.add(Component.translatable("block.babel.golden_chalice.description_2"));
-        list.add(Component.translatable("block.babel.golden_chalice.description_3"));
+        list.add(Component.translatable("block.babel.golden_chalice.description_0").withStyle(ChatFormatting.ITALIC));
+        list.add(Component.translatable("block.babel.golden_chalice.description_1").withStyle(ChatFormatting.AQUA));
+        list.add(Component.translatable("block.babel.golden_chalice.description_2").withStyle(ChatFormatting.AQUA));
+        list.add(Component.translatable("block.babel.golden_chalice.description_3").withStyle(ChatFormatting.AQUA));
     }
 
     @Override

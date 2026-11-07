@@ -5,7 +5,6 @@ import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.init.BabelItems;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -26,7 +25,7 @@ public class ActorsJewelryBoxItem extends CollectibleItem.CustomCollectibleItem 
 
     @Override
     public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-        if (level instanceof ServerLevel) {
+        if (!player.level().isClientSide()) {
             ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(BabelItems.ORIGINIUM_INGOT.get(), 20));
         }
     }

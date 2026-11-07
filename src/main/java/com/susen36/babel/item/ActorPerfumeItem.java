@@ -27,6 +27,8 @@ public class ActorPerfumeItem extends CollectibleItem.CustomCollectibleItem {
 
     @Override
     public void applyEffectTick(Player player, int layer) {
-        player.heal(Math.max(player.getMaxHealth() * 0.05F, 1.0F));
+        if (!player.level().isClientSide()) {
+            player.heal(Math.max(player.getMaxHealth() * 0.05F, 1.0F));
+        }
     }
 }

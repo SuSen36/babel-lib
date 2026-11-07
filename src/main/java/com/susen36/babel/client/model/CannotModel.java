@@ -87,6 +87,7 @@ public class CannotModel extends HierarchicalModel<CannotEntity> {
     public void setupAnim(CannotEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
         this.animate(entity.idleAnimationState, CannotAnimations.IDLE, ageInTicks);
+        this.animate(entity.skillAnimationState, CannotAnimations.SKILL1, ageInTicks);
         this.animateWalk(CannotAnimations.MOVE, limbSwing, limbSwingAmount, 4.5F, 2.5F);
     }
 

@@ -24,6 +24,7 @@ public class BrilliantLamentItem extends CollectibleItem.CustomCollectibleItem {
                         .build());
     }
 
+    //TODO 父类可以给一个方法来收集固定范围内的生物而不是每个收藏品都写一个
     @Override
     public void onDealDamage(LivingDamageEvent event, Player player, LivingEntity target, int layer) {
         if (target instanceof Monster monster

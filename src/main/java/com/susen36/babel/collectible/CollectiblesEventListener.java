@@ -1,11 +1,11 @@
 package com.susen36.babel.collectible;
 
+import com.susen36.babel.BabelConfig;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.api.event.CollectibleDropEvent;
 import com.susen36.babel.api.event.CollectibleEvent;
 import com.susen36.babel.api.event.OriginiumIngotDropEvent;
-import com.susen36.babel.item.FourLeafCloverFossilItem;
-import com.susen36.babel.item.SupremeRingItem;
+import com.susen36.babel.init.BabelCollectible;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,28 +19,26 @@ import org.jetbrains.annotations.NotNull;
 @Mod.EventBusSubscriber(modid = BabelMod.MODID)
 public class CollectiblesEventListener {
 
-    private static final long COLLECTIBLE_DURATION_TICKS = 6L * 60 * 60 * 20;
-
     @SubscribeEvent
     public static void onCollectibleUsedEvent(@NotNull CollectibleEvent.Used event) {
         var player = event.getEntity();
         var level = player.level();
         if (level instanceof ServerLevel) {
             var cd = Collectibles.getCooldownData(player);
-            cd.setCooldownEndTick(event.getItem(), level.getServer(), COLLECTIBLE_DURATION_TICKS);
+            cd.setCooldownEndTick(event.getItem(), level.getServer(), BabelConfig.collectibleDurationTicks);
         }
     }
 
     @SubscribeEvent
     public static void onOriginiumIngotDrop(@NotNull OriginiumIngotDropEvent event) {
-        if (event.getKiller() instanceof Player player && SupremeRingItem.isUsed(player)) {
+        if (event.getKiller() instanceof Player player && Collectibles.isUsed(player, BabelCollectible.SUPREME_RING)) {
             event.setMultiplier(event.getMultiplier() * 1.5F);
         }
     }
 
     @SubscribeEvent
     public static void onCollectibleDrop(@NotNull CollectibleDropEvent event) {
-        if (event.getKiller() instanceof Player player && FourLeafCloverFossilItem.isUsed(player)) {
+        if (event.getKiller() instanceof Player player && Collectibles.isUsed(player, BabelCollectible.FOUR_LEAF_CLOVER_FOSSIL)) {
             event.setChance(event.getChance() * 2.0F);
         }
     }

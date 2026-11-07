@@ -1,16 +1,14 @@
 package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
+import com.susen36.babel.api.event.ElementEvent;
 import com.susen36.babel.api.event.ResistDamageEvent;
 import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.effect.PalsyMobEffect;
 import com.susen36.babel.elemental.FrenzyInjury;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
-import com.susen36.babel.init.BabelAttributes;
-import com.susen36.babel.init.BabelMobEffects;
-import com.susen36.babel.init.BabelParticles;
-import com.susen36.babel.init.BabelSounds;
+import com.susen36.babel.init.*;
 import com.susen36.babel.manager.EPManager;
 import com.susen36.babel.util.DataUtils;
 import net.minecraft.server.level.ServerLevel;
@@ -20,6 +18,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -152,8 +151,7 @@ public class EPEvents {
         LivingEntity target = event.getEntity();
         Entity sourceEntity = event.getSource().getEntity();
         LivingEntity attacker = sourceEntity instanceof Projectile projectile && projectile.getOwner() instanceof LivingEntity owner
-                ? owner
-                : sourceEntity instanceof LivingEntity living ? living : null;
+                ? owner : sourceEntity instanceof LivingEntity living ? living : null;
 
         if (attacker != null) {
             EPManager.ElementalAttackConfig attackConfig = EPManager.getElementalAttackConfig(attacker);
@@ -221,6 +219,25 @@ public class EPEvents {
             if (frenzy instanceof FrenzyInjury fi && fi.underBurst()) {
                 fi.addFrenzyStack();
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onElementalInjuryResist(ElementEvent.Hurt event) {
+        MobEffectInstance effect = event.getEntity().getEffect(BabelMobEffects.ESSENCE_RESISTANCE.get());
+        if (effect != null) {
+            double reduction = Mth.clamp(0.15 * (effect.getAmplifier() + 1), 0.0, 1.0);
+            event.setAmount(Mth.floor(event.getAmount() * (1.0 - reduction)));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onElementBurstResist(LivingHurtEvent event) {
+        LivingEntity target = event.getEntity();
+        MobEffectInstance effect = target.getEffect(BabelMobEffects.ESSENCE_RESISTANCE.get());
+        if (effect != null && !target.level().isClientSide() && event.getSource().is(BabelDamageTypes.ELEMENT_BREAK)) {
+            double reduction = Mth.clamp(0.25 * (effect.getAmplifier() + 1), 0.0, 1.0);
+            event.setAmount(event.getAmount() * (float) (1.0 - reduction));
         }
     }
 }

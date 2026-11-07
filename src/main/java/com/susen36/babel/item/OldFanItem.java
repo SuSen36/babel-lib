@@ -11,6 +11,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraftforge.common.Tags;
 
 import java.util.List;
 
@@ -34,6 +35,8 @@ public class OldFanItem extends CollectibleItem.CustomCollectibleItem {
         boolean bow = false;
         boolean crossbow = false;
         boolean shield = false;
+        boolean trident = false;
+        boolean potion = false;
         List<NonNullList<ItemStack>> storages = List.of(player.getInventory().items, player.getInventory().offhand);
         for (NonNullList<ItemStack> storage : storages) {
             for (ItemStack stack : storage) {
@@ -43,9 +46,11 @@ public class OldFanItem extends CollectibleItem.CustomCollectibleItem {
                 sword |= stack.getItem() instanceof SwordItem || stack.is(ItemTags.SWORDS);
                 axe |= stack.getItem() instanceof AxeItem || stack.is(ItemTags.AXES);
                 hoe |= stack.getItem() instanceof HoeItem || stack.is(ItemTags.HOES);
-                bow |= stack.getItem() instanceof BowItem;
-                crossbow |= stack.getItem() instanceof CrossbowItem;
-                shield |= stack.getItem() instanceof ShieldItem;
+                bow |= stack.getItem() instanceof BowItem || stack.is(Tags.Items.TOOLS_BOWS);
+                crossbow |= stack.getItem() instanceof CrossbowItem || stack.is(Tags.Items.TOOLS_CROSSBOWS);
+                shield |= stack.getItem() instanceof ShieldItem || stack.is(Tags.Items.TOOLS_SHIELDS);
+                trident |= stack.getItem() instanceof TridentItem || stack.is(Tags.Items.TOOLS_TRIDENTS);
+                potion |= stack.getItem() instanceof PotionItem;
             }
         }
         int stacks = 0;
@@ -55,6 +60,8 @@ public class OldFanItem extends CollectibleItem.CustomCollectibleItem {
         if (bow) stacks++;
         if (crossbow) stacks++;
         if (shield) stacks++;
+        if (trident) stacks++;
+        if (potion) stacks++;
         return stacks;
     }
 }

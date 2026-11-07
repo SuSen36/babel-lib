@@ -14,6 +14,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.MerchantOffer;
@@ -41,6 +42,10 @@ public class CannotScreen extends AbstractContainerScreen<CannotMenu> {
     private static final int ENTITY_ANCHOR_X = 131;
     private static final int ENTITY_ANCHOR_Y = 77;
     private static final int ENTITY_SCALE = 25;
+    // 坎诺特立绘的点击攻击判定区（以锚点为中心）
+    private static final int ENTITY_CLICK_HALF_WIDTH = 15;
+    private static final int ENTITY_CLICK_TOP = 27;
+    private static final int ENTITY_CLICK_BOTTOM = 77;
     private static final int GEM_X = 190;
     private static final int GEM_Y = 57;
     private static final int GEM_WIDTH = 16;
@@ -253,11 +258,22 @@ public class CannotScreen extends AbstractContainerScreen<CannotMenu> {
         this.isDragging = false;
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
+        if (button == 0 && this.isOverEntityArea(x, y, i, j)) {
+            this.minecraft.player.swing(InteractionHand.MAIN_HAND);
+            this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, CannotMenu.ATTACK_BUTTON_ID);
+            return true;
+        }
         if (this.canScroll(this.menu.getOffers().size()) && x > (double) (i + SCROLL_BAR_START_X) && x < (double) (i + SCROLL_BAR_START_X + 6) && y > (double) (j + SCROLL_BAR_TOP_POS_Y) && y <= (double) (j + SCROLL_BAR_TOP_POS_Y + SCROLL_BAR_HEIGHT + 1)) {
             this.isDragging = true;
         }
 
         return super.mouseClicked(x, y, button);
+    }
+
+    private boolean isOverEntityArea(double x, double y, int leftPos, int topPos) {
+        int entityX = leftPos + ENTITY_ANCHOR_X;
+        return x >= entityX - ENTITY_CLICK_HALF_WIDTH && x < entityX + ENTITY_CLICK_HALF_WIDTH
+                && y >= topPos + ENTITY_CLICK_TOP && y < topPos + ENTITY_CLICK_BOTTOM;
     }
 
     @OnlyIn(Dist.CLIENT)

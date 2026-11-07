@@ -17,7 +17,8 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * {@code babel:applies_difficulty} 默认纳入末影龙与 {@code forge:bosses}；
- * {@code babel:elite} 默认纳入原版精锐敌怪；{@code babel:bypasses_difficulty} 保持为空，交由依赖模组自行添加。
+ * {@code babel:elite} 默认纳入原版精锐敌怪；{@code babel:sarkaz} 默认嵌套 {@code forge:nether_mobs}；
+ * {@code babel:bypasses_difficulty} 保持为空，交由依赖模组自行添加。
  */
 public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
 
@@ -25,6 +26,7 @@ public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
     private static final TagKey<EntityType<?>> BYPASSES_DIFFICULTY = babelEntityTypeTag("bypasses_difficulty");
     private static final TagKey<EntityType<?>> ELITE = babelEntityTypeTag("elite");
     private static final TagKey<EntityType<?>> FORGE_BOSSES = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("forge", "bosses"));
+    private static final TagKey<EntityType<?>> FORGE_NETHER_MOBS = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("forge", "nether_mobs"));
     private static final TagKey<EntityType<?>> INFECTED_CREATURE = babelEntityTypeTag("infected_creature");
     private static final TagKey<EntityType<?>> SEABORN = babelEntityTypeTag("seaborn");
     private static final TagKey<EntityType<?>> ORIGINIUM_CREATION = babelEntityTypeTag("originium_creation");
@@ -39,27 +41,24 @@ public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        tag(FORGE_BOSSES);
-
         tag(APPLIES_DIFFICULTY)
                 .add(ResourceKey.create(Registries.ENTITY_TYPE, EntityType.getKey(EntityType.ENDER_DRAGON)))
                 .addTag(FORGE_BOSSES);
+        tag(BYPASSES_DIFFICULTY);
 
+        tag(FORGE_BOSSES);
         tag(ELITE)
                 .add(entityTypeKey(EntityType.BLAZE), entityTypeKey(EntityType.ELDER_GUARDIAN),
                         entityTypeKey(EntityType.ENDERMAN), entityTypeKey(EntityType.EVOKER), entityTypeKey(EntityType.GHAST),
                         entityTypeKey(EntityType.PIGLIN_BRUTE), entityTypeKey(EntityType.RAVAGER), entityTypeKey(EntityType.SHULKER),
                         entityTypeKey(EntityType.VINDICATOR), entityTypeKey(EntityType.WARDEN),
                         entityTypeKey(EntityType.WITHER_SKELETON));
-
-        tag(BYPASSES_DIFFICULTY);
-
         tag(INFECTED_CREATURE);
         tag(SEABORN);
         tag(ORIGINIUM_CREATION);
         tag(COLLAPSAL);
         tag(MACHINA).add(entityTypeKey(EntityType.IRON_GOLEM));
-        tag(SARKAZ);
+        tag(SARKAZ).addTag(FORGE_NETHER_MOBS);
     }
 
     private static ResourceKey<EntityType<?>> entityTypeKey(EntityType<?> type) {

@@ -21,6 +21,10 @@ public class BabelConfig {
             .comment("收藏品刷新概率。在每次触发战利品表（如打开箱子）时以此概率额外随机加入一件收藏品")
             .defineInRange("collectible_loot_chance", 0.3, 0.0, 1.0);
 
+    public static final ForgeConfigSpec.LongValue COLLECTIBLE_DURATION_TICKS = BUILDER
+            .comment("收藏品激活后的持续时长，到期后自动失效")
+            .defineInRange("collectible_duration_ticks", 576000L, 0L, Long.MAX_VALUE);
+
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> HAND_STRANGLE_RECOGNIZABLE = BUILDER
             .comment("其它能使收藏品扼喉之手生效的物品。最好是弩。用 * 号代表该命名空间下的所有物品，如 tacz:*, babel:oceanized_* 等，下同")
             .defineList("hand_strangle_recognizable", List.of("CrossbowMod2:item.woodenCrossbow"), entry -> true);
@@ -85,6 +89,7 @@ public class BabelConfig {
     public static boolean epBarStyle;
     public static boolean banAdvancedCollectibles;
     public static double collectibleLootChance;
+    public static long collectibleDurationTicks;
     public static double epXOffset;
     public static double epYOffset;
     public static double lifePointInit;
@@ -107,6 +112,7 @@ public class BabelConfig {
         epBarStyle = EP_BAR_STYLE.get();
         banAdvancedCollectibles = BAN_ADVANCED_COLLECTIBLES.get();
         collectibleLootChance = COLLECTIBLE_LOOT_CHANCE.get();
+        collectibleDurationTicks = COLLECTIBLE_DURATION_TICKS.get();
         epXOffset = EP_X_OFFSET.get();
         epYOffset = EP_Y_OFFSET.get();
         lifePointInit = LIFE_POINT_INIT.get();
@@ -128,6 +134,7 @@ public class BabelConfig {
         epBarStyle = EP_BAR_STYLE.get();
         banAdvancedCollectibles = BAN_ADVANCED_COLLECTIBLES.get();
         collectibleLootChance = COLLECTIBLE_LOOT_CHANCE.get();
+        collectibleDurationTicks = COLLECTIBLE_DURATION_TICKS.get();
         epXOffset = EP_X_OFFSET.get();
         epYOffset = EP_Y_OFFSET.get();
         lifePointInit = LIFE_POINT_INIT.get();

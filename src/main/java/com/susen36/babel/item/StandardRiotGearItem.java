@@ -13,7 +13,7 @@ import net.minecraftforge.event.entity.living.LivingDamageEvent;
 
 public class StandardRiotGearItem extends CollectibleItem.CustomCollectibleItem {
     /** 附加的法术伤害会再次触发 onDealDamage，用重入标记让它在第一层停住，不影响任何伤害类型的加成。 */
-    private static final ThreadLocal<Boolean> APPLYING_EXTRA = ThreadLocal.withInitial(() -> Boolean.FALSE);
+    private static final ThreadLocal<LivingEntity> EXTRA_DAMAGE_TARGET = new ThreadLocal<>();
 
     public StandardRiotGearItem() {
         super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
@@ -26,12 +26,15 @@ public class StandardRiotGearItem extends CollectibleItem.CustomCollectibleItem 
 
     @Override
     public void onDealDamage(LivingDamageEvent event, Player player, LivingEntity target, int layer) {
-        if (target instanceof Monster && !APPLYING_EXTRA.get()) {
-            APPLYING_EXTRA.set(Boolean.TRUE);
+        if (!event.isCanceled() && target instanceof Monster && target.isAlive() && EXTRA_DAMAGE_TARGET.get() != target) {
+            EXTRA_DAMAGE_TARGET.set(target);
+            int savedInvulnerable = target.invulnerableTime;
+            target.invulnerableTime = 0;
             try {
                 target.hurt(target.level().damageSources().indirectMagic(player, player), event.getAmount() * 0.2F);
             } finally {
-                APPLYING_EXTRA.set(Boolean.FALSE);
+                EXTRA_DAMAGE_TARGET.remove();
+                target.invulnerableTime = Math.max(savedInvulnerable, target.invulnerableTime);
             }
         }
     }

@@ -11,12 +11,10 @@ public final class BabelItemTags {
         throw new UnsupportedOperationException("Utility class");
     }
 
-    public static final TagKey<Item> FIREWORK_WEAPONS = create("firework_weapons");
     public static final TagKey<Item> KING_RELICS = create("king_relics");
     public static final TagKey<Item> ARCHFIEND_RELICS = create("archfiend_relics");
 
     private static TagKey<Item> create(String path) {
-        return TagKey.create(Registries.ITEM,
-                new ResourceLocation(BabelMod.MODID, path));
+        return TagKey.create(Registries.ITEM, new ResourceLocation(BabelMod.MODID, path));
     }
 }

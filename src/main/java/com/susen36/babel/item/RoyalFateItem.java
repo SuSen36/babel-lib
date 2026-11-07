@@ -33,9 +33,9 @@ public class RoyalFateItem extends CollectibleItem.CustomCollectibleItem {
 
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-		double maxLives = LifePointUtils.getMaxLifePoint(player);
-		LifePointUtils.setShieldPoint(player, LifePointUtils.getShieldPoint(player) + (int) maxLives);
-		LifePointUtils.setShieldPoint(player, LifePointUtils.getShieldPoint(player) + 3);
+		int maxLives = LifePointUtils.getMaxLifePoint(player);
+		LifePointUtils.addShieldPoint(player, maxLives);
+		LifePointUtils.addShieldPoint(player,  3);
 		LifePointUtils.setMaxLifePoint(player, 1);
 		LifePointUtils.setLifePoint(player, 1);
 	}

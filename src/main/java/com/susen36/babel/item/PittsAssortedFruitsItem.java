@@ -21,9 +21,9 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class RainbowCandyItem extends CollectibleItem.CustomCollectibleItem {
-    public RainbowCandyItem() {
-        super(new Item.Properties().stacksTo(64).food(new FoodProperties.Builder().nutrition(6).saturationMod(0.5f).alwaysEat().build()), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
+public class PittsAssortedFruitsItem extends CollectibleItem.CustomCollectibleItem {
+    public PittsAssortedFruitsItem() {
+        super(new Item.Properties().stacksTo(1).food(new FoodProperties.Builder().nutrition(6).saturationMod(0.5f).alwaysEat().build()), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)

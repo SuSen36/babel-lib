@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "babel:item/necklace_of_presence"
+    "layer0": "babel:item/presence_necklace"
   }
 }

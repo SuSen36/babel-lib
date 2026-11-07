@@ -31,7 +31,7 @@ public class AlleySculptureItem extends CollectibleItem.CustomCollectibleItem {
 
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-		LifePointUtils.setLifePoint(player, LifePointUtils.getLifePoint(player) + 3);
+		LifePointUtils.addLifePoint(player, 3);
 	}
 
 	@Override

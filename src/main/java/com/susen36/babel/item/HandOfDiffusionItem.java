@@ -36,7 +36,7 @@ public class HandOfDiffusionItem extends CollectibleItem.CustomCollectibleItem {
     public static void onStruckByLightning(EntityStruckByLightningEvent event) {
         Player player = event.getLightning().getCause();
         if (player != null && event.getEntity() != player
-                && Collectibles.getData(player).isUsed(BabelCollectible.HAND_OF_DIFFUSION.get())
+                && Collectibles.isUsed(player, BabelCollectible.HAND_OF_DIFFUSION)
                 && STRUCK_ENTITIES.computeIfAbsent(event.getLightning(), bolt -> new HashSet<>()).add(event.getEntity().getUUID())) {
             player.getFoodData().eat(1, 0.0F);
         }

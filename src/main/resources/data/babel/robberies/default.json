@@ -1,0 +1,122 @@
+{
+  "spawn_range": 4,
+  "mobs_per_wave": 11,
+  "wave_count": 5,
+  "simultaneous_mobs": 4,
+  "ticks_between_spawn": 10,
+  "initial_spawn_count": 3,
+  "wave_interval_ticks": 225,
+  "support_interval_ticks": 100,
+  "support_radius": 8.0,
+  "support_heal_per_pulse": 2.0,
+  "boss_bar_name": {
+    "translate": "event.babel.robbery.bossbar"
+  },
+  "spawn_potentials": [
+    {
+      "weight": 5,
+      "entity": "minecraft:vindicator"
+    },
+    {
+      "weight": 3,
+      "entity": "minecraft:pillager"
+    },
+    {
+      "weight": 2,
+      "entity": "minecraft:witch",
+      "min_wave": 4
+    },
+    {
+      "weight": 2,
+      "entity": "minecraft:ravager",
+      "min_wave": 3
+    },
+    {
+      "weight": 1,
+      "entity": "minecraft:evoker",
+      "min_wave": 5
+    },
+    {
+      "weight": 1,
+      "entity": "minecraft:vex",
+      "min_wave": 5
+    }
+  ],
+  "effect_groups": [
+    {
+      "effects": [
+        {
+          "effect": "minecraft:strength",
+          "duration": 200,
+          "amplifier": 4
+        },
+        {
+          "effect": "minecraft:speed",
+          "duration": 200,
+          "amplifier": 4
+        }
+      ]
+    },
+    {
+      "effects": [
+        {
+          "effect": "minecraft:resistance",
+          "duration": 200,
+          "amplifier": 4
+        },
+        {
+          "effect": "minecraft:regeneration",
+          "duration": 100,
+          "amplifier": 1
+        }
+      ]
+    },
+    {
+      "effects": [
+        {
+          "effect": "minecraft:health_boost",
+          "duration": 200,
+          "amplifier": 1
+        },
+        {
+          "effect": "minecraft:regeneration",
+          "duration": 100,
+          "amplifier": 1
+        }
+      ]
+    },
+    {
+      "effects": [
+        {
+          "effect": "minecraft:strength",
+          "duration": 200,
+          "amplifier": 4
+        },
+        {
+          "effect": "minecraft:resistance",
+          "duration": 200,
+          "amplifier": 4
+        }
+      ]
+    },
+    {
+      "effects": [
+        {
+          "effect": "babel:physical_dodge",
+          "duration": 200,
+          "amplifier": 4
+        },
+        {
+          "effect": "babel:magic_dodge",
+          "duration": 200,
+          "amplifier": 4
+        },
+        {
+          "effect": "minecraft:speed",
+          "duration": 200,
+          "amplifier": 4
+        }
+      ]
+    }
+  ]
+}

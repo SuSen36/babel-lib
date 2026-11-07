@@ -16,7 +16,7 @@ import net.minecraft.world.level.Level;
 
 public class WrathOfSiracusansItem extends CollectibleItem.CustomCollectibleItem {
 	public WrathOfSiracusansItem() {
-		super(new Item.Properties().stacksTo(64).food(new FoodProperties.Builder().nutrition(10).saturationMod(0.6f).alwaysEat().build()), 25, false, CollectibleTiers.ADVANCED, new CollectibleItem.Levels(0, 1, 0),
+		super(new Item.Properties().stacksTo(1).food(new FoodProperties.Builder().nutrition(10).saturationMod(0.6f).alwaysEat().build()), 25, false, CollectibleTiers.ADVANCED, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
 						.particle(ParticleTypes.HAPPY_VILLAGER, 72)

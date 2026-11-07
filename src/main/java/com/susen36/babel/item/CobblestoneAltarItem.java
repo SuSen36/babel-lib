@@ -14,8 +14,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 public class CobblestoneAltarItem extends CollectibleItem.CustomCollectibleItem {
@@ -30,11 +28,6 @@ public class CobblestoneAltarItem extends CollectibleItem.CustomCollectibleItem 
                         .build());
         addLayerAttributeModifier(Attributes.ATTACK_DAMAGE, 0.05, AttributeModifier.Operation.MULTIPLY_BASE);
         addLayerAttributeModifier(Attributes.ARMOR, 0.05, AttributeModifier.Operation.MULTIPLY_BASE);
-    }
-
-    @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-        Collectibles.getLayerData(player).setLayer(this, 0);
     }
 
     @Override

@@ -41,7 +41,7 @@ public class HandOfFlowingWaterItem extends CollectibleItem.CustomCollectibleIte
     }
 
     public static boolean isFlowing(Player player) {
-        return Collectibles.getData(player).isUsed(BabelCollectible.HAND_OF_FLOWING_WATER.get());
+        return Collectibles.isUsed(player, BabelCollectible.HAND_OF_FLOWING_WATER);
     }
 
     public static boolean isBowOrCrossbow(ItemStack stack) {

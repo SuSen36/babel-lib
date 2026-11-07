@@ -10,10 +10,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
+public class PresenceNecklaceItem extends CollectibleItem.CustomCollectibleItem {
 
-public class NecklaceOfPresenceItem extends CollectibleItem.CustomCollectibleItem {
-
-    public NecklaceOfPresenceItem() {
+    public PresenceNecklaceItem() {
         super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.NORMAL,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()

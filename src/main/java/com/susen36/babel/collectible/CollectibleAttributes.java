@@ -1,6 +1,7 @@
 package com.susen36.babel.collectible;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -19,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class CollectibleAttributes {
 
     // 范围修饰符对账记录：玩家 UUID -> (修饰符 ID -> 上轮命中实体)；修饰符均为 transient 不入档，卸载/死亡由存档特性兜底
-    private static final Map<UUID, Map<UUID, RangeHit>> RANGE_TRACKER = new HashMap<>();
+    private static final Map<UUID, Map<UUID, RangeHit>> RANGE_TRACKER = new ConcurrentHashMap<>();
 
     private record RangeHit(Attribute attribute, Set<UUID> entityIds) {
     }
@@ -41,7 +42,7 @@ public final class CollectibleAttributes {
                             AttributeModifier existing = instance.getModifier(identity.id());
                             if (stacks > 0) {
                                 double expected = bonus.perStack() * stacks;
-                                if (existing == null || existing.getAmount() != expected) {
+                                if (existing == null || !Mth.equal(existing.getAmount(), expected)) {
                                     if (existing != null) {
                                         instance.removeModifier(identity.id());
                                     }
@@ -63,7 +64,7 @@ public final class CollectibleAttributes {
      */
     public static void reconcileRange(Player player) {
         if (player.level() instanceof ServerLevel serverLevel) {
-            Map<UUID, RangeHit> tracked = RANGE_TRACKER.computeIfAbsent(player.getUUID(), id -> new HashMap<>());
+            Map<UUID, RangeHit> tracked = RANGE_TRACKER.computeIfAbsent(player.getUUID(), id -> new ConcurrentHashMap<>());
             var used = Collectibles.getData(player);
             Set<UUID> expected = new HashSet<>();
             for (RegistryObject<Item> entry : Collectibles.Collectibles.values()) {
@@ -74,7 +75,7 @@ public final class CollectibleAttributes {
                         UUID modifierId = identity.id();
                         expected.add(modifierId);
                         List<? extends LivingEntity> entities = serverLevel.getEntitiesOfClass(bonus.entityType(),
-                                new AABB(player.position(), player.position()).inflate(bonus.range()));
+                                new AABB(player.position(), player.position()).inflate(bonus.range()), LivingEntity::isAlive);
                         Set<UUID> hitIds = new HashSet<>();
                         for (LivingEntity living : entities) {
                             // 持有者自身与未通过归属过滤的实体不参与范围修饰符对账
@@ -85,7 +86,7 @@ public final class CollectibleAttributes {
                             if (instance != null) {
                                 hitIds.add(living.getUUID());
                                 AttributeModifier existing = instance.getModifier(modifierId);
-                                if (existing == null || existing.getAmount() != bonus.amount()) {
+                                if (existing == null || !Mth.equal(existing.getAmount(), bonus.amount())) {
                                     double oldMax = instance.getValue();
                                     instance.removeModifier(modifierId);
                                     instance.addTransientModifier(new AttributeModifier(
@@ -142,12 +143,13 @@ public final class CollectibleAttributes {
         }
     }
 
-    /** 生命上限被修饰符改变后，按比例同步当前生命 */
+    /** 生命上限被修饰符改变后，按比例同步当前生命；旧上限异常时按满血处理，避免除零产生 Infinity/NaN */
     private static void syncHealth(LivingEntity living, Attribute attribute, double oldMax) {
         AttributeInstance instance = living.getAttribute(Attributes.MAX_HEALTH);
-        if (attribute == Attributes.MAX_HEALTH && instance != null && instance.getValue() != oldMax) {
+        if (attribute == Attributes.MAX_HEALTH && instance != null && !Mth.equal(instance.getValue(), oldMax)) {
             double newMax = instance.getValue();
-            living.setHealth((float) Math.min(living.getHealth() * newMax / oldMax, newMax));
+            float ratio = oldMax > 0.0D ? (float) (living.getHealth() / oldMax) : 1.0F;
+            living.setHealth((float) newMax * Mth.clamp(ratio, 0.0F, 1.0F));
         }
     }
 

@@ -35,7 +35,7 @@ public class KettleItem extends CollectibleItem.CustomCollectibleItem {
 
     @Override
     public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-        LifePointUtils.setLifePoint(player, LifePointUtils.getLifePoint(player) + 1);
+        LifePointUtils.addLifePoint(player, 1);
         player.giveExperienceLevels(1);
     }
 

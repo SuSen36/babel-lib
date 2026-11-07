@@ -4,6 +4,7 @@ import com.susen36.babel.BabelMod;
 import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.capability.health.HealthCapability;
 import com.susen36.babel.network.BabelNetwork;
+import com.susen36.babel.robbery.RobberyCapability;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -90,6 +91,9 @@ public class BabelCapabilityEvents {
         Player player = event.getEntity();
         Player oldPlayer = event.getOriginal();
         oldPlayer.reviveCaps();
+        RobberyCapability oldRobbery = RobberyCapability.of(oldPlayer);
+        RobberyCapability robbery = RobberyCapability.of(player);
+        robbery.deserializeNBT(oldRobbery.serializeNBT());
         EPCapability oldEP = BabelCapability.getEP(oldPlayer);
         EPCapability ep = BabelCapability.getEP(player);
         if (oldEP != null && ep != null) {

@@ -15,8 +15,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 public class FristonPItem extends CollectibleItem.CustomCollectibleItem {
@@ -34,11 +32,6 @@ public class FristonPItem extends CollectibleItem.CustomCollectibleItem {
                         .showOverlay(true)
                         .build());
         addLayerAttributeModifier(Attributes.ATTACK_SPEED, ATTACK_SPEED_PER_LAYER, AttributeModifier.Operation.ADDITION);
-    }
-
-    @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-        Collectibles.getLayerData(player).setLayer(this, 0);
     }
 
     @Override

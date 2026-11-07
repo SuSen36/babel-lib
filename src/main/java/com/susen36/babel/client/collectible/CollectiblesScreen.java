@@ -4,6 +4,7 @@ import com.susen36.babel.BabelMod;
 import com.susen36.babel.client.gui.CannotScreen;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.menu.CannotMenu;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.PlainTextButton;
@@ -116,8 +117,8 @@ public class CollectiblesScreen extends Screen {
         if (hovered != -1) {
             String descriptionId = this.entries.get(hovered).getItem().getDescriptionId();
             String name = Component.translatable(descriptionId).getString();
-            String desc = Component.translatable(descriptionId + ".description_0").getString();
-            guiGraphics.renderTooltip(this.font, Component.literal(name + ": " + desc), mouseX, mouseY);
+            Component desc = Component.translatable(descriptionId + ".description_0").withStyle(ChatFormatting.AQUA);
+            guiGraphics.renderTooltip(this.font, Component.literal(name + ": ").append(desc), mouseX, mouseY);
         }
     }
 
@@ -176,7 +177,7 @@ public class CollectiblesScreen extends Screen {
             int bx = this.leftPos + SLOT_ORIGIN_X + within % COLS_PER_PAGE * SLOT_STEP;
             int by = this.topPos + SLOT_ORIGIN_Y + within / COLS_PER_PAGE * SLOT_STEP;
             if (mouseX >= bx && mouseX < bx + SLOT_SIZE && mouseY >= by && mouseY < by + SLOT_SIZE) {
-                this.minecraft.gameMode.handleInventoryButtonClick(this.lostAndFoundContainerId, CannotMenu.LOST_AND_FOUND_ID_BASE + i);
+                this.minecraft.gameMode.handleInventoryButtonClick(this.lostAndFoundContainerId, CannotMenu.LOST_AND_FOUND_ID + i);
                 this.returnToCannotScreen();
                 clicked = true;
             }

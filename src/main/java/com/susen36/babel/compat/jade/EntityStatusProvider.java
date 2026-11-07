@@ -13,10 +13,10 @@ import snownee.jade.api.IEntityComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
-public enum MissNumbProvider implements IEntityComponentProvider {
+public enum EntityStatusProvider implements IEntityComponentProvider {
     INSTANCE;
 
-    public static final ResourceLocation UID = new ResourceLocation(BabelMod.MODID, "miss_numb_provider");
+    public static final ResourceLocation UID = new ResourceLocation(BabelMod.MODID, "entity_status_provider");
 
     @Override
     public void appendTooltip(ITooltip tooltip, EntityAccessor accessor, IPluginConfig config) {
@@ -26,7 +26,7 @@ public enum MissNumbProvider implements IEntityComponentProvider {
             int magic = (int) getMagicMiss(living);
             int numb = (int) getNumb(living);
             if (physical > 0 || magic > 0 || numb > 0) {
-                tooltip.add(new MissNumbElement(physical, magic, numb));
+                tooltip.add(new EntityStatusElement(physical, magic, numb));
             }
         }
     }

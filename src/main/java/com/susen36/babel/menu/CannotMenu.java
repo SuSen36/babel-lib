@@ -29,8 +29,9 @@ import java.util.List;
 public class CannotMenu extends AbstractContainerMenu {
     public static final int PAYMENT_SLOT = 0;
     public static final int RESULT_SLOT = 1;
-    // 交换按钮 id 需与交易选择 id (0..offers.size-1) 隔离
-    public static final int LOST_AND_FOUND_ID_BASE = 1000;
+    public static final int LOST_AND_FOUND_ID = 1000;
+    public static final int ATTACK_BUTTON_ID = 2000;
+    private static final double ATTACK_REACH_SQR = 81.0D;
     private static final int RESULT_CONTAINER_SLOT = 2;
     private static final int INV_SLOT_START = 2;
     private static final int INV_SLOT_END = 29;
@@ -107,14 +108,27 @@ public class CannotMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(Player player, int id) {
         boolean result;
-        if (id >= LOST_AND_FOUND_ID_BASE) {
-            result = this.lostAndFoundExchange(player, id - LOST_AND_FOUND_ID_BASE);
+        if (id == ATTACK_BUTTON_ID) {
+            result = this.attackTrader(player);
+        } else if (id >= LOST_AND_FOUND_ID) {
+            result = this.lostAndFoundExchange(player, id - LOST_AND_FOUND_ID);
         } else {
             this.setSelectionHint(id);
             this.tryMoveItems(id);
             result = true;
         }
         return result;
+    }
+
+    // 服务端走玩家真实近战攻击路径（含攻速冷却、附魔、横扫），客户端不执行
+    private boolean attackTrader(Player player) {
+        boolean attacked = false;
+        if (!player.level().isClientSide() && this.traderEntity != null && this.traderEntity.isAlive()
+                && player.distanceToSqr(this.traderEntity) <= ATTACK_REACH_SQR) {
+            player.attack(this.traderEntity);
+            attacked = true;
+        }
+        return attacked;
     }
 
     // index 为已激活收藏品列表中的位置

@@ -1,10 +1,10 @@
 package com.susen36.babel.mixin;
 
+import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.effect.InvisibleMobEffect;
+import com.susen36.babel.init.BabelCollectible;
 import com.susen36.babel.init.BabelMobEffects;
-import com.susen36.babel.item.DreamingEssenceItem;
 import com.susen36.babel.item.HandOfFlowingWaterItem;
-import com.susen36.babel.item.VanillaSodaItem;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -30,6 +30,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class LivingEntityMixin {
     @Unique
     private double feeblenessUseTickRemainder;
+
+    @Shadow
+    protected int useItemRemaining;
+
+    @Shadow
+    protected abstract void completeUsingItem();
+
+    @Shadow
+    public abstract int getUseItemRemainingTicks();
+
+    @Shadow
+    protected abstract boolean shouldTriggerItemUseEffects();
+
+    @Shadow
+    protected abstract void triggerItemUseEffects(ItemStack stack, int count);
 
     @Inject(method = "startUsingItem", at = @At(value = "FIELD",
             target = "Lnet/minecraft/world/entity/LivingEntity;useItemRemaining:I", opcode = Opcodes.PUTFIELD,
@@ -85,10 +100,10 @@ public abstract class LivingEntityMixin {
                 && effect.getDuration() > 1) {
             // 多收藏品来源按乘法叠加，仅生成一次副本，避免污染调用方持有的实例导致时长连乘
             float multiplier = 1.0F;
-            if (DreamingEssenceItem.isUsed(player)) {
+            if (Collectibles.isUsed(player, BabelCollectible.DREAMING_ESSENCE)) {
                 multiplier *= 1.5F;
             }
-            if (VanillaSodaItem.isUsed(player)) {
+            if (Collectibles.isUsed(player, BabelCollectible.VANILLA_SODA)) {
                 multiplier *= 1.2F;
             }
             if (multiplier != 1.0F) {
@@ -108,19 +123,4 @@ public abstract class LivingEntityMixin {
             cir.setReturnValue(cir.getReturnValueD() * factor);
         }
     }
-
-    @Shadow
-    protected int useItemRemaining;
-
-    @Shadow
-    protected abstract void completeUsingItem();
-
-    @Shadow
-    public abstract int getUseItemRemainingTicks();
-
-    @Shadow
-    protected abstract boolean shouldTriggerItemUseEffects();
-
-    @Shadow
-    protected abstract void triggerItemUseEffects(ItemStack stack, int count);
 }

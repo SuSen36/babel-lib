@@ -3,11 +3,13 @@ package com.susen36.babel.capability;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.capability.health.HealthCapability;
+import com.susen36.babel.robbery.RobberyCapability;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -40,6 +42,7 @@ public class BabelCapability {
     private static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
         event.register(EPCapability.class);
         event.register(HealthCapability.class);
+        event.register(RobberyCapability.class);
     }
 
     @SubscribeEvent
@@ -48,6 +51,9 @@ public class BabelCapability {
             CapabilityProvider provider = new CapabilityProvider(living);
             event.addCapability(EP_CAP_ID, provider);
             event.addCapability(HEALTH_CAP_ID, provider);
+        }
+        if (event.getObject() instanceof Player) {
+            event.addCapability(RobberyCapability.KEY, new RobberyCapability());
         }
     }
 

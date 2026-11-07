@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
@@ -43,6 +44,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     private final CollectibleTiers tier;
     private final Levels levels;
     private final CollectibleActivation activation;
+    private static final double REPEAT_USE_DURATION_MULTIPLIER = 1.75D;
 
     public CollectibleItem(CollectibleEffect effect) {
         this(effect, 25, false, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
@@ -131,8 +133,8 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         for (int i = 0; ; i++) {
             String key = descKey + "_" + i;
             Component line = i == 0
-                    ? Component.translatable(key).withStyle(ChatFormatting.AQUA, ChatFormatting.ITALIC)
-                    : Component.translatable(key).withStyle(ChatFormatting.GRAY);
+                    ? Component.translatable(key).withStyle(ChatFormatting.AQUA)
+                    : Component.translatable(key).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
             if (line.getString().equals(key)) {
                 break;
             }
@@ -171,6 +173,9 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     ) {
         if (!player.isShiftKeyDown()) {
             player.startUsingItem(usedHand);
+            if (Collectibles.getData(player).isUsed(this)) {
+                player.useItemRemaining = Mth.ceil(this.useTicks * REPEAT_USE_DURATION_MULTIPLIER);
+            }
             return InteractionResultHolder.consume(player.getItemInHand(usedHand));
         } else {
             return onSneakUse(level, player, usedHand);
@@ -349,7 +354,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         protected static boolean matchesConfigured(Iterable<? extends String> rules, String name) {
             boolean matched = false;
             for (String rule : rules) {
-                if (rule != null && name != null && ("*".equals(rule) || name.equals(rule))) {
+                if (name != null && ("*".equals(rule) || name.equals(rule))) {
                     matched = true;
                 } else if (rule != null && name != null) {
                     int wildcardIndex = rule.indexOf('*');
@@ -631,6 +636,9 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         ) {
             if (!player.isShiftKeyDown()) {
                 player.startUsingItem(usedHand);
+                if (Collectibles.getData(player).isUsed(this)) {
+                    player.useItemRemaining = Mth.ceil(this.useTicks * REPEAT_USE_DURATION_MULTIPLIER);
+                }
                 return InteractionResultHolder.consume(player.getItemInHand(usedHand));
             } else {
                 return onSneakUse(level, player, usedHand);

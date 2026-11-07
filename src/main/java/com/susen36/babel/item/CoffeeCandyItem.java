@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
 
 public class CoffeeCandyItem extends CollectibleItem.CustomCollectibleItem {
 	public CoffeeCandyItem() {
-		super(new Item.Properties().stacksTo(64).food(new FoodProperties.Builder().nutrition(2).saturationMod(1f).build()), 30, false, CollectibleTiers.RARE, new CollectibleItem.Levels(0, 1, 0),
+		super(new Item.Properties().stacksTo(1).food(new FoodProperties.Builder().nutrition(2).saturationMod(1f).build()), 30, false, CollectibleTiers.RARE, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
 						.particle(ParticleTypes.HAPPY_VILLAGER, 72)

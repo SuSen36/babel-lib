@@ -26,6 +26,6 @@ public class ProofOfLongevityItem extends CollectibleItem.CustomCollectibleItem 
 
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-		LifePointUtils.setLifePoint(player, LifePointUtils.getLifePoint(player) + 6);
+		LifePointUtils.addLifePoint(player,  6);
 	}
 }

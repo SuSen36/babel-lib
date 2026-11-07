@@ -8,10 +8,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
+public class LeithanianHonorMedalItem extends CollectibleItem.CustomCollectibleItem {
 
-public class LeithanianMedalOfHonorItem extends CollectibleItem.CustomCollectibleItem {
-
-    public LeithanianMedalOfHonorItem() {
+    public LeithanianHonorMedalItem() {
         super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.RARE,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()

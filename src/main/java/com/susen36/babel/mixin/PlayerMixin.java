@@ -1,8 +1,9 @@
 package com.susen36.babel.mixin;
 
+import com.susen36.babel.collectible.Collectibles;
+import com.susen36.babel.init.BabelCollectible;
 import com.susen36.babel.init.BabelDamageTypes;
 import com.susen36.babel.init.BabelMobEffects;
-import com.susen36.babel.item.DreambindCastleModelItem;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
@@ -19,7 +20,7 @@ public abstract class PlayerMixin {
     private DamageSource dreambindRetag(DamageSources sources, Player attacker, Entity target) {
         if (target instanceof LivingEntity living
                 && living.hasEffect(BabelMobEffects.SLEEP.get())
-                && DreambindCastleModelItem.isUsed(attacker)) {
+                && Collectibles.isUsed(attacker, BabelCollectible.DREAMBIND_CASTLE_MODEL)) {
             return BabelDamageTypes.source(attacker.level(), BabelDamageTypes.DREAMBIND_STRIKE, attacker);
         }
         return sources.playerAttack(attacker);

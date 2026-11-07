@@ -107,6 +107,14 @@ public class Collectibles implements INBTSerializable<ListTag> {
         return CollectibleCapability.of(player).getCollectibles();
     }
 
+    public static boolean isUsed(@NotNull Player player, @NotNull RegistryObject<? extends Item> collectible) {
+        return getData(player).isUsed(collectible.get());
+    }
+
+    public static boolean isUsed(@NotNull Player player, @NotNull Item item) {
+        return getData(player).isUsed(item);
+    }
+
     public static @NotNull Collectibles.Layer getLayerData(@NotNull Player player) {
         return CollectibleCapability.of(player).getLayer();
     }
