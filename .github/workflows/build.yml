@@ -29,4 +29,3 @@ jobs:
         with:
           name: mod jars
           path: build/libs/
-          archive: false

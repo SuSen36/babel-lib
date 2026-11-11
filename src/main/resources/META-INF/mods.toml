@@ -9,11 +9,8 @@ version="${mod_version}"
 displayName="${mod_name}"
 authors="susen36"
 description='''
-Babel (巴别塔) — Arknight Common Library.
+Babel (巴别塔) — Arknights Common Library.
 '''
-
-[[mixins]]
-config="babel.mixins.json"
 
 [[dependencies.${mod_id}]]
     modId="forge"
