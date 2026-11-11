@@ -7,9 +7,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
 
 public class StandardRiotGearItem extends CollectibleItem.CustomCollectibleItem {
     /** 附加的法术伤害会再次触发 onDealDamage，用重入标记让它在第一层停住，不影响任何伤害类型的加成。 */
@@ -22,20 +20,18 @@ public class StandardRiotGearItem extends CollectibleItem.CustomCollectibleItem 
                         .particle(ParticleTypes.CLOUD, 72)
                         .showOverlay(true)
                         .build());
-    }
-
-    @Override
-    public void onDealDamage(LivingDamageEvent event, Player player, LivingEntity target, int layer) {
-        if (!event.isCanceled() && target instanceof Monster && target.isAlive() && EXTRA_DAMAGE_TARGET.get() != target) {
-            EXTRA_DAMAGE_TARGET.set(target);
-            int savedInvulnerable = target.invulnerableTime;
-            target.invulnerableTime = 0;
-            try {
-                target.hurt(target.level().damageSources().indirectMagic(player, player), event.getAmount() * 0.2F);
-            } finally {
-                EXTRA_DAMAGE_TARGET.remove();
-                target.invulnerableTime = Math.max(savedInvulnerable, target.invulnerableTime);
+        addDamageEffect(Monster.class, (event, player, target, layer) -> {
+            if (!event.isCanceled() && target.isAlive() && EXTRA_DAMAGE_TARGET.get() != target) {
+                EXTRA_DAMAGE_TARGET.set(target);
+                int savedInvulnerable = target.invulnerableTime;
+                target.invulnerableTime = 0;
+                try {
+                    target.hurt(target.level().damageSources().indirectMagic(player, player), event.getAmount() * 0.2F);
+                } finally {
+                    EXTRA_DAMAGE_TARGET.remove();
+                    target.invulnerableTime = Math.max(savedInvulnerable, target.invulnerableTime);
+                }
             }
-        }
+        });
     }
 }

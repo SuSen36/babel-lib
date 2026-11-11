@@ -46,7 +46,7 @@ public class HandOfEngraveItem extends CollectibleItem.CustomCollectibleItem {
     @Override
     public void onPlayerKill(LivingDeathEvent event, Player player, Entity victim, int layer) {
         if (layer >= 0 && layer < 99
-                && (victim instanceof Monster || victim instanceof Mob mob && mob.getTarget() == player)) {
+                && (victim instanceof Monster || (victim instanceof Mob mob && mob.getTarget() == player))) {
             ItemStack mainHandItem = player.getMainHandItem();
             boolean validWeapon = mainHandItem.is(Items.TRIDENT) || mainHandItem.is(FORGE_TRIDENTS) || mainHandItem.is(ItemTags.AXES) || event.getSource().is(DamageTypes.TRIDENT)
                     || matchesConfigured(BabelConfig.handEngraveRecognizable,

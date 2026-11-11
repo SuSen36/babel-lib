@@ -2,8 +2,8 @@ package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.entity.CannotEntity;
+import com.susen36.babel.entity.robbery.RobberyCapability;
 import com.susen36.babel.init.BabelEntities;
-import com.susen36.babel.robbery.RobberyCapability;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;

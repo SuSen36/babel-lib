@@ -55,7 +55,7 @@ public class HandOfSpeedItem extends CollectibleItem.CustomCollectibleItem {
             alone = true;
             for (LivingEntity nearby : player.level().getEntitiesOfClass(LivingEntity.class, area)) {
                 if (nearby != player && (nearby instanceof Player
-                        || nearby instanceof OwnableEntity ownable && ownable.getOwner() instanceof Player)) {
+                        || (nearby instanceof OwnableEntity ownable && ownable.getOwner() instanceof Player))) {
                     alone = false;
                     break;
                 }

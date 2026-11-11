@@ -106,8 +106,7 @@ public class CollectibleLootModifier extends LootModifier {
     }
 
     private static int weightOf(Item item) {
-        CollectibleTiers tier = item instanceof CollectibleLike collectible
-                ? collectible.getTier() : CollectibleTiers.NORMAL;
+        CollectibleTiers tier = item instanceof CollectibleLike collectible ? collectible.getTier() : CollectibleTiers.NORMAL;
         return switch (tier) {
             case CURSED -> 2;
             case RARE -> 4;

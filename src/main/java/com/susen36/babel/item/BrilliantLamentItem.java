@@ -6,11 +6,8 @@ import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.util.DataUtils;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
 
 public class BrilliantLamentItem extends CollectibleItem.CustomCollectibleItem {
 
@@ -22,17 +19,10 @@ public class BrilliantLamentItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)
                         .showOverlay(true)
                         .build());
-    }
-
-    //TODO 父类可以给一个方法来收集固定范围内的生物而不是每个收藏品都写一个
-    @Override
-    public void onDealDamage(LivingDamageEvent event, Player player, LivingEntity target, int layer) {
-        if (target instanceof Monster monster
-                && Math.abs(monster.getX() - player.getX()) <= MONSTER_RANGE
-                && Math.abs(monster.getY() - player.getY()) <= MONSTER_RANGE
-                && Math.abs(monster.getZ() - player.getZ()) <= MONSTER_RANGE
-                && DataUtils.isMagic(event.getSource())) {
-            event.setAmount(event.getAmount() * 1.4F);
-        }
+        addDamageEffect(Monster.class, MONSTER_RANGE, (event, player, monster, layer) -> {
+            if (DataUtils.isMagic(event.getSource())) {
+                event.setAmount(event.getAmount() * 1.4F);
+            }
+        });
     }
 }

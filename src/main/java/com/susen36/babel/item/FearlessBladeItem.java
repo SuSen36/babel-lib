@@ -17,7 +17,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
-//所有敌人/友军的范围可能需要统一
+
 public class FearlessBladeItem extends CollectibleItem.CustomCollectibleItem {
 
     private static final float TRIGGER_CHANCE = 0.05F;

@@ -71,10 +71,12 @@ public class CannotMenu extends AbstractContainerMenu {
         this.addSlot(new Slot(this.tradeContainer, PAYMENT_SLOT, PAYMENT_SLOT_X, SLOT_Y));
         this.addSlot(new MerchantResultSlot(playerInventory.player, trader, this.tradeContainer, RESULT_CONTAINER_SLOT, RESULT_SLOT_X, SLOT_Y));
         this.addDataSlot(new DataSlot() {
+            @Override
             public int get() {
                 return CannotMenu.this.traderEntity != null && CannotMenu.this.traderEntity.hasLostAndFound() ? 1 : 0;
             }
 
+            @Override
             public void set(int value) {
                 CannotMenu.this.hasLostAndFoundData = value;
             }
@@ -230,7 +232,7 @@ public class CannotMenu extends AbstractContainerMenu {
         if (!this.trader.isClientSide()) {
             ItemStack payment = this.tradeContainer.removeItemNoUpdate(PAYMENT_SLOT);
             if (!payment.isEmpty()) {
-                if (!player.isAlive() || player instanceof ServerPlayer serverPlayer && serverPlayer.hasDisconnected()) {
+                if (!player.isAlive() || (player instanceof ServerPlayer serverPlayer && serverPlayer.hasDisconnected())) {
                     player.drop(payment, false);
                 } else if (player instanceof ServerPlayer serverPlayer) {
                     serverPlayer.getInventory().placeItemBackInInventory(payment);

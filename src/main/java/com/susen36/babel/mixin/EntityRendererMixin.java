@@ -1,8 +1,10 @@
 package com.susen36.babel.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.susen36.babel.client.renderer.BarrierRenderer;
 import com.susen36.babel.client.renderer.FrozenIceRenderer;
 import com.susen36.babel.init.BabelMobEffects;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.world.entity.Entity;
@@ -22,6 +24,16 @@ public abstract class EntityRendererMixin {
     private void renderFrozenIce(Entity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight, CallbackInfo ci) {
         if (entity instanceof LivingEntity living && !living.isSpectator() && living.hasEffect(BabelMobEffects.FROZEN.get())) {
             FrozenIceRenderer.render(living, poseStack, buffer, packedLight);
+        }
+    }
+
+    @Inject(method = "render", at = @At("RETURN"))
+    private void renderBarrier(Entity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight, CallbackInfo ci) {
+        if (entity instanceof LivingEntity living && !living.isSpectator()) {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (entity != minecraft.getCameraEntity() || !minecraft.options.getCameraType().isFirstPerson()) {
+                BarrierRenderer.render(living, partialTicks, poseStack, buffer);
+            }
         }
     }
 }

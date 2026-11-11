@@ -19,11 +19,13 @@ public class CannotRenderer extends MobRenderer<CannotEntity, CannotModel> {
         super(context, new CannotModel(context.bakeLayer(CannotModel.LAYER_LOCATION)), 0.5F);
     }
 
+    @Override
     protected void scale(CannotEntity entity, PoseStack poseStack, float partialTickTime) {
         poseStack.scale(SCALE, SCALE, SCALE);
         super.scale(entity, poseStack, partialTickTime);
     }
 
+    @Override
     public ResourceLocation getTextureLocation(CannotEntity entity) {
         return TEXTURE_LOCATION;
     }

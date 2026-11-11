@@ -1,4 +1,4 @@
-package com.susen36.babel.robbery;
+package com.susen36.babel.entity.robbery;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Robbery {
-    public static final Robbery DEFAULT = new Robbery(4, 6, 5, 4, 10, 3, 300,
-            100, 8.0F, 2.0F,
+    // 懒加载：静态初始化若早于药水效果注册，RegistryObject.get() 会抛异常
+    public static Robbery defaultConfig() {
+        return new Robbery(4, 6, 5, 4, 10, 3, 300,
+            460, 8.0F, 2.0F,
             List.of(
                     new SpawnEntry(5, EntityType.VINDICATOR, null, 1),
                     new SpawnEntry(3, EntityType.PILLAGER, null, 1)
@@ -53,6 +55,7 @@ public class Robbery {
                             new SupportEffect(MobEffects.MOVEMENT_SPEED, 200, 4)
                     ))
             ), Component.translatable("event.babel.robbery.bossbar"));
+    }
 
     private final int spawnRange;
     private final int mobsPerWave;
@@ -144,7 +147,7 @@ public class Robbery {
         int mobsPerWave = GsonHelper.getAsInt(json, "mobs_per_wave", 6);
         int waveCount = GsonHelper.getAsInt(json, "wave_count", 5);
         int waveIntervalTicks = GsonHelper.getAsInt(json, "wave_interval_ticks", 300);
-        int supportIntervalTicks = GsonHelper.getAsInt(json, "support_interval_ticks", 100);
+        int supportIntervalTicks = GsonHelper.getAsInt(json, "support_interval_ticks", 460);
         int simultaneousMobs = GsonHelper.getAsInt(json, "simultaneous_mobs", 4);
         int ticksBetweenSpawn = GsonHelper.getAsInt(json, "ticks_between_spawn", 10);
         int initialSpawnCount = GsonHelper.getAsInt(json, "initial_spawn_count", 3);

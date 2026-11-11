@@ -140,7 +140,7 @@ public class VampireBedBlock extends Block {
         final Vec3 center = new Vec3(x, y, z);
         List<Entity> entfound = world.getEntitiesOfClass(Entity.class, new AABB(center, center).inflate(64 / 2d), e -> true).stream().sorted(Comparator.comparingDouble(entcnd -> entcnd.distanceToSqr(center))).toList();
         for (Entity entityiterator : entfound) {
-            if ((entityiterator instanceof Bat || entityiterator instanceof LivingEntity livEnt1 && livEnt1.getMobType() == MobType.UNDEAD)
+            if ((entityiterator instanceof Bat || (entityiterator instanceof LivingEntity livEnt1 && livEnt1.getMobType() == MobType.UNDEAD))
                     && new Vec3((double) x + 0.5, (double) y + 1, (double) z + 0.5).distanceTo(new Vec3(entityiterator.getX(), entityiterator.getY(), entityiterator.getZ())) > 1) {
                 if (Math.random() < 0.2) {
                     if (entityiterator instanceof Mob mob)

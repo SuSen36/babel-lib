@@ -84,6 +84,7 @@ public class CannotModel extends HierarchicalModel<CannotEntity> {
         return LayerDefinition.create(meshdefinition, 192, 192);
     }
 
+    @Override
     public void setupAnim(CannotEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
         this.animate(entity.idleAnimationState, CannotAnimations.IDLE, ageInTicks);
@@ -91,6 +92,7 @@ public class CannotModel extends HierarchicalModel<CannotEntity> {
         this.animateWalk(CannotAnimations.MOVE, limbSwing, limbSwingAmount, 4.5F, 2.5F);
     }
 
+    @Override
     public ModelPart root() {
         return this.root;
     }

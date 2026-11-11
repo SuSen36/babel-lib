@@ -38,13 +38,10 @@ public class RockHornItem extends CollectibleItem.CustomCollectibleItem {
                         .showOverlay(true)
                         .build());
         addRangeEffect(LivingEntity.class, ALLY_RANGE, (nearby, player, layer) -> {
-            boolean ally = nearby instanceof Player || nearby instanceof OwnableEntity ownable && ownable.getOwner() == player;
-            if (ally) {
-                Scan scan = NEARBY_SCANS.get(player);
-                int count = scan != null && scan.tick() == player.tickCount ? scan.count() : 0;
-                NEARBY_SCANS.put(player, new Scan(player.tickCount, count + 1));
-            }
-        });
+            Scan scan = NEARBY_SCANS.get(player);
+            int count = scan != null && scan.tick() == player.tickCount ? scan.count() : 0;
+            NEARBY_SCANS.put(player, new Scan(player.tickCount, count + 1));
+        }, (nearby, player) -> nearby instanceof Player || (nearby instanceof OwnableEntity ownable && ownable.getOwner() == player));
         addConditionalAttributeModifier(Attributes.ATTACK_DAMAGE, 0.2, AttributeModifier.Operation.MULTIPLY_BASE,
                 (player, self) -> nearbyAllyStacks(player));
     }

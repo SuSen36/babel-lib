@@ -2,26 +2,20 @@ package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.api.event.ElementEvent;
-import com.susen36.babel.api.event.ResistDamageEvent;
 import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.ep.EPCapability;
-import com.susen36.babel.effect.PalsyMobEffect;
 import com.susen36.babel.elemental.FrenzyInjury;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
-import com.susen36.babel.init.*;
-import com.susen36.babel.manager.EPManager;
-import com.susen36.babel.util.DataUtils;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
+import com.susen36.babel.elemental.base.EPManager;
+import com.susen36.babel.init.BabelDamageTypes;
+import com.susen36.babel.init.BabelMobEffects;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -82,70 +76,6 @@ public class EPEvents {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onLivingDamagePreHigh(LivingDamageEvent event) {
-        LivingEntity entity = event.getEntity();
-        DamageSource source = event.getSource();
-        if (DataUtils.isNotReal(source)) {
-            float originalAmount = event.getAmount();
-            float amount = originalAmount;
-            if (DataUtils.isMagic(source)) {
-                AttributeInstance magic = entity.getAttribute(BabelAttributes.MAGIC_RESISTANCE.get());
-                if (magic != null) {
-                    double v = magic.getValue();
-                    v = ResistDamageEvent.modifyEffectiveResistanceValue(entity, source, amount, v);
-                    if (v > 0) {
-                        amount *= (float) ((100.0 - Mth.clamp(v, 0.0, 100.0)) * 0.01);
-                    }
-                }
-            } else if (DataUtils.isPhysical(source)) {
-                AttributeInstance defense = entity.getAttribute(BabelAttributes.DEFENSE.get());
-                if (defense != null) {
-                    double v = defense.getValue();
-                    v = ResistDamageEvent.modifyEffectiveDefenseValue(entity, source, amount, v);
-                    if (v > 0) {
-                        amount -= (float) v;
-                    }
-                }
-            }
-            amount = Math.max(originalAmount * 0.05F, amount);
-            if (amount < originalAmount) {
-                event.setAmount(amount);
-            }
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW)
-    public static void handleBarrierFunc(LivingDamageEvent event) {
-        DamageSource source = event.getSource();
-        LivingEntity entity = event.getEntity();
-        if (!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !source.is(DamageTypeTags.BYPASSES_EFFECTS)) {
-            AttributeInstance instance = entity.getAttribute(BabelAttributes.BARRIER.get());
-            if (instance != null) {
-                float amount = event.getAmount();
-                double brr = instance.getValue();
-                if (brr > 0.0) {
-                    double disp;
-                    if (brr >= amount) {
-                        instance.setBaseValue(brr - amount);
-                        disp = amount;
-                        event.setAmount(0.0F);
-                    } else {
-                        instance.setBaseValue(0.0);
-                        disp = brr;
-                        event.setAmount(amount - (float) brr);
-                    }
-                    entity.level().playSound(null, entity.blockPosition(), BabelSounds.BARRIER.get(),
-                            SoundSource.HOSTILE, 2.0F, (float) Mth.nextDouble(RandomSource.create(), 0.9, 1.1));
-                    if (entity.level() instanceof ServerLevel level) {
-                        level.sendParticles(BabelParticles.BARRIER_SHOW.get(), entity.getX(), entity.getY() + 0.75, entity.getZ(),
-                                (int) Math.min(disp * 0.5, 24), 0.75, 0.75, 0.75, 0.1);
-                    }
-                }
-            }
-        }
-    }
-
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public static void handleElementalAttackDamage(LivingDamageEvent event) {
         LivingEntity target = event.getEntity();
@@ -195,17 +125,6 @@ public class EPEvents {
             if (necrosis != null && necrosis.underBurst()) {
                 event.setAmount(damage * 1.1F);
             }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onPalsyingCancel(LivingHurtEvent event) {
-        LivingEntity target = event.getEntity();
-        if (!event.isCanceled() && !target.level().isClientSide()
-                && event.getSource().getEntity() instanceof LivingEntity attacker
-                && attacker.hasEffect(BabelMobEffects.PALSY.get())) {
-            PalsyMobEffect.onAttackBlocked(attacker, target);
-            event.setCanceled(true);
         }
     }
 

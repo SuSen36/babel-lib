@@ -32,7 +32,7 @@ public abstract class LivingEntityMixin {
     private double feeblenessUseTickRemainder;
 
     @Shadow
-    protected int useItemRemaining;
+    public int useItemRemaining;
 
     @Shadow
     protected abstract void completeUsingItem();

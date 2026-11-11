@@ -206,7 +206,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
     }
 
-    public @NotNull HashSet<Item> getUsed() {
+    public @NotNull Set<Item> getUsed() {
         var used = new HashSet<Item>();
         for (var entry : states.entrySet()) {
             if (entry.getValue().used) {

@@ -1,8 +1,7 @@
 package com.susen36.babel.util;
 
-import com.susen36.babel.manager.EPManager;
-import com.susen36.babel.api.event.ElementEvent;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
+import com.susen36.babel.elemental.base.EPManager;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;

@@ -40,8 +40,7 @@ public class HandOfSwipeItem extends CollectibleItem.CustomCollectibleItem {
         if (player.getOffhandItem().is(Items.BRUSH) || player.hasEffect(MobEffects.REGENERATION)) {
             Level level = player.level();
             Vec3 center = new Vec3(player.getX(), player.getY(), player.getZ());
-            List<Monster> monsters = level.getEntitiesOfClass(Monster.class,
-                    new AABB(center, center).inflate(8), entity -> true);
+            List<Monster> monsters = level.getEntitiesOfClass(Monster.class, new AABB(center, center).inflate(8), entity -> true);
             for (Monster monster : monsters) {
                 if (player.distanceToSqr(monster) < 64) {
                     MobEffectInstance regen = player.getEffect(MobEffects.REGENERATION);

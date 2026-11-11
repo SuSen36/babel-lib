@@ -6,11 +6,8 @@ import com.susen36.babel.collectible.CollectibleTiers;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
 
 public class BlazeChainsawItem extends CollectibleItem.CustomCollectibleItem {
     /** 加成衰减到 +0% 的距离。 */
@@ -23,13 +20,9 @@ public class BlazeChainsawItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)
                         .showOverlay(true)
                         .build());
-    }
-
-    @Override
-    public void onDealDamage(LivingDamageEvent event, Player player, LivingEntity target, int layer) {
-        if (target instanceof Monster) {
+        addDamageEffect(Monster.class, (event, player, target, layer) -> {
             float bonus = Mth.clamp(1.0F - target.distanceTo(player) / MAX_RANGE, 0.0F, 1.0F);
             event.setAmount(event.getAmount() * (1.0F + bonus));
-        }
+        });
     }
 }

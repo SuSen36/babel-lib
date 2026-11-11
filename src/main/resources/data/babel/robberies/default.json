@@ -6,7 +6,7 @@
   "ticks_between_spawn": 10,
   "initial_spawn_count": 3,
   "wave_interval_ticks": 225,
-  "support_interval_ticks": 100,
+  "support_interval_ticks": 460,
   "support_radius": 8.0,
   "support_heal_per_pulse": 2.0,
   "boss_bar_name": {

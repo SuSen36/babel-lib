@@ -50,6 +50,8 @@ public class LifePointEvents {
                     }
                     health.sync();
                     LifePointConsumeEvent.firePost(player, event.getSource(), type, 1F);
+                } else if (!LifePointConsumeEvent.firePost(player, event.getSource(), LifePointConsumeEvent.Type.FAIL, 0F)) {
+                    event.setCanceled(true);
                 }
             }
         }

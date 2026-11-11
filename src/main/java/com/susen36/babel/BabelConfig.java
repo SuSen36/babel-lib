@@ -85,6 +85,10 @@ public class BabelConfig {
             .comment("两段式寒冷转化：首次冻结伤害仅标记寒冷（原版冻结计时），寒冷期间再次受到冻结伤害时转为冰冻药水效果，时长取寒冷剩余时间。关闭后冻结伤害保持原版行为")
             .define("cold_to_frozen", true);
 
+    public static final ForgeConfigSpec.LongValue ROBBERY_RESTRICTION_DURATION_TICKS = BUILDER
+            .comment("触发坎诺特劫掠后的限制时长，期间坎诺特不再理睬该玩家")
+            .defineInRange("robbery_restriction_duration_ticks", 108000L, 0L, Long.MAX_VALUE);
+
     static final ForgeConfigSpec SPEC = BUILDER.build();
     public static boolean epBarStyle;
     public static boolean banAdvancedCollectibles;
@@ -106,6 +110,7 @@ public class BabelConfig {
     public static List<? extends String> royalAllianceTreatyRecognizable;
     public static boolean witherElementalDamage;
     public static boolean coldToFrozen;
+    public static long robberyRestrictionDurationTicks;
 
     @SubscribeEvent
     public static void onLoad(final ModConfigEvent.Loading event) {
@@ -128,6 +133,7 @@ public class BabelConfig {
         royalAllianceTreatyRecognizable = ROYAL_ALLIANCE_TREATY_RECOGNIZABLE.get();
         witherElementalDamage = WITHER_ELEMENTAL_DAMAGE.get();
         coldToFrozen = COLD_TO_FROZEN.get();
+        robberyRestrictionDurationTicks = ROBBERY_RESTRICTION_DURATION_TICKS.get();
     }
 
     public static void onReloading(final ModConfigEvent.Reloading event) {
@@ -150,5 +156,6 @@ public class BabelConfig {
         royalAllianceTreatyRecognizable = ROYAL_ALLIANCE_TREATY_RECOGNIZABLE.get();
         witherElementalDamage = WITHER_ELEMENTAL_DAMAGE.get();
         coldToFrozen = COLD_TO_FROZEN.get();
+        robberyRestrictionDurationTicks = ROBBERY_RESTRICTION_DURATION_TICKS.get();
     }
 }

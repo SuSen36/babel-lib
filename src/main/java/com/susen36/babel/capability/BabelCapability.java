@@ -3,7 +3,7 @@ package com.susen36.babel.capability;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.capability.health.HealthCapability;
-import com.susen36.babel.robbery.RobberyCapability;
+import com.susen36.babel.entity.robbery.RobberyCapability;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;

@@ -24,7 +24,6 @@ public class BabelParticles {
     public static final RegistryObject<SimpleParticleType> MISS_MAGIC = REGISTRY.register("miss_magic", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> LIFELOSS = REGISTRY.register("lifeloss", () -> new SimpleParticleType(true));
     public static final RegistryObject<SimpleParticleType> SHIELDLOSS = REGISTRY.register("shieldloss", () -> new SimpleParticleType(false));
-    public static final RegistryObject<SimpleParticleType> BARRIER_SHOW = REGISTRY.register("barrier_show", () -> new SimpleParticleType(false));
 
     private BabelParticles() {
         throw new UnsupportedOperationException("Utility class");
@@ -43,7 +42,6 @@ public class BabelParticles {
             event.registerSpriteSet(BabelParticles.MISS_MAGIC.get(), MissParticle::provider);
             event.registerSpriteSet(BabelParticles.LIFELOSS.get(), LifelossParticle::provider);
             event.registerSpriteSet(BabelParticles.SHIELDLOSS.get(), ShieldlossParticle::provider);
-            event.registerSpriteSet(BabelParticles.BARRIER_SHOW.get(), BarrierShowParticle::provider);
         }
     }
 }

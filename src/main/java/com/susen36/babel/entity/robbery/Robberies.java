@@ -1,4 +1,4 @@
-package com.susen36.babel.robbery;
+package com.susen36.babel.entity.robbery;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -42,7 +42,11 @@ public class Robberies extends SimpleJsonResourceReloadListener {
     }
 
     public static Robbery get(ResourceLocation id) {
-        return CONFIGS.getOrDefault(id, Robbery.DEFAULT);
+        Robbery config = CONFIGS.get(id);
+        if (config == null) {
+            config = Robbery.defaultConfig();
+        }
+        return config;
     }
 
     @Nullable

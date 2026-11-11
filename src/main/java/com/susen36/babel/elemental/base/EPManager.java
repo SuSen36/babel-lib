@@ -1,4 +1,4 @@
-package com.susen36.babel.manager;
+package com.susen36.babel.elemental.base;
 
 import com.susen36.babel.api.entity.ElementalAttackModifier;
 import com.susen36.babel.api.entity.ElementalAttacker;
@@ -7,8 +7,6 @@ import com.susen36.babel.api.entity.ElementalDefenseModifier;
 import com.susen36.babel.api.event.ElementEvent;
 import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.ep.EPCapability;
-import com.susen36.babel.elemental.base.AbstractEPCapability;
-import com.susen36.babel.elemental.base.ElementalInjurySource;
 import com.susen36.babel.init.BabelAttributes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -47,23 +45,22 @@ public class EPManager {
             rate = attacker.getElementalRate();
             injuryDamage = attacker.getElementalInjuryDamage(entity);
         }
-        if (attackerEntity == null) {
-            return new ElementalAttackConfig(type, rate, injuryDamage);
-        }
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            ItemStack stack = attackerEntity.getItemBySlot(slot);
-            if (stack.getItem() instanceof ElementalAttacker attacker) {
-                rate += attacker.getElementalRate();
-                injuryDamage += attacker.getElementalInjuryDamage();
-                if (!(attackerEntity instanceof ElementalAttacker)) {
-                    type = attacker.getElementalType();
+        if (attackerEntity != null) {
+            for (EquipmentSlot slot : EquipmentSlot.values()) {
+                ItemStack stack = attackerEntity.getItemBySlot(slot);
+                if (stack.getItem() instanceof ElementalAttacker attacker) {
+                    rate += attacker.getElementalRate();
+                    injuryDamage += attacker.getElementalInjuryDamage();
+                    if (!(attackerEntity instanceof ElementalAttacker)) {
+                        type = attacker.getElementalType();
+                    }
                 }
             }
-        }
-        for (MobEffectInstance effect : attackerEntity.getActiveEffects()) {
-            if (effect.getEffect() instanceof ElementalAttackModifier modifier) {
-                rate = modifier.modifyElementalRate(attackerEntity, rate, effect.getAmplifier());
-                injuryDamage += modifier.getElementalInjuryDamage(attackerEntity, effect.getAmplifier());
+            for (MobEffectInstance effect : attackerEntity.getActiveEffects()) {
+                if (effect.getEffect() instanceof ElementalAttackModifier modifier) {
+                    rate = modifier.modifyElementalRate(attackerEntity, rate, effect.getAmplifier());
+                    injuryDamage += modifier.getElementalInjuryDamage(attackerEntity, effect.getAmplifier());
+                }
             }
         }
         return new ElementalAttackConfig(type, rate, injuryDamage);
@@ -73,12 +70,10 @@ public class EPManager {
     }
 
     public static void setElementalDefenseBaseModifier(LivingEntity entity, double modifier) {
-        if (entity != null) {
-            if (entity instanceof ElementalDefender defender) {
-                defender.setElementalDefenseBaseModifier(modifier);
-            } else {
-                ELEMENTAL_DEFENSE_BASE_MODIFIERS.put(entity, modifier);
-            }
+        if (entity instanceof ElementalDefender defender) {
+            defender.setElementalDefenseBaseModifier(modifier);
+        } else if (entity != null) {
+            ELEMENTAL_DEFENSE_BASE_MODIFIERS.put(entity, modifier);
         }
     }
 
@@ -105,9 +100,12 @@ public class EPManager {
     }
 
     public static boolean hurtElemental(LivingEntity target, AbstractEPCapability.EPType type, int amount) {
-        if (target == null || type.isEmpty() || amount <= 0) return false;
-        EPCapability ep = getEP(target);
-        return ep != null && ep.hurt(type, amount);
+        boolean hurt = false;
+        if (target != null && !type.isEmpty() && amount > 0) {
+            EPCapability ep = getEP(target);
+            hurt = ep != null && ep.hurt(type, amount);
+        }
+        return hurt;
     }
 
     public static boolean hurtElemental(LivingEntity target, AbstractEPCapability.EPType type, @Nullable LivingEntity attacker, int amount) {
@@ -115,99 +113,131 @@ public class EPManager {
     }
 
     public static boolean hurtElemental(LivingEntity target, AbstractEPCapability.EPType type, @Nullable LivingEntity attacker, int amount, ElementEvent.HurtType hurtType) {
-        if (target == null || type.isEmpty() || amount <= 0) return false;
-        ElementalInjurySource<?> source = attacker != null
-                ? ElementalInjurySource.from(attacker, null)
-                : ElementalInjurySource.fromNothing();
-        EPCapability ep = getEP(target);
-        return ep != null && ep.hurt(type, source, amount, hurtType, attacker);
+        boolean hurt = false;
+        if (target != null && !type.isEmpty() && amount > 0) {
+            ElementalInjurySource<?> source = attacker != null
+                    ? ElementalInjurySource.from(attacker, null)
+                    : ElementalInjurySource.fromNothing();
+            EPCapability ep = getEP(target);
+            hurt = ep != null && ep.hurt(type, source, amount, hurtType, attacker);
+        }
+        return hurt;
     }
 
     public static void healElemental(LivingEntity target, AbstractEPCapability.EPType type, int amount) {
-        if (target == null || type.isEmpty() || amount <= 0) return;
-        EPCapability ep = getEP(target);
-        if (ep != null) ep.heal(type, amount);
+        if (target != null && !type.isEmpty() && amount > 0) {
+            EPCapability ep = getEP(target);
+            if (ep != null) {
+                ep.heal(type, amount);
+            }
+        }
     }
 
     public static void healToFull(LivingEntity entity, AbstractEPCapability.EPType type) {
-        if (entity == null || type.isEmpty()) return;
-        EPCapability ep = getEP(entity);
-        if (ep == null) return;
-        AbstractEPCapability cap = ep.getEP(type);
-        if (cap == null) return;
-        float threshold = BabelAttributes.getMaxElementalValue(entity);
-        if (threshold <= 0.0F) return;
-        cap.heal(Mth.floor(threshold));
+        if (entity != null && !type.isEmpty()) {
+            EPCapability ep = getEP(entity);
+            AbstractEPCapability cap = ep != null ? ep.getEP(type) : null;
+            float threshold = BabelAttributes.getMaxElementalValue(entity);
+            if (cap != null && threshold > 0.0F) {
+                cap.heal(Mth.floor(threshold));
+            }
+        }
     }
 
     public static float getRemainProgress(LivingEntity entity, AbstractEPCapability.EPType type) {
-        if (entity == null || type.isEmpty()) return 1.0F;
-        EPCapability ep = getEP(entity);
-        if (ep == null) return 1.0F;
-        AbstractEPCapability cap = ep.getEP(type);
-        return cap == null ? 1.0F : (float) cap.getInjuryProgress();
+        float progress = 1.0F;
+        if (entity != null && !type.isEmpty()) {
+            EPCapability ep = getEP(entity);
+            AbstractEPCapability cap = ep != null ? ep.getEP(type) : null;
+            progress = cap == null ? 1.0F : (float) cap.getInjuryProgress();
+        }
+        return progress;
     }
 
     public static int getValue(LivingEntity entity, AbstractEPCapability.EPType type) {
-        if (entity == null || type.isEmpty()) return 0;
-        EPCapability ep = getEP(entity);
-        if (ep == null) return 0;
-        AbstractEPCapability cap = ep.getEP(type);
-        return cap == null ? 0 : cap.getValue();
+        int value = 0;
+        if (entity != null && !type.isEmpty()) {
+            EPCapability ep = getEP(entity);
+            AbstractEPCapability cap = ep != null ? ep.getEP(type) : null;
+            value = cap == null ? 0 : cap.getValue();
+        }
+        return value;
     }
 
     public static float getMaxValue(LivingEntity entity, AbstractEPCapability.EPType type) {
-        if (entity == null || type.isEmpty()) return 0.0F;
-        return BabelAttributes.getMaxElementalValue(entity);
+        float maxValue = 0.0F;
+        if (entity != null && !type.isEmpty()) {
+            maxValue = BabelAttributes.getMaxElementalValue(entity);
+        }
+        return maxValue;
     }
 
     public static boolean underBurst(LivingEntity entity, AbstractEPCapability.EPType type) {
-        if (entity == null || type.isEmpty()) return false;
-        EPCapability ep = getEP(entity);
-        if (ep == null) return false;
-        AbstractEPCapability cap = ep.getEP(type);
-        return cap != null && cap.underBurst();
+        boolean underBurst = false;
+        if (entity != null && !type.isEmpty()) {
+            EPCapability ep = getEP(entity);
+            AbstractEPCapability cap = ep != null ? ep.getEP(type) : null;
+            underBurst = cap != null && cap.underBurst();
+        }
+        return underBurst;
     }
 
     public static boolean isUnderBreak(LivingEntity entity) {
-        if (entity == null) return false;
-        EPCapability ep = getEP(entity);
-        return ep != null && ep.isUnderBreak();
+        boolean underBreak = false;
+        if (entity != null) {
+            EPCapability ep = getEP(entity);
+            underBreak = ep != null && ep.isUnderBreak();
+        }
+        return underBreak;
     }
 
     public static boolean isImmune(LivingEntity entity, AbstractEPCapability.EPType type) {
-        if (entity == null || type.isEmpty()) return false;
-        EPCapability ep = getEP(entity);
-        if (ep == null) return false;
-        AbstractEPCapability cap = ep.getEP(type);
-        return cap != null && cap.isImmune(ElementalInjurySource.fromNothing());
+        boolean immune = false;
+        if (entity != null && !type.isEmpty()) {
+            EPCapability ep = getEP(entity);
+            AbstractEPCapability cap = ep != null ? ep.getEP(type) : null;
+            immune = cap != null && cap.isImmune(ElementalInjurySource.fromNothing());
+        }
+        return immune;
     }
 
     public static void setImmune(LivingEntity entity, AbstractEPCapability.EPType type, int ticks) {
-        if (entity == null || type.isEmpty() || ticks < 0) return;
-        EPCapability ep = getEP(entity);
-        if (ep == null) return;
-        AbstractEPCapability cap = ep.getEP(type);
-        if (cap != null) cap.setImmune(ticks);
+        if (entity != null && !type.isEmpty() && ticks >= 0) {
+            EPCapability ep = getEP(entity);
+            if (ep != null) {
+                AbstractEPCapability cap = ep.getEP(type);
+                if (cap != null) {
+                    cap.setImmune(ticks);
+                }
+            }
+        }
     }
 
     public static void setAllImmune(LivingEntity entity, int ticks) {
-        if (entity == null || ticks < 0) return;
-        EPCapability ep = getEP(entity);
-        if (ep == null) return;
-        for (AbstractEPCapability.EPType type : AbstractEPCapability.EPType.values()) {
-            if (!type.isEmpty()) {
-                AbstractEPCapability cap = ep.getEP(type);
-                if (cap != null) cap.setImmune(ticks);
+        if (entity != null && ticks >= 0) {
+            EPCapability ep = getEP(entity);
+            if (ep != null) {
+                for (AbstractEPCapability.EPType type : AbstractEPCapability.EPType.values()) {
+                    if (!type.isEmpty()) {
+                        AbstractEPCapability cap = ep.getEP(type);
+                        if (cap != null) {
+                            cap.setImmune(ticks);
+                        }
+                    }
+                }
             }
         }
     }
 
     public static void setPermanentImmunity(LivingEntity entity, AbstractEPCapability.EPType type) {
-        if (entity == null || type.isEmpty()) return;
-        EPCapability ep = getEP(entity);
-        if (ep == null) return;
-        AbstractEPCapability cap = ep.getEP(type);
-        if (cap != null) cap.setPermanentImmunity();
+        if (entity != null && !type.isEmpty()) {
+            EPCapability ep = getEP(entity);
+            if (ep != null) {
+                AbstractEPCapability cap = ep.getEP(type);
+                if (cap != null) {
+                    cap.setPermanentImmunity();
+                }
+            }
+        }
     }
 }

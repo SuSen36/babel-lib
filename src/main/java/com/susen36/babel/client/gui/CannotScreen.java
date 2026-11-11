@@ -131,7 +131,7 @@ public class CannotScreen extends AbstractContainerScreen<CannotMenu> {
             int i1 = 0;
 
             for (MerchantOffer merchantoffer : merchantoffers) {
-                if (!this.canScroll(merchantoffers.size()) || i1 >= this.scrollOff && i1 < NUMBER_OF_OFFER_BUTTONS + this.scrollOff) {
+                if (!this.canScroll(merchantoffers.size()) || (i1 >= this.scrollOff && i1 < NUMBER_OF_OFFER_BUTTONS + this.scrollOff)) {
                     ItemStack itemstack = merchantoffer.getBaseCostA();
                     ItemStack itemstack1 = merchantoffer.getCostA();
                     ItemStack itemstack2 = merchantoffer.getCostB();

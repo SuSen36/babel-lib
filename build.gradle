@@ -112,6 +112,12 @@ dependencies {
     errorprone "com.google.errorprone:error_prone_core:${errorprone_version}"
     errorprone "com.uber.nullaway:nullaway:${nullaway_version}"
 
+    // MixinExtras
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.6"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.3.6")) {
+        jarJar.ranged(it, "[0.3.0,)")
+    }
+
     // JEI相关
     // compile against the JEI API but do not include it at runtime
     compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"))
@@ -184,28 +190,28 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.errorprone {
         check('NullAway', net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
+
         errorproneArgs.add('-XepOpt:NullAway:AnnotatedPackages=com.susen36.babel')
         // ErrorProne 2.36.0 ParameterName 检查器存在 subSequence 越界崩溃，禁用
         errorproneArgs.add('-Xep:ParameterName:OFF')
-        // 以下检查对 MC/Mixin 结构系统性误报：Mixin 注入方法必然无调用方、实体比较必须用引用相等、
+        // 仅保留 Mixin/Forge 框架必然触发的误报
         errorproneArgs.addAll([
-                '-Xep:UnusedMethod:OFF',
-                '-Xep:UnusedVariable:OFF',
-                '-Xep:ReferenceEquality:OFF',
-                '-Xep:UnnecessaryParentheses:OFF',
-                '-Xep:OperatorPrecedence:OFF',
-                '-Xep:MissingOverride:OFF',
-                '-Xep:NonApiType:OFF',
-                '-Xep:ProtectedMembersInFinalClass:OFF',
-                '-Xep:ImmutableEnumChecker:OFF',
-                '-Xep:FutureReturnValueIgnored:OFF'
+                '-Xep:ReferenceEquality:OFF',        // 实体比较必须用引用相等，equals 会被实体 ID 重写干扰
+                '-Xep:UnusedMethod:OFF',             // @Inject / @WrapOperation 等注入方法无 Java 调用方
+                '-Xep:UnusedVariable:OFF',           // @Shadow 字段 / Mixin 暂存字段无直接读写
+                '-Xep:FutureReturnValueIgnored:OFF', // Forge 事件总线 / 网络层大量丢弃 Future
+                '-Xep:InlineMeSuggester:OFF',        // Minecraft 大量使用 @Deprecated，替换建议不适用
+                '-Xep:ThreadJoinLoop:OFF',           // ErrorProne 2.36.0 扫描特定代码时 AST 节点越界崩溃
+                '-Xep:ImmutableEnumChecker:OFF'      // 枚举持有 Factory 避免冗长 switch 的设计模式误报
         ])
-        // 注册类静态字段（DeferredRegister/配置模式）由框架在类加载后赋值，非真实空指针风险，暂排除后续分批处理
+        // @Shadow 字段由 Mixin 在运行时注入，NullAway 无法追踪其赋值
+        errorproneArgs.add('-XepOpt:NullAway:ExcludedFieldAnnotations=org.spongepowered.asm.mixin.Shadow')
+        // 注册类静态字段由 Forge 在类加载后赋值，非真实空指针风险
         errorproneArgs.add('-XepOpt:NullAway:ExcludedClasses=com.susen36.babel.init.BabelCollectible,com.susen36.babel.BabelConfig')
     }
-    // ErrorProne 不支持 Gradle 增量编译默认的 ifError=INIT 停止策略
     options.compilerArgs.add('-XDshould-stop.ifError=FLOW')
 }
+
 tasks.withType(ProcessResources).configureEach {
     filteringCharset = 'UTF-8'
 }

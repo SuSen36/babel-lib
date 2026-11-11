@@ -125,16 +125,20 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
     public abstract void doNonPlayerBurstTick();
 
     public final void burstTick(){
-        if (livingEntity instanceof Player) doPlayerBurstTick();
+        if (livingEntity instanceof Player) {
+            doPlayerBurstTick();
+        }
         else doNonPlayerBurstTick();
-    };
+    }
 
     public final void doBurst() {
         EPCapability ep = BabelCapability.getEP(livingEntity);
         if (ep != null) {
             ep.setUnderBreak(maxReviveTick);
         }
-        if (livingEntity instanceof Player) doPlayerBurst();
+        if (livingEntity instanceof Player) {
+            doPlayerBurst();
+        }
         else doNonPlayerBurst();
     }
 

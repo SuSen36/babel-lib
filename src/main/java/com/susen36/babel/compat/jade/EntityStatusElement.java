@@ -22,8 +22,8 @@ public class EntityStatusElement extends Element {
     private static final ResourceLocation NUMB_ICON = new ResourceLocation(BabelMod.MODID, "textures/gui/overlay/numb.png");
 
     public EntityStatusElement(int physical, int magic, int numb) {
-        this.physical = physical > 0 ? "" + physical : "";
-        this.magic = magic > 0 ? "" + magic : "";
+        this.physical = physical > 0 ? physical + "%" : "";
+        this.magic = magic > 0 ? magic + "%" : "";
         this.style = numb;
         this.showPhysical = physical > 0;
         this.showMagic = magic > 0;

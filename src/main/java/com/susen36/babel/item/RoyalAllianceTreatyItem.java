@@ -24,7 +24,7 @@ public class RoyalAllianceTreatyItem extends CollectibleItem.CustomCollectibleIt
 		super(new Item.Properties().stacksTo(1).fireResistant(), 25, false, CollectibleTiers.ADVANCED, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
-						.particle(ParticleTypes.FLAME, 72)
+						.particle(ParticleTypes.ASH, 72)
 						.showOverlay(true)
 						.build());
 	}

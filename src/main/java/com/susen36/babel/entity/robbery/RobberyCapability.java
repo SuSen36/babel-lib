@@ -1,5 +1,6 @@
-package com.susen36.babel.robbery;
+package com.susen36.babel.entity.robbery;
 
+import com.susen36.babel.BabelConfig;
 import com.susen36.babel.BabelMod;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -19,7 +20,6 @@ public class RobberyCapability implements ICapabilitySerializable<CompoundTag> {
     public static final Capability<RobberyCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<RobberyCapability>() {});
     public static final ResourceLocation KEY = new ResourceLocation(BabelMod.MODID, "robbery_cap");
     private static final String RESTRICTED_UNTIL_TICK = "RestrictedUntilTick";
-    private static final long RESTRICTION_DURATION_TICKS = 3L * 60L * 60L * 20L;
 
     private final LazyOptional<RobberyCapability> self = LazyOptional.of(() -> this);
     private long restrictedUntilTick;
@@ -34,7 +34,7 @@ public class RobberyCapability implements ICapabilitySerializable<CompoundTag> {
     }
 
     public void startRestriction(long currentTick) {
-        this.restrictedUntilTick = currentTick + RESTRICTION_DURATION_TICKS;
+        this.restrictedUntilTick = currentTick + BabelConfig.robberyRestrictionDurationTicks;
     }
 
     @Nonnull

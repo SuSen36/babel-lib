@@ -101,6 +101,7 @@ public class BabelCollectible {
     public static RegistryObject<Item> DARKNIGHT_WHISPERER;
     public static RegistryObject<Item> GODMOTHERS_TOKEN;
     public static RegistryObject<Item> GAULISH_SILVER_COIN;
+    public static RegistryObject<Item> LUCKY_COIN;
     public static RegistryObject<Item> GAULISH_BANK_CHECK;
     public static RegistryObject<Item> TOPOGRAPHICAL_MAP;
     public static RegistryObject<Item> DIVINE_CONCH;
@@ -140,6 +141,14 @@ public class BabelCollectible {
     public static RegistryObject<Item> FOREST_NIGHT_WHISPERS;
     public static RegistryObject<Item> CANNOT_MARK;
     public static RegistryObject<Item> DANCERS_BRACELETS;
+    public static RegistryObject<Item> SPECIAL_SUPPRESSOR;
+    public static RegistryObject<Item> SHALLOWS_WHISPERS;
+    public static RegistryObject<Item> DESIGNERS_RULER;
+    public static RegistryObject<Item> HONOR_RIBBON;
+    public static RegistryObject<Item> PURE_WHITE_DANCE_SHOES;
+    public static RegistryObject<Item> JET_BLACK_DANCE_SHOES;
+    public static RegistryObject<Item> LIVING_WOODPLATE;
+    public static RegistryObject<Item> END_OF_TIMES;
 
     public static final ArrayList<RegistryObject<Item>> BABEL_COLLECTIBLES = new ArrayList<>();
 
@@ -231,6 +240,7 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(KNIGHTS_CODE = REGISTRY.registerCollectible("knights_code", KnightsCodeItem::new));
         BABEL_COLLECTIBLES.add(DARKNIGHT_WHISPERER = REGISTRY.registerCollectible("darknight_whisperer", DarknightWhispererItem::new));
         BABEL_COLLECTIBLES.add(GAULISH_SILVER_COIN = REGISTRY.registerCollectible("gaulish_silver_coin", GaulishSilverCoinItem::new));
+        BABEL_COLLECTIBLES.add(LUCKY_COIN = REGISTRY.registerCollectible("lucky_coin", LuckyCoinItem::new));
         BABEL_COLLECTIBLES.add(GAULISH_BANK_CHECK = REGISTRY.registerCollectible("gaulish_bank_check", GaulishBankCheckItem::new));
         BABEL_COLLECTIBLES.add(TOPOGRAPHICAL_MAP = REGISTRY.registerCollectible("topographical_map", TopographicalMapItem::new));
         BABEL_COLLECTIBLES.add(GODMOTHERS_TOKEN = REGISTRY.registerCollectible("godmothers_token", GodmothersTokenItem::new));
@@ -273,6 +283,14 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(FOREST_NIGHT_WHISPERS = REGISTRY.registerCollectible("forest_night_whispers", ForestNightWhispersItem::new));
         BABEL_COLLECTIBLES.add(CANNOT_MARK = REGISTRY.registerCollectible("cannot_mark", CannotMarkItem::new));
         BABEL_COLLECTIBLES.add(DANCERS_BRACELETS = REGISTRY.registerCollectible("dancers_bracelets", DancersBraceletsItem::new));
+        BABEL_COLLECTIBLES.add(SPECIAL_SUPPRESSOR = REGISTRY.registerCollectible("special_suppressor", SpecialSuppressorItem::new));
+        BABEL_COLLECTIBLES.add(SHALLOWS_WHISPERS = REGISTRY.registerCollectible("shallows_whispers", ShallowsWhispersItem::new));
+        BABEL_COLLECTIBLES.add(DESIGNERS_RULER = REGISTRY.registerCollectible("designers_ruler", DesignersRulerItem::new));
+        BABEL_COLLECTIBLES.add(HONOR_RIBBON = REGISTRY.registerCollectible("honor_ribbon", HonorRibbonItem::new));
+        BABEL_COLLECTIBLES.add(PURE_WHITE_DANCE_SHOES = REGISTRY.registerCollectible("pure_white_dance_shoes", PureWhiteDanceShoesItem::new));
+        BABEL_COLLECTIBLES.add(JET_BLACK_DANCE_SHOES = REGISTRY.registerCollectible("jet_black_dance_shoes", JetBlackDanceShoesItem::new));
+        BABEL_COLLECTIBLES.add(LIVING_WOODPLATE = REGISTRY.registerCollectible("living_woodplate", LivingWoodplateItem::new));
+        BABEL_COLLECTIBLES.add(END_OF_TIMES = REGISTRY.registerCollectible("end_of_times", EndOfTimesItem::new));
     }
 
     private BabelCollectible() {

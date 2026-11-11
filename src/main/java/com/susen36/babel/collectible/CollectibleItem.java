@@ -112,6 +112,12 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         return tier;
     }
 
+    // 稀有度仅由档位决定
+    @Override
+    public final Rarity getRarity(ItemStack stack) {
+        return rarityForTier(tier);
+    }
+
     /**
      * 诅咒级收藏品物品名染红（同原版负面附魔），其余沿用等级稀有度颜色。
      */
@@ -183,10 +189,10 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     }
 
     /**
-     * 蹲下使用时的特殊 hook，子类可重写；默认不执行任何收藏品流程。
+     * 蹲下使用时的特殊 hook，默认不执行任何收藏品流程。
      */
     @NotNull
-    protected InteractionResultHolder<ItemStack> onSneakUse(
+    InteractionResultHolder<ItemStack> onSneakUse(
             @NotNull Level level,
             @NotNull Player player,
             @NotNull InteractionHand hand
@@ -397,14 +403,22 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             void apply(T entity, Player player, int layer);
         }
 
-        public record RangeBinding<T extends LivingEntity>(Class<T> entityType, double range, RangeEffect<T> effect) {
+        public record RangeBinding<T extends LivingEntity>(Class<T> entityType, double range, RangeEffect<T> effect, @Nullable BiPredicate<LivingEntity, Player> ownerFilter) {
         }
 
         private final List<RangeBinding<?>> rangeEffects = new ArrayList<>();
 
         /** 注册范围效果：每 20 tick 对玩家周围 range×2 立方体内的每只指定类型实体回调一次。 */
+        protected final <T extends LivingEntity> void addRangeEffect(Class<T> entityType, double range, RangeEffect<T> effect, @Nullable BiPredicate<LivingEntity, Player> ownerFilter) {
+            this.rangeEffects.add(new RangeBinding<>(entityType, range, effect, ownerFilter));
+        }
+
         protected final <T extends LivingEntity> void addRangeEffect(Class<T> entityType, double range, RangeEffect<T> effect) {
-            this.rangeEffects.add(new RangeBinding<>(entityType, range, effect));
+            this.addRangeEffect(entityType, range, effect, null);
+        }
+
+        protected final <T extends LivingEntity> void addRangeEffect(Class<T> entityType, RangeEffect<T> effect, BiPredicate<LivingEntity, Player> ownerFilter) {
+            this.addRangeEffect(entityType, MONSTER_RANGE, effect, ownerFilter);
         }
 
         protected final <T extends LivingEntity> void addRangeEffect(Class<T> entityType, RangeEffect<T> effect) {
@@ -413,6 +427,49 @@ public final class CollectibleItem extends Item implements CollectibleLike {
 
         public final List<RangeBinding<?>> getRangeEffects() {
             return this.rangeEffects;
+        }
+
+        @FunctionalInterface
+        public interface DamageEffect<T extends LivingEntity> {
+            void apply(LivingDamageEvent event, Player player, T target, int layer);
+        }
+
+        public record DamageBinding<T extends LivingEntity>(Class<T> entityType, double range, DamageEffect<T> effect, @Nullable BiPredicate<LivingEntity, Player> ownerFilter) {
+            public void apply(LivingDamageEvent event, Player player, LivingEntity target, int layer) {
+                if (this.entityType.isInstance(target)) {
+                    boolean inRange = this.range == Double.POSITIVE_INFINITY;
+                    if (!inRange) {
+                        double dx = target.getX() - player.getX();
+                        double dy = target.getY() - player.getY();
+                        double dz = target.getZ() - player.getZ();
+                        inRange = dx >= -this.range && dx <= this.range
+                                && dy >= -this.range && dy <= this.range
+                                && dz >= -this.range && dz <= this.range;
+                    }
+                    if (inRange && (this.ownerFilter == null || this.ownerFilter.test(target, player))) {
+                        this.effect.apply(event, player, this.entityType.cast(target), layer);
+                    }
+                }
+            }
+        }
+
+        private final List<DamageBinding<?>> damageEffects = new ArrayList<>();
+
+        /** 伤害效果仅筛选本次事件目标；显式范围按三轴坐标差含边界比较，省略范围时不限制距离。 */
+        protected final <T extends LivingEntity> void addDamageEffect(Class<T> entityType, double range, DamageEffect<T> effect, @Nullable BiPredicate<LivingEntity, Player> ownerFilter) {
+            this.damageEffects.add(new DamageBinding<>(entityType, range, effect, ownerFilter));
+        }
+
+        protected final <T extends LivingEntity> void addDamageEffect(Class<T> entityType, double range, DamageEffect<T> effect) {
+            this.addDamageEffect(entityType, range, effect, null);
+        }
+
+        protected final <T extends LivingEntity> void addDamageEffect(Class<T> entityType, DamageEffect<T> effect, BiPredicate<LivingEntity, Player> ownerFilter) {
+            this.addDamageEffect(entityType, Double.POSITIVE_INFINITY, effect, ownerFilter);
+        }
+
+        protected final <T extends LivingEntity> void addDamageEffect(Class<T> entityType, DamageEffect<T> effect) {
+            this.addDamageEffect(entityType, Double.POSITIVE_INFINITY, effect);
         }
 
         /** 范围属性修饰符绑定：修饰符 ID 按收藏品 + 属性 + 后缀派生，金额不随层数变化；ownerFilter 非空时仅对判定通过的实体生效。 */
@@ -464,9 +521,12 @@ public final class CollectibleItem extends Item implements CollectibleLike {
 
         /**
          * 持有者作为伤害来源对生物造成伤害（LivingDamageEvent 阶段），近战、投射物与法术来源都会触发。
-         * 分发器只转发事件，目标类型、伤害类型、范围等判定由覆写方自行完成；此时护甲与魔抗结算已结束，setAmount 改的是最终伤害。
+         * 按注册顺序筛选目标类型、范围与归属，伤害类型由回调判定；此时护甲与魔抗结算已结束，setAmount 改的是最终伤害。
          */
-        public void onDealDamage(LivingDamageEvent event, Player player, LivingEntity target, int layer) {
+        public final void onDealDamage(LivingDamageEvent event, Player player, LivingEntity target, int layer) {
+            for (DamageBinding<?> binding : this.damageEffects) {
+                binding.apply(event, player, target, layer);
+            }
         }
 
         /** 持有者承受伤害（LivingDamageEvent 阶段），可通过 event 调整最终伤害。 */
@@ -479,6 +539,10 @@ public final class CollectibleItem extends Item implements CollectibleLike {
 
         /** 持有者失去生命值或护盾（LifePointConsumeEvent 阶段）；type 为扣除的资源类型，amount 为扣除量，事件只读。 */
         public void onLifePointLoss(LifePointConsumeEvent event, Player player, int layer) {
+        }
+
+        /** 持有者自身死亡（LivingDeathEvent 阶段）；在 LifePoint 扣减之后分发，cancel 事件可原地复活持有者。 */
+        public void onOwnerDeath(LivingDeathEvent event, Player player, int layer) {
         }
 
         /** 持有者接受治疗或生命回复（LivingHealEvent 阶段）；药水治疗与饱食自然回复都走 LivingEntity.heal，setAmount 可调整治疗量。 */
@@ -545,6 +609,12 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         @Override
         final public CollectibleTiers getTier() {
             return tier;
+        }
+
+        // 稀有度仅由档位决定，禁止子类覆写破坏享元
+        @Override
+        public final Rarity getRarity(ItemStack stack) {
+            return rarityForTier(tier);
         }
 
         /**

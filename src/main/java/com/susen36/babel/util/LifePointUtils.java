@@ -36,6 +36,14 @@ public class LifePointUtils {
         }
     }
 
+    public static void healLifePoint(Entity entity, int amount) {
+        if (amount > 0) {
+            HealthCapability capability = get(entity);
+            capability.setLives(Math.min(capability.getLives() + amount, capability.getMaxLives()));
+            capability.sync();
+        }
+    }
+
     public static int getMaxLifePoint(Entity entity) {
         return (int) get(entity).getMaxLives();
     }

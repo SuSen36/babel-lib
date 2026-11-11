@@ -55,6 +55,8 @@ public class LifePointConsumeEvent extends LivingEvent {
         }
     }
 
+
+    @Cancelable
     public static class Post extends LifePointConsumeEvent {
         public Post(Player player, DamageSource source, Type type, float amount) {
             super(player, source, type, amount);
@@ -67,13 +69,16 @@ public class LifePointConsumeEvent extends LivingEvent {
         return event.isCanceled();
     }
 
-    public static void firePost(Player player, DamageSource source, Type type, float amount) {
+    public static boolean firePost(Player player, DamageSource source, Type type, float amount) {
         Post event = new Post(player, source, type, amount);
         MinecraftForge.EVENT_BUS.post(event);
+        return event.isCanceled();
     }
 
     public enum Type {
         SHIELD,
-        LIVES
+        LIVES,
+        /** 阻挡失败：护盾与目标生命均耗尽，即真实死亡。 */
+        FAIL
     }
 }
