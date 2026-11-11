@@ -33,8 +33,16 @@ bin/
 .DS_Store
 
 ### Minecraft Modding ###
+
 run/
-!**/src/**/run/
-**/src/generated/**/.cache/
-repo/
-!**/src/**/repo/
+run-data/
+runs/
+logs/
+crash-reports/
+mcmodsrepo/
+src/generated/resources/.cache/
+
+*.class
+*.log
+hs_err_pid*
+.local/
