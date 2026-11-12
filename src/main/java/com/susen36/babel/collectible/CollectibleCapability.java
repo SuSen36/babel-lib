@@ -13,6 +13,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.Nullable;
 
 public class CollectibleCapability implements ICapabilitySerializable<CompoundTag> {
     public static final Capability<CollectibleCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
@@ -51,9 +52,10 @@ public class CollectibleCapability implements ICapabilitySerializable<CompoundTa
         return LazyOptional.empty();
     }
 
+    // 实体死亡被移除后 LazyOptional 失效，此处必须返回 null 而非抛异常
+    @Nullable
     public static CollectibleCapability of(Player player) {
-        return player.getCapability(CAPABILITY).orElseThrow(() ->
-                new IllegalStateException("collectible capability is not attached to " + player));
+        return player.getCapability(CAPABILITY).orElse(null);
     }
 
     @Override

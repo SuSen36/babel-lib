@@ -33,12 +33,15 @@ public class CollectibleItemEvents {
     }
 
     // 必须按注册顺序遍历：攻击/击杀钩子共用玩家随机数，遍历顺序变化会改变掷骰结果
+    // 玩家死亡瞬间 Capability 可能已被注销（removed=KILLED），此时静默跳过
     private static void forEachUsedCollectible(Player player, UsedCollectibleHook hook) {
         Collectibles usedData = Collectibles.getData(player);
-        Collectibles.Layer layerData = Collectibles.getLayerData(player);
-        for (RegistryObject<Item> holder : Collectibles.Collectibles.values()) {
-            if (usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible) {
-                hook.invoke(collectible, player, layerData.getLayer(holder.get()));
+        if (usedData != null) {
+            Collectibles.Layer layerData = Collectibles.getLayerData(player);
+            for (RegistryObject<Item> holder : Collectibles.Collectibles.values()) {
+                if (usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible) {
+                    hook.invoke(collectible, player, layerData.getLayer(holder.get()));
+                }
             }
         }
     }

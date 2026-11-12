@@ -103,8 +103,14 @@ public class Collectibles implements INBTSerializable<ListTag> {
         original.invalidateCaps();
     }
 
-    public static @NotNull Collectibles getData(@NotNull Player player) {
-        return CollectibleCapability.of(player).getCollectibles();
+    @Nullable
+    public static Collectibles getData(@NotNull Player player) {
+        CollectibleCapability cap = CollectibleCapability.of(player);
+        Collectibles result = null;
+        if (cap != null) {
+            result = cap.getCollectibles();
+        }
+        return result;
     }
 
     public static boolean isUsed(@NotNull Player player, @NotNull RegistryObject<? extends Item> collectible) {
