@@ -2,6 +2,8 @@ package com.susen36.babel.difficulty;
 
 import net.minecraft.util.Mth;
 
+import java.util.Locale;
+
 /**
  * 难度等级值类型。
  */
@@ -32,6 +34,6 @@ public final class NDifficultyLevel {
 
     @Override
     public String toString() {
-        return this.tier.name().toLowerCase() + "-" + value();
+        return this.tier.name().toLowerCase(Locale.ROOT) + "-" + value();
     }
 }

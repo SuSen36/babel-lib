@@ -82,7 +82,7 @@ public class NDifficultyEvent {
             CompoundTag data = living.getPersistentData();
 
             // 防止区块重新加载时重复乘算导致数值无限膨胀
-            if (n > 1.0 && !data.getBoolean("BabelDifficultyApplied")) {
+            if (n > 1.0 && !data.getBoolean("NDifficultyApplied")) {
                 double percentage = living.getHealth() / living.getMaxHealth();
 
                 AttributeInstance maxHealth = living.getAttribute(Attributes.MAX_HEALTH);
@@ -107,7 +107,7 @@ public class NDifficultyEvent {
                     living.setHealth((float) (newMaxHealth.getValue() * percentage));
                 }
 
-                data.putBoolean("BabelDifficultyApplied", true);
+                data.putBoolean("NDifficultyApplied", true);
             }
         }
     }
