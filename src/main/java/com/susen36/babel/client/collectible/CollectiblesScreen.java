@@ -59,7 +59,7 @@ public class CollectiblesScreen extends Screen {
         this.entries.clear();
         var used = Collectibles.getData(player);
         for (var entry : Collectibles.Collectibles.values()) {
-            if (used.isUsed(entry.get())) {
+            if (used != null && used.isUsed(entry.get())) {
                 ItemStack stack = new ItemStack(entry.get());
                 stack.setCount(Math.max(1, Collectibles.getLayerData(player).getLayer(entry.get())));
                 this.entries.add(stack);

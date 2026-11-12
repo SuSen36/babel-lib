@@ -79,7 +79,7 @@ public class CollectibleItemEvents {
             Collectibles.Layer layerData = Collectibles.getLayerData(player);
             Map<RangeKey, List<? extends LivingEntity>> rangedEntities = new HashMap<>();
             for (RegistryObject<Item> holder : Collectibles.Collectibles.values()) {
-                if (usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible) {
+                if (usedData != null && usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     int layer = layerData.getLayer(holder.get());
                     for (CollectibleItem.CustomCollectibleItem.RangeBinding<?> binding : collectible.getRangeEffects()) {
                         dispatchRange(binding, rangedEntities, player, layer);

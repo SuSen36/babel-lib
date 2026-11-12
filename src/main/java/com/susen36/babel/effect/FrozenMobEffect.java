@@ -2,7 +2,6 @@ package com.susen36.babel.effect;
 
 import com.susen36.babel.init.BabelMobEffects;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -15,7 +14,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.monster.Blaze;
-import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.MagmaCube;
 import net.minecraftforge.common.ForgeMod;
 
@@ -61,13 +59,7 @@ public class FrozenMobEffect extends MobEffect {
             brain.eraseMemory(MemoryModuleType.ANGRY_AT);
             brain.eraseMemory(MemoryModuleType.HURT_BY_ENTITY);
 
-            if (entity instanceof Creeper creeper) {
-                CompoundTag tag = new CompoundTag();
-                entity.saveWithoutId(tag);
-                tag.putBoolean("ignited", false);
-                entity.load(tag);
-                creeper.setSwellDir(0);
-            } else if (entity instanceof Blaze) {
+            if (entity instanceof Blaze) {
                 entity.hurt(entity.level().damageSources().freeze(), 3);
             } else if (entity instanceof MagmaCube) {
                 entity.hurt(entity.level().damageSources().freeze(), 1);

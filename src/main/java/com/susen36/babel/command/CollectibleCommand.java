@@ -80,11 +80,13 @@ public class CollectibleCommand {
     private static int clearCollectibles(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "targets");
         for (ServerPlayer player : targets) {
-            var data = Collectibles.getData(player);
-            for (Item item : new ArrayList<>(data.getUsed())) {
-                data.remove(item);
+            Collectibles data = Collectibles.getData(player);
+            if (data != null) {
+                for (Item item : new ArrayList<>(data.getUsed())) {
+                    data.remove(item);
+                }
+                BabelNetwork.syncCollectibles(player);
             }
-            BabelNetwork.syncCollectibles(player);
         }
         sendFeedback(ctx, "command.collectible.clear", targets, null);
         return targets.size();

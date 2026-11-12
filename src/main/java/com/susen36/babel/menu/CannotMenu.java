@@ -1,8 +1,6 @@
 package com.susen36.babel.menu;
 
 import com.susen36.babel.api.event.LostAndFoundEvent;
-import com.susen36.babel.collectible.CollectibleItem;
-import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.entity.CannotEntity;
 import com.susen36.babel.init.BabelMenus;
@@ -143,10 +141,8 @@ public class CannotMenu extends AbstractContainerMenu {
             List<Item> pool = new ArrayList<>();
             for (RegistryObject<Item> entry : Collectibles.Collectibles.values()) {
                 Item candidate = entry.get();
-                if (data.isUsed(candidate)) {
+                if (data != null && data.isUsed(candidate)) {
                     used.add(candidate);
-                } else if (!(candidate instanceof CollectibleItem collectible) || collectible.getTier() != CollectibleTiers.CURSED) {
-                    pool.add(candidate);
                 }
             }
             if (index >= 0 && index < used.size() && !pool.isEmpty()) {

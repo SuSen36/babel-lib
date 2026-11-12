@@ -52,6 +52,7 @@ public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
                         entityTypeKey(EntityType.PIGLIN_BRUTE), entityTypeKey(EntityType.RAVAGER), entityTypeKey(EntityType.SHULKER),
                         entityTypeKey(EntityType.VINDICATOR), entityTypeKey(EntityType.WARDEN),
                         entityTypeKey(EntityType.WITHER_SKELETON));
+
         tag(INFECTED_CREATURE)
                 .add(entityTypeKey(EntityType.BEE), entityTypeKey(EntityType.CAVE_SPIDER),
                         entityTypeKey(EntityType.CREEPER), entityTypeKey(EntityType.ENDERMITE),

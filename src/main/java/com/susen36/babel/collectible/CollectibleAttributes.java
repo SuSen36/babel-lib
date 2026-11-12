@@ -35,7 +35,10 @@ public final class CollectibleAttributes {
                 Item item = entry.get();
                 if (item instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     for (CollectibleItem.CustomCollectibleItem.AttributeBonus bonus : collectible.getAttributeBonuses()) {
-                        int stacks = used.isUsed(item) ? bonus.stacks().getStacks(player, collectible) : 0;
+                        int stacks = 0;
+                        if (used != null) {
+                            stacks = used.isUsed(item) ? bonus.stacks().getStacks(player, collectible) : 0;
+                        }
                         AttributeInstance instance = player.getAttribute(bonus.attribute());
                         if (instance != null) {
                             ModifierIdentity identity = modifierIdentity(item, bonus.attribute(), "");
@@ -69,7 +72,7 @@ public final class CollectibleAttributes {
             Set<UUID> expected = new HashSet<>();
             for (RegistryObject<Item> entry : Collectibles.Collectibles.values()) {
                 Item item = entry.get();
-                if (used.isUsed(item) && item instanceof CollectibleItem.CustomCollectibleItem collectible) {
+                if (used != null && used.isUsed(item) && item instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     for (CollectibleItem.CustomCollectibleItem.RangeAttributeBonus bonus : collectible.getRangeAttributeBonuses()) {
                         ModifierIdentity identity = modifierIdentity(item, bonus.attribute(), bonus.idSuffix());
                         UUID modifierId = identity.id();
@@ -143,13 +146,21 @@ public final class CollectibleAttributes {
         }
     }
 
-    /** 生命上限被修饰符改变后，按比例同步当前生命；旧上限异常时按满血处理，避免除零产生 Infinity/NaN */
+    /**
+     * 生命上限被修饰符改变后，把高于新上限的当前生命钳制到新上限。
+     * 原版 1.20.1 不在上限变化时修正超标血量，而是留到下一次 hurt 结算：actuallyHurt 里
+     * setHealth(health - damage) 内部 clamp 到 getMaxHealth()，超标部分会在那次伤害中被一并扣掉，
+     * 表现为额外掉血。这里直写 DATA_HEALTH_ID 提前完成钳制，绕过 hurt 流程；
+     * 血量未超标时不动，避免上限升高被观察为无事件回血。
+     */
     private static void syncHealth(LivingEntity living, Attribute attribute, double oldMax) {
         AttributeInstance instance = living.getAttribute(Attributes.MAX_HEALTH);
         if (attribute == Attributes.MAX_HEALTH && instance != null && !Mth.equal(instance.getValue(), oldMax)) {
-            double newMax = instance.getValue();
-            float ratio = oldMax > 0.0D ? (float) (living.getHealth() / oldMax) : 1.0F;
-            living.setHealth((float) newMax * Mth.clamp(ratio, 0.0F, 1.0F));
+            float newMax = (float) instance.getValue();
+            float health = living.getHealth();
+            if (health > newMax) {
+                living.getEntityData().set(LivingEntity.DATA_HEALTH_ID, newMax);
+            }
         }
     }
 

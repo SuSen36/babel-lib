@@ -8,6 +8,7 @@
     "AbstractVillagerMixin",
     "BeaconBlockEntityMixin",
     "BowItemMixin",
+    "CreeperMixin",
     "CrossbowItemMixin",
     "EnderManMixin",
     "EntityMixin",

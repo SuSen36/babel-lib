@@ -179,7 +179,8 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     ) {
         if (!player.isShiftKeyDown()) {
             player.startUsingItem(usedHand);
-            if (Collectibles.getData(player).isUsed(this)) {
+            var usedData = Collectibles.getData(player);
+            if (usedData != null && usedData.isUsed(this)) {
                 player.useItemRemaining = Mth.ceil(this.useTicks * REPEAT_USE_DURATION_MULTIPLIER);
             }
             return InteractionResultHolder.consume(player.getItemInHand(usedHand));
@@ -210,7 +211,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             // 冷却中可重复使用：每次使用重新触发完整激活流程，冷却由 Used 事件监听器统一重置
             if (canAlwaysUse || !isBanned()) {
                 activate(level, player, stack, this);
-                return consumeSelf(stack);
+                return consumeSelf(stack, player);
             } else {
                 playFailure(level, player, stack);
             }
@@ -260,7 +261,9 @@ public final class CollectibleItem extends Item implements CollectibleLike {
 
     void activate(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack, @NotNull Item item) {
         var data = Collectibles.getData(player);
-        data.markUsed(item);
+        if (data != null) {
+            data.markUsed(item);
+        }
         CollectibleEvent.onUsed(player, item);
         playSuccess(level, player, stack);
         int layer = Collectibles.getLayerData(player).getLayer(item);
@@ -270,9 +273,11 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         }
     }
 
-    private ItemStack consumeSelf(@NotNull ItemStack stack) {
-        var stackCopy = stack.copy();
-        stackCopy.shrink(1);
+    private ItemStack consumeSelf(@NotNull ItemStack stack, @NotNull Player player) {
+        ItemStack stackCopy = stack.copy();
+        if (!player.getAbilities().instabuild) {
+            stackCopy.shrink(1);
+        }
         return stackCopy;
     }
 
@@ -285,9 +290,11 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         if (activation.autoUseOnGain() && entity instanceof Player player && entity.tickCount % 10 == 0) {
             var data = Collectibles.getData(player);
             Item item = stack.getItem();
-            if (!data.isUsed(item) && !isBanned()) {
+            if (data != null && !data.isUsed(item) && !isBanned()) {
                 activate(level, player, stack, item);
-                consumeSelf(stack);
+                if (!player.getAbilities().instabuild) {
+                    stack.shrink(1);
+                }
             }
         }
     }
@@ -354,7 +361,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         }
 
         public final List<AttributeBonus> getAttributeBonuses() {
-            return this.attributeBonuses;
+            return List.copyOf(this.attributeBonuses);
         }
 
         protected static boolean matchesConfigured(Iterable<? extends String> rules, String name) {
@@ -377,9 +384,12 @@ public final class CollectibleItem extends Item implements CollectibleLike {
 
         protected static int countUsedRelics(Player player, TagKey<Item> tag) {
             int count = 0;
-            for (Item relic : Collectibles.getData(player).getUsed()) {
-                if (relic.builtInRegistryHolder().is(tag)) {
-                    count++;
+            Collectibles data = Collectibles.getData(player);
+            if (data != null) {
+                for (Item relic : data.getUsed()) {
+                    if (relic.builtInRegistryHolder().is(tag)) {
+                        count++;
+                    }
                 }
             }
             return count;
@@ -426,7 +436,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         }
 
         public final List<RangeBinding<?>> getRangeEffects() {
-            return this.rangeEffects;
+            return List.copyOf(this.rangeEffects);
         }
 
         @FunctionalInterface
@@ -508,7 +518,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         }
 
         public final List<RangeAttributeBonus> getRangeAttributeBonuses() {
-            return this.rangeAttributeBonuses;
+            return List.copyOf(this.rangeAttributeBonuses);
         }
 
         /** LivingHurtEvent 阶段回调；事件可能已取消、直接伤害来源可能是持有者本人，需要时由实现自行判定。 */
@@ -582,8 +592,8 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             for (int i = 0; ; i++) {
                 String key = descKey + "_" + i;
                 Component line = i == 0
-                        ? Component.translatable(key).withStyle(ChatFormatting.AQUA, ChatFormatting.ITALIC)
-                        : Component.translatable(key).withStyle(ChatFormatting.GRAY);
+                        ? Component.translatable(key).withStyle(ChatFormatting.AQUA)
+                        : Component.translatable(key).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
                 if (line.getString().equals(key)) {
                     break;
                 }
@@ -626,9 +636,11 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             if (activation.autoUseOnGain() && entity instanceof Player player && entity.tickCount % 10 == 0) {
                 var data = Collectibles.getData(player);
                 Item item = stack.getItem();
-                if (!data.isUsed(item) && !isBanned()) {
+                if (data != null && !data.isUsed(item) && !isBanned()) {
                     activate(level, player, stack, item);
-                    consumeSelf(stack, player);
+                    if (!player.getAbilities().instabuild) {
+                        stack.shrink(1);
+                    }
                 }
             }
         }
@@ -667,7 +679,9 @@ public final class CollectibleItem extends Item implements CollectibleLike {
 
         void activate(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack, @NotNull Item item) {
             var data = Collectibles.getData(player);
-            data.markUsed(item);
+            if (data != null) {
+                data.markUsed(item);
+            }
             CollectibleEvent.onUsed(player, item);
             playSuccess(level, player, stack);
             int layer = Collectibles.getLayerData(player).getLayer(item);
@@ -706,7 +720,8 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         ) {
             if (!player.isShiftKeyDown()) {
                 player.startUsingItem(usedHand);
-                if (Collectibles.getData(player).isUsed(this)) {
+                var usedData = Collectibles.getData(player);
+                if (usedData != null && usedData.isUsed(this)) {
                     player.useItemRemaining = Mth.ceil(this.useTicks * REPEAT_USE_DURATION_MULTIPLIER);
                 }
                 return InteractionResultHolder.consume(player.getItemInHand(usedHand));

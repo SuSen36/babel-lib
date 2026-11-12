@@ -96,9 +96,10 @@ public class Collectibles implements INBTSerializable<ListTag> {
         Player original = event.getOriginal();
         original.reviveCaps();
         CollectibleCapability oldCap = original.getCapability(CollectibleCapability.CAPABILITY).orElse(null);
-        if (oldCap != null) {
+        CollectibleCapability newCap = CollectibleCapability.of(event.getEntity());
+        if (oldCap != null && newCap != null) {
             CompoundTag nbt = oldCap.serializeNBT();
-            CollectibleCapability.of(event.getEntity()).deserializeNBT(nbt);
+            newCap.deserializeNBT(nbt);
         }
         original.invalidateCaps();
     }
@@ -114,27 +115,36 @@ public class Collectibles implements INBTSerializable<ListTag> {
     }
 
     public static boolean isUsed(@NotNull Player player, @NotNull RegistryObject<? extends Item> collectible) {
-        return getData(player).isUsed(collectible.get());
+        Collectibles data = getData(player);
+        return data != null && data.isUsed(collectible.get());
     }
 
     public static boolean isUsed(@NotNull Player player, @NotNull Item item) {
-        return getData(player).isUsed(item);
+        Collectibles data = getData(player);
+        return data != null && data.isUsed(item);
     }
 
+    // capability 失效（死亡克隆等瞬态）时回退到空数据实例：读取得默认值，写入不落到真实存档
     public static @NotNull Collectibles.Layer getLayerData(@NotNull Player player) {
-        return CollectibleCapability.of(player).getLayer();
+        CollectibleCapability cap = CollectibleCapability.of(player);
+        return cap != null ? cap.getLayer() : new Collectibles(null).layer;
     }
 
     public static @NotNull Collectibles.Cooldown getCooldownData(@NotNull Player player) {
-        return CollectibleCapability.of(player).getCooldown();
+        CollectibleCapability cap = CollectibleCapability.of(player);
+        return cap != null ? cap.getCooldown() : new Collectibles(null).cooldown;
     }
 
     public static Tag serializeStates(@NotNull Player player) {
-        return getData(player).serializeNBT();
+        Collectibles data = getData(player);
+        return data != null ? data.serializeNBT() : new ListTag();
     }
 
     public static void deserializeStates(@NotNull Player player, @NotNull ListTag tag) {
-        getData(player).deserializeNBT(tag);
+        Collectibles data = getData(player);
+        if (data != null) {
+            data.deserializeNBT(tag);
+        }
     }
 
     public static void addLayerAndSync(@NotNull Player player, @NotNull Item item, int delta) {
@@ -159,15 +169,17 @@ public class Collectibles implements INBTSerializable<ListTag> {
      * 整条移除收藏品状态；unmarkUsed 仅取消激活，层与冷却数据保留。
      */
     public static void deactivateAndSync(@NotNull Player player, @NotNull Item item) {
-        if (!player.level().isClientSide) {
-            getData(player).remove(item);
+        Collectibles data = getData(player);
+        if (!player.level().isClientSide && data != null) {
+            data.remove(item);
             BabelNetwork.syncCollectibles(player);
         }
     }
 
     public static void expireUsedCollectibles(@NotNull Player player) {
-        if (!player.level().isClientSide) {
-            Collectibles data = getData(player);
+        Collectibles data = getData(player);
+        if (!player.level().isClientSide && data != null) {
+
             long currentTick = player.level().getServer().overworld().getGameTime();
             boolean changed = false;
             for (Item item : new ArrayList<>(data.getUsed())) {
@@ -259,10 +271,11 @@ public class Collectibles implements INBTSerializable<ListTag> {
 
     private static @Nullable Item resolveItem(@NotNull String id) {
         RegistryObject<Item> entry = Collectibles.get(id);
-        if (entry != null && entry.get() != null) {
-            return entry.get();
+        Item item = null;
+        if (entry != null && entry.isPresent()) {
+            item = entry.get();
         }
-        return null;
+        return item;
     }
 
     @Override
