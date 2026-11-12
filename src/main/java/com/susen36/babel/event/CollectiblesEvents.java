@@ -3,10 +3,12 @@ package com.susen36.babel.event;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.api.event.CollectibleDropEvent;
 import com.susen36.babel.api.event.LifePointConsumeEvent;
+import com.susen36.babel.api.event.LivingAddEffectEvent;
 import com.susen36.babel.api.event.OriginiumIngotDropEvent;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.init.BabelCollectible;
 import com.susen36.babel.item.EndOfTimesItem;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -37,6 +39,24 @@ public class CollectiblesEvents {
                 && Collectibles.isUsed(player, BabelCollectible.END_OF_TIMES)) {
             event.setCanceled(true);
             EndOfTimesItem.revive(player);
+        }
+    }
+
+
+    @SubscribeEvent
+    public static void onLivingAddEffectEvent(@NotNull LivingAddEffectEvent event) {
+        if (event.getEntity() instanceof Player player
+                && event.getEffect().getEffect().getCategory() == MobEffectCategory.BENEFICIAL
+                && event.getEffect().getDuration() > 1) {
+            // 多收藏品来源按乘法叠加
+            float multiplier = 1.0F;
+            if (Collectibles.isUsed(player, BabelCollectible.DREAMING_ESSENCE)) {
+                multiplier *= 1.5F;
+            }
+            if (Collectibles.isUsed(player, BabelCollectible.VANILLA_SODA)) {
+                multiplier *= 1.2F;
+            }
+            event.scaleDuration(multiplier);
         }
     }
 }

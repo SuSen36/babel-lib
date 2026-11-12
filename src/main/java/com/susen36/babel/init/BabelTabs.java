@@ -34,6 +34,5 @@ public class BabelTabs {
                     }).build());
 
     private BabelTabs() {
-        throw new UnsupportedOperationException("Utility class");
     }
 }

@@ -1,13 +1,11 @@
 package com.susen36.babel.mixin;
 
-import com.susen36.babel.collectible.Collectibles;
+import com.susen36.babel.api.event.LivingAddEffectEvent;
 import com.susen36.babel.effect.InvisibleMobEffect;
-import com.susen36.babel.init.BabelCollectible;
 import com.susen36.babel.init.BabelMobEffects;
 import com.susen36.babel.item.HandOfFlowingWaterItem;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -90,28 +88,9 @@ public abstract class LivingEntityMixin {
         }
     }
 
-    @ModifyVariable(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z",
-            at = @At("HEAD"), argsOnly = true)
-    private MobEffectInstance boostBeneficialEffectDuration(MobEffectInstance effect) {
-        LivingEntity self = (LivingEntity) (Object) this;
-        MobEffectInstance result = effect;
-        if (self instanceof Player player
-                && effect.getEffect().getCategory() == MobEffectCategory.BENEFICIAL
-                && effect.getDuration() > 1) {
-            // 多收藏品来源按乘法叠加，仅生成一次副本，避免污染调用方持有的实例导致时长连乘
-            float multiplier = 1.0F;
-            if (Collectibles.isUsed(player, BabelCollectible.DREAMING_ESSENCE)) {
-                multiplier *= 1.5F;
-            }
-            if (Collectibles.isUsed(player, BabelCollectible.VANILLA_SODA)) {
-                multiplier *= 1.2F;
-            }
-            if (multiplier != 1.0F) {
-                result = new MobEffectInstance(effect.getEffect(), (int) (effect.getDuration() * multiplier),
-                        effect.getAmplifier(), effect.isAmbient(), effect.isVisible(), effect.showIcon());
-            }
-        }
-        return result;
+    @ModifyVariable(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"), argsOnly = true)
+    private MobEffectInstance onAddEffect(MobEffectInstance effect) {
+        return LivingAddEffectEvent.onAddEffect((LivingEntity) (Object) this, effect);
     }
 
     @Inject(method = "getVisibilityPercent", at = @At("RETURN"), cancellable = true)

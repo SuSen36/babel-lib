@@ -18,15 +18,13 @@ public final class NDifficulty {
     }
 
     /**
-     * 难度倍率。easy 模式返回 0；normal 模式返回
-     * {@code (1 + 0.01 * clampedLevel * 2) ^ progressCoefficient}。
+     * 难度倍率。大于0返回 {@code 1 + 0.01 * clampedLevel * 2}。
      */
     public static double multiplier(LevelAccessor world) {
         NDifficultyLevel dl = difficultyLevel(world);
-        if (dl.isEasy()) {
+        if (dl.value() == 0) {
             return 0.0;
         }
-        double n = 1 + 0.01 * dl.value() * 2;
-        return Math.pow(n, 1);
+        return 1 + 0.01 * dl.value() * 2;
     }
 }

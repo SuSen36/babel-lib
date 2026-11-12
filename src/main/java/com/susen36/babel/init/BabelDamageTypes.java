@@ -21,11 +21,9 @@ public class BabelDamageTypes {
     public static final ResourceKey<DamageType> TRUE_DAMAGE = create("true_damage");
     public static final ResourceKey<DamageType> DREAMBIND_STRIKE = create("dreambind_strike");
     /** 伤害类型加入此 tag 即可伤害沉睡单位 */
-    public static final TagKey<DamageType> CAN_HURT_SLEEPING = TagKey.create(
-            Registries.DAMAGE_TYPE, new ResourceLocation(BabelMod.MODID, "can_hurt_sleeping"));
+    public static final TagKey<DamageType> HURTS_SLEEPING = TagKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(BabelMod.MODID, "hurts_sleeping"));
 
     private BabelDamageTypes() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     private static ResourceKey<DamageType> create(String name) {

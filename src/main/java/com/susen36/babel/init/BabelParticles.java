@@ -26,7 +26,6 @@ public class BabelParticles {
     public static final RegistryObject<SimpleParticleType> SHIELDLOSS = REGISTRY.register("shieldloss", () -> new SimpleParticleType(false));
 
     private BabelParticles() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = BabelMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)

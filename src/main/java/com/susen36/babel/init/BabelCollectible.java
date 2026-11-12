@@ -294,6 +294,5 @@ public class BabelCollectible {
     }
 
     private BabelCollectible() {
-        throw new UnsupportedOperationException("Utility class");
     }
 }

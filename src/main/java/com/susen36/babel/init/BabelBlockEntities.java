@@ -18,6 +18,5 @@ public class BabelBlockEntities {
             REGISTRY.register("king_pedestal", () -> BlockEntityType.Builder.of(KingPedestalBlockEntity::new, BabelBlocks.KING_PEDESTAL.get()).build(null));
 
     private BabelBlockEntities() {
-        throw new UnsupportedOperationException("Utility class");
     }
 }

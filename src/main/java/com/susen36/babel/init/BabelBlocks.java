@@ -19,6 +19,5 @@ public class BabelBlocks {
     public static final RegistryObject<? extends Block> GOLDEN_CHALICE = REGISTRY.register("golden_chalice", GoldenChaliceBlock::new);
 
     private BabelBlocks() {
-        throw new UnsupportedOperationException("Utility class");
     }
 }

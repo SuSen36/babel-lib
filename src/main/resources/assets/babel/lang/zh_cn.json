@@ -496,7 +496,7 @@
   "item.babel.gaulish_bank_check.description_0": "使用后获得12个绿宝石",
   "item.babel.gaulish_bank_check.description_1": "镶金嵌银、奢华无比的支票本，现在已经无从兑现。",
   "item.babel.topographical_map": "地形图",
-  "item.babel.topographical_map.description_0": "使用后获得1级经验值，防御力+4%",
+  "item.babel.topographical_map.description_0": "使用后获得1级经验值，防御力+4%/+5%/+6%/+8%（随难度提升）",
   "item.babel.topographical_map.description_1": "一份颇有年代感的手绘地图，图上的名称和对应地形都有较大更易，比例尺似乎也有些问题。",
   "item.babel.divine_conch": "神音海螺",
   "item.babel.divine_conch.description_0": "生命上限+6%",

@@ -26,6 +26,5 @@ public class BabelMobEffects {
     public static final RegistryObject<PhysicalDodgeMobEffect> PHYSICAL_DODGE = REGISTRY.register("physical_dodge", PhysicalDodgeMobEffect::new);
 
     private BabelMobEffects() {
-        throw new UnsupportedOperationException("Utility class");
     }
 }

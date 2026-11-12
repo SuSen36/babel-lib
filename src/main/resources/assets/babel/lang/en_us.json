@@ -517,7 +517,7 @@
   "item.babel.gaulish_bank_check.description_0": "Grants 12 emeralds when used",
   "item.babel.gaulish_bank_check.description_1": "An extravagant checkbook plated in gold and silver. Can no longer be cashed.",
   "item.babel.topographical_map": "Topographical Map",
-  "item.babel.topographical_map.description_0": "Grants 1 experience level when used, armor +4%",
+  "item.babel.topographical_map.description_0": "Grants 1 experience level when used, armor +4%/+5%/+6%/+8% (scales with difficulty)",
   "item.babel.topographical_map.description_1": "A hand-drawn map that exudes a sense of antiquity. The labels and corresponding terrain have been enlarged, and there seems to be something off about its scale.",
   "item.babel.hand_of_flowing_water": "Hand of Flowing Water",
   "item.babel.hand_of_flowing_water.description_0": "After using a bow or crossbow, use speed +25%, each finished use grants 1 stack for max 4 stacks, and get emptied if not using for 8s; bows and crossbows no longer consume arrows (including tipped arrows)",

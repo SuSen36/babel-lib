@@ -1,5 +1,8 @@
 package com.susen36.babel.api.event;
 
+import com.susen36.babel.BabelConfig;
+import com.susen36.babel.collectible.Collectibles;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.MinecraftForge;
@@ -60,6 +63,9 @@ public class CollectibleEvent extends PlayerEvent {
     }
 
     public static void onUsed(Player player, Item item) {
+        if (player.level() instanceof ServerLevel serverLevel) {
+            Collectibles.getCooldownData(player).setCooldownEndTick(item, serverLevel.getServer(), BabelConfig.collectibleDurationTicks);
+        }
         MinecraftForge.EVENT_BUS.post(new Used(player, item));
     }
 

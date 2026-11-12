@@ -29,6 +29,6 @@ public class BabelItems {
     }
 
     private BabelItems() {
-        throw new UnsupportedOperationException("Utility class");
+
     }
 }

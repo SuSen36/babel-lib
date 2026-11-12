@@ -6,7 +6,7 @@ import net.minecraft.world.level.GameRules;
  * babel 库提供的游戏规则。
  * <p>
  * {@code difficultyLevel}：难度等级。
- * 0 或 -1 为 easy（简单模式，不触发难度倍率）；1-18 为 normal（数值即难度，参与倍率计算）。
+ * 0不触发难度倍率，1-18 参与倍率计算。
  */
 public final class BabelGameRules {
     private BabelGameRules() {

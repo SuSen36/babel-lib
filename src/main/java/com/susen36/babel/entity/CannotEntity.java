@@ -128,13 +128,12 @@ public class CannotEntity extends AbstractVillager {
         super.aiStep();
         if (!this.level().isClientSide) {
             this.robbery.tick((ServerLevel) this.level(), this);
-            this.maybeDespawn();
-        }
-    }
-
-    private void maybeDespawn() {
-        if (this.despawnDelay > 0 && !this.isTrading() && !this.robbery.isActive() && --this.despawnDelay == 0) {
-            this.discard();
+            if (this.despawnDelay > 0 && !this.isTrading() && !this.robbery.isActive()) {
+                this.despawnDelay--;
+                if (this.despawnDelay == 0) {
+                    this.discard();
+                }
+            }
         }
     }
 
@@ -730,12 +729,17 @@ public class CannotEntity extends AbstractVillager {
             this.ticksActive = 0L;
             if (this.active && tag.contains("RobberyMobs", 9)) {
                 if (tag.contains("RobberyConfigId", 8)) {
-                    this.configId = new ResourceLocation(tag.getString("RobberyConfigId"));
+                    this.configId = ResourceLocation.tryParse(tag.getString("RobberyConfigId"));
+                    if (this.configId == null) {
+                        this.configId = Robberies.DEFAULT_ID;
+                    }
                 } else {
                     this.configId = Robberies.DEFAULT_ID;
                 }
                 this.config = Robberies.get(this.configId);
-                this.bossEvent.setName(this.config.getBossBarName());
+                if (this.config != null) {
+                    this.bossEvent.setName(this.config.getBossBarName());
+                }
                 ListTag mobs = tag.getList("RobberyMobs", 11);
                 for (Tag mobTag : mobs) {
                     this.spawnedMobs.add(NbtUtils.loadUUID(mobTag));

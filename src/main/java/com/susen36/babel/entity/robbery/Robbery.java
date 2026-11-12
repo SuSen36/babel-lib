@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.susen36.babel.init.BabelMobEffects;
+import net.minecraft.ResourceLocationException;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
@@ -23,38 +24,38 @@ public class Robbery {
     // 懒加载：静态初始化若早于药水效果注册，RegistryObject.get() 会抛异常
     public static Robbery defaultConfig() {
         return new Robbery(4, 6, 5, 4, 10, 3, 300,
-            460, 8.0F, 2.0F,
-            List.of(
-                    new SpawnEntry(5, EntityType.VINDICATOR, null, 1),
-                    new SpawnEntry(3, EntityType.PILLAGER, null, 1)
-            ),
-            List.of(
-                    new SupportGroup(List.of(
-                            new SupportEffect(MobEffects.DAMAGE_BOOST, 200, 4),
-                            new SupportEffect(MobEffects.MOVEMENT_SPEED, 200, 4)
-                    )),
-                    new SupportGroup(List.of(
-                            new SupportEffect(MobEffects.DAMAGE_RESISTANCE, 200, 4),
-                            new SupportEffect(MobEffects.REGENERATION, 100, 1)
-                    )),
-                    new SupportGroup(List.of(
-                            new SupportEffect(MobEffects.HEALTH_BOOST, 200, 1),
-                            new SupportEffect(MobEffects.REGENERATION, 100, 1)
-                    )),
-                    new SupportGroup(List.of(
-                            new SupportEffect(MobEffects.DAMAGE_BOOST, 200, 4),
-                            new SupportEffect(MobEffects.DAMAGE_RESISTANCE, 200, 4)
-                    )),
-                    new SupportGroup(List.of(
-                            new SupportEffect(BabelMobEffects.SLEEP.get(), 200, 0),
-                            new SupportEffect(MobEffects.REGENERATION, 200, 1)
-                    )),
-                    new SupportGroup(List.of(
-                            new SupportEffect(BabelMobEffects.PHYSICAL_DODGE.get(), 200, 4),
-                            new SupportEffect(BabelMobEffects.MAGIC_DODGE.get(), 200, 4),
-                            new SupportEffect(MobEffects.MOVEMENT_SPEED, 200, 4)
-                    ))
-            ), Component.translatable("event.babel.robbery.bossbar"));
+                460, 8.0F, 2.0F,
+                List.of(
+                        new SpawnEntry(5, EntityType.VINDICATOR, null, 1),
+                        new SpawnEntry(3, EntityType.PILLAGER, null, 1)
+                ),
+                List.of(
+                        new SupportGroup(List.of(
+                                new SupportEffect(MobEffects.DAMAGE_BOOST, 200, 4),
+                                new SupportEffect(MobEffects.MOVEMENT_SPEED, 200, 4)
+                        )),
+                        new SupportGroup(List.of(
+                                new SupportEffect(MobEffects.DAMAGE_RESISTANCE, 200, 4),
+                                new SupportEffect(MobEffects.REGENERATION, 100, 1)
+                        )),
+                        new SupportGroup(List.of(
+                                new SupportEffect(MobEffects.HEALTH_BOOST, 200, 1),
+                                new SupportEffect(MobEffects.REGENERATION, 100, 1)
+                        )),
+                        new SupportGroup(List.of(
+                                new SupportEffect(MobEffects.DAMAGE_BOOST, 200, 4),
+                                new SupportEffect(MobEffects.DAMAGE_RESISTANCE, 200, 4)
+                        )),
+                        new SupportGroup(List.of(
+                                new SupportEffect(BabelMobEffects.SLEEP.get(), 200, 0),
+                                new SupportEffect(MobEffects.REGENERATION, 200, 1)
+                        )),
+                        new SupportGroup(List.of(
+                                new SupportEffect(BabelMobEffects.PHYSICAL_DODGE.get(), 200, 4),
+                                new SupportEffect(BabelMobEffects.MAGIC_DODGE.get(), 200, 4),
+                                new SupportEffect(MobEffects.MOVEMENT_SPEED, 200, 4)
+                        ))
+                ), Component.translatable("event.babel.robbery.bossbar"));
     }
 
     private final int spawnRange;
@@ -75,6 +76,12 @@ public class Robbery {
                    int ticksBetweenSpawn, int initialSpawnCount, int waveIntervalTicks, int supportIntervalTicks,
                    float supportRadius, float supportHealPerPulse, List<SpawnEntry> spawnPotentials,
                    List<SupportGroup> supportGroups, Component bossBarName) {
+        if (spawnPotentials.isEmpty()) {
+            throw new IllegalArgumentException("spawnPotentials cannot be empty");
+        }
+        if (supportGroups.isEmpty()) {
+            throw new IllegalArgumentException("supportGroups cannot be empty");
+        }
         this.spawnRange = spawnRange;
         this.mobsPerWave = mobsPerWave;
         this.waveCount = waveCount;
@@ -189,7 +196,12 @@ public class Robbery {
         private static SpawnEntry fromJson(JsonObject json) {
             int weight = GsonHelper.getAsInt(json, "weight", 1);
             String entityId = GsonHelper.getAsString(json, "entity");
-            ResourceLocation entityKey = new ResourceLocation(entityId);
+            ResourceLocation entityKey;
+            try {
+                entityKey = new ResourceLocation(entityId);
+            } catch (ResourceLocationException e) {
+                throw new JsonSyntaxException("Invalid entity id format: " + entityId);
+            }
             EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(entityKey);
             if (type == null) {
                 throw new JsonSyntaxException("Unknown entity id in robbery spawn entry: " + entityId);
@@ -224,7 +236,12 @@ public class Robbery {
     public record SupportEffect(MobEffect effect, int duration, int amplifier) {
         private static SupportEffect fromJson(JsonObject json) {
             String effectId = GsonHelper.getAsString(json, "effect");
-            ResourceLocation effectKey = new ResourceLocation(effectId);
+            ResourceLocation effectKey;
+            try {
+                effectKey = new ResourceLocation(effectId);
+            } catch (ResourceLocationException e) {
+                throw new JsonSyntaxException("Invalid effect id format: " + effectId);
+            }
             MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue(effectKey);
             if (effect == null) {
                 throw new JsonSyntaxException("Unknown effect id in robbery support entry: " + effectId);

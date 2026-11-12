@@ -21,7 +21,6 @@ public class BabelEntities {
                     .build("babel:cannot"));
 
     private BabelEntities() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = BabelMod.MODID)

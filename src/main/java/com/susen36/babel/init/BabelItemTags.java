@@ -7,9 +7,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 
 public final class BabelItemTags {
-    private BabelItemTags() {
-        throw new UnsupportedOperationException("Utility class");
-    }
+    private BabelItemTags() {}
 
     public static final TagKey<Item> KING_RELICS = create("king_relics");
     public static final TagKey<Item> ARCHFIEND_RELICS = create("archfiend_relics");

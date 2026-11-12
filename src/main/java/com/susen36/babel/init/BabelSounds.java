@@ -16,6 +16,5 @@ public class BabelSounds {
     public static final RegistryObject<SoundEvent> BARRIER = REGISTRY.register("barrier", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BabelMod.MODID, "barrier")));
 
     private BabelSounds() {
-        throw new UnsupportedOperationException("Utility class");
     }
 }

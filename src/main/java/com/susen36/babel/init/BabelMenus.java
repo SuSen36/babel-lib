@@ -16,6 +16,5 @@ public class BabelMenus {
             () -> new MenuType<>((IContainerFactory<CannotMenu>) (windowId, inventory, buffer) -> new CannotMenu(windowId, inventory, buffer), FeatureFlags.VANILLA_SET));
 
     private BabelMenus() {
-        throw new UnsupportedOperationException("Utility class");
     }
 }

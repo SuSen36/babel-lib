@@ -17,6 +17,5 @@ public class BabelPotions {
     public static final RegistryObject<Potion> STRONG_INVISIBLE = REGISTRY.register("strong_invisible", () -> new Potion("invisible", new MobEffectInstance(BabelMobEffects.INVISIBLE.get(), 9600, 1)));
 
     private BabelPotions() {
-        throw new UnsupportedOperationException("Utility class");
     }
 }

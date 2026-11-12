@@ -25,8 +25,7 @@ public class RobberyCapability implements ICapabilitySerializable<CompoundTag> {
     private long restrictedUntilTick;
 
     public static RobberyCapability of(Player player) {
-        return player.getCapability(CAPABILITY).orElseThrow(() ->
-                new IllegalStateException("robbery capability is not attached to " + player));
+        return player.getCapability(CAPABILITY).orElseThrow(() -> new IllegalStateException("robbery capability is not attached to " + player));
     }
 
     public boolean isRestricted(long currentTick) {

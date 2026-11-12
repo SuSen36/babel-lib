@@ -4,6 +4,7 @@ import com.susen36.babel.BabelMod;
 import com.susen36.babel.difficulty.NDifficulty;
 import com.susen36.babel.init.BabelEntityTypeTags;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -42,20 +43,16 @@ public class NDifficultyEvent {
 
     @SubscribeEvent
     public static void onLivingDamage(LivingDamageEvent event) {
-        Level world = event.getEntity().level();
         Entity entity = event.getEntity();
+        Level world = entity.level();
 
-        if (NDifficulty.difficultyLevel(world).value() >= 12) {
-            if (world.getLevelData().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
-                    && (entity.getType().is(BabelEntityTypeTags.ELITE)
-                    || entity.getType().is(BabelEntityTypeTags.FORGE_BOSSES))) {
-                LivingEntity living = entity instanceof Mob mob ? mob.getTarget() : null;
-                if (living != null && living.isAlive()) {
-                    Entity boat = entity.getVehicle();
-                    if (boat instanceof Boat) {
-                        boat.hurt(entity.damageSources().generic(), 20);
-                    }
-                }
+        if (NDifficulty.difficultyLevel(world).value() >= 12
+                && world.getLevelData().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
+                && (entity.getType().is(BabelEntityTypeTags.ELITE) || entity.getType().is(BabelEntityTypeTags.FORGE_BOSSES))) {
+
+            LivingEntity target = entity instanceof Mob mob ? mob.getTarget() : null;
+            if (target != null && target.isAlive() && entity.getVehicle() instanceof Boat boat) {
+                boat.hurt(entity.damageSources().generic(), 20);
             }
         }
     }
@@ -64,6 +61,7 @@ public class NDifficultyEvent {
     public static void onLivingExperienceDrop(LivingExperienceDropEvent event) {
         LivingEntity living = event.getEntity();
         EntityType<?> type = living.getType();
+
         if (!type.is(BYPASSES_DIFFICULTY) && (type.is(APPLIES_DIFFICULTY) || living instanceof Monster)) {
             int level = NDifficulty.difficultyLevel(living.level()).value();
             if (level > 0) {
@@ -75,36 +73,41 @@ public class NDifficultyEvent {
     @SubscribeEvent
     public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
         Entity entity = event.getEntity();
-        if (entity instanceof LivingEntity living) {
-            EntityType<?> type = entity.getType();
-            if (!type.is(BYPASSES_DIFFICULTY) && (type.is(APPLIES_DIFFICULTY) || entity instanceof Monster)) {
-                Level world = event.getLevel();
-                double n = NDifficulty.multiplier(world);
-                if (n > 1.0) {
-                    double percentage = living.getHealth() / living.getMaxHealth();
+        Level world = event.getLevel();
+        EntityType<?> type = entity.getType();
 
-                    AttributeInstance maxHealth = living.getAttribute(Attributes.MAX_HEALTH);
-                    if (maxHealth != null) {
-                        maxHealth.setBaseValue(maxHealth.getBaseValue() * n);
-                    }
-                    AttributeInstance armor = living.getAttribute(Attributes.ARMOR);
-                    if (armor != null) {
-                        armor.setBaseValue(armor.getBaseValue() * n);
-                    }
-                    AttributeInstance armorToughness = living.getAttribute(Attributes.ARMOR_TOUGHNESS);
-                    if (armorToughness != null) {
-                        armorToughness.setBaseValue(armorToughness.getBaseValue() * n);
-                    }
-                    AttributeInstance attackDamage = living.getAttribute(Attributes.ATTACK_DAMAGE);
-                    if (attackDamage != null) {
-                        attackDamage.setBaseValue(attackDamage.getBaseValue() * n);
-                    }
+        if (entity instanceof LivingEntity living && !type.is(BYPASSES_DIFFICULTY) && (type.is(APPLIES_DIFFICULTY) || entity instanceof Monster)) {
 
-                    AttributeInstance newMaxHealth = living.getAttribute(Attributes.MAX_HEALTH);
-                    if (newMaxHealth != null) {
-                        living.setHealth((float) (newMaxHealth.getValue() * percentage));
-                    }
+            double n = NDifficulty.multiplier(world);
+            CompoundTag data = living.getPersistentData();
+
+            // 防止区块重新加载时重复乘算导致数值无限膨胀
+            if (n > 1.0 && !data.getBoolean("BabelDifficultyApplied")) {
+                double percentage = living.getHealth() / living.getMaxHealth();
+
+                AttributeInstance maxHealth = living.getAttribute(Attributes.MAX_HEALTH);
+                if (maxHealth != null) {
+                    maxHealth.setBaseValue(maxHealth.getBaseValue() * n);
                 }
+                AttributeInstance armor = living.getAttribute(Attributes.ARMOR);
+                if (armor != null) {
+                    armor.setBaseValue(armor.getBaseValue() * n);
+                }
+                AttributeInstance armorToughness = living.getAttribute(Attributes.ARMOR_TOUGHNESS);
+                if (armorToughness != null) {
+                    armorToughness.setBaseValue(armorToughness.getBaseValue() * n);
+                }
+                AttributeInstance attackDamage = living.getAttribute(Attributes.ATTACK_DAMAGE);
+                if (attackDamage != null) {
+                    attackDamage.setBaseValue(attackDamage.getBaseValue() * n);
+                }
+
+                AttributeInstance newMaxHealth = living.getAttribute(Attributes.MAX_HEALTH);
+                if (newMaxHealth != null) {
+                    living.setHealth((float) (newMaxHealth.getValue() * percentage));
+                }
+
+                data.putBoolean("BabelDifficultyApplied", true);
             }
         }
     }

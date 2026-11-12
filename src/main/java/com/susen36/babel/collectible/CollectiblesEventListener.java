@@ -1,8 +1,6 @@
 package com.susen36.babel.collectible;
 
-import com.susen36.babel.BabelConfig;
 import com.susen36.babel.BabelMod;
-import com.susen36.babel.api.event.CollectibleEvent;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -14,16 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 @Mod.EventBusSubscriber(modid = BabelMod.MODID)
 public class CollectiblesEventListener {
-
-    @SubscribeEvent
-    public static void onCollectibleUsedEvent(@NotNull CollectibleEvent.Used event) {
-        var player = event.getEntity();
-        var level = player.level();
-        if (level instanceof ServerLevel) {
-            var cd = Collectibles.getCooldownData(player);
-            cd.setCooldownEndTick(event.getItem(), level.getServer(), BabelConfig.collectibleDurationTicks);
-        }
-    }
 
     @SubscribeEvent
     public static void onPlayerLoggedInEvent(@NotNull PlayerEvent.PlayerLoggedInEvent event) {
