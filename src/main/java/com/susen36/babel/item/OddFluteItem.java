@@ -34,7 +34,7 @@ public class OddFluteItem extends CollectibleItem.CustomCollectibleItem {
 	}
 
 	@Override
-	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+	public void onEffectStarted(ItemStack stack, Level level, Player player) {
 		if (level instanceof ServerLevel serverLevel) {
 			double x = player.getX();
 			double y = player.getY();

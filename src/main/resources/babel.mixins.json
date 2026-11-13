@@ -8,6 +8,7 @@
     "AbstractVillagerMixin",
     "BeaconBlockEntityMixin",
     "BowItemMixin",
+    "CarvedPumpkinBlockMixin",
     "CreeperMixin",
     "CrossbowItemMixin",
     "EnderManMixin",
@@ -16,6 +17,7 @@
     "LootModifierManagerMixin",
     "PlayerMixin",
     "ThrownTridentMixin",
+    "VillagerMixin",
     "WitherBossMixin",
     "WitherSkullMixin"
   ],

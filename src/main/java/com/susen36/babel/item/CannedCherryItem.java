@@ -37,7 +37,7 @@ public class CannedCherryItem extends CollectibleItem.CustomCollectibleItem {
 	}
 
 	@Override
-	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+	public void onEffectStarted(ItemStack stack, Level level, Player player) {
 		ItemStack setstack = new ItemStack(Items.GLASS_BOTTLE).copy();
 		setstack.setCount(1);
 		ItemHandlerHelper.giveItemToPlayer(player, setstack);

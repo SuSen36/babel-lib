@@ -21,10 +21,5 @@ public class GoldPlatedDiceItem extends CollectibleItem.CustomCollectibleItem {
                         .showOverlay(true)
                         .build());
         addRangeAttributeModifier(Monster.class, Attributes.MAX_HEALTH, -0.15, AttributeModifier.Operation.MULTIPLY_BASE);
-        addRangeEffect(Monster.class, (monster, player, layer) -> {
-            if (monster.getHealth() > monster.getMaxHealth()) {
-                monster.setHealth(monster.getMaxHealth());
-            }
-        });
     }
 }

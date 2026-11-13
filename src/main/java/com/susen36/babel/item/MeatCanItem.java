@@ -28,7 +28,7 @@ public class MeatCanItem extends CollectibleItem.CustomCollectibleItem {
 	}
 
 	@Override
-	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+	public void onEffectStarted(ItemStack stack, Level level, Player player) {
 		if (!level.isClientSide())
 			player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 900, 0));
 		Item emptyCan = BuiltInRegistries.ITEM.get(new ResourceLocation("caerula_arbor", "empty_can"));

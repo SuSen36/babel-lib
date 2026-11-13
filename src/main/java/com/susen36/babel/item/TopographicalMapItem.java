@@ -32,7 +32,7 @@ public class TopographicalMapItem extends CollectibleItem.CustomCollectibleItem 
     }
 
     @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+    public void onEffectStarted(ItemStack stack, Level level, Player player) {
         if (!level.isClientSide()) {
             player.giveExperienceLevels(1);
         }

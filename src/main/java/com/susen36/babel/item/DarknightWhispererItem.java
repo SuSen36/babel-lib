@@ -21,11 +21,5 @@ public class DarknightWhispererItem extends CollectibleItem.CustomCollectibleIte
                         .showOverlay(true)
                         .build());
         addRangeAttributeModifier(Monster.class, Attributes.MAX_HEALTH, -0.10, AttributeModifier.Operation.MULTIPLY_BASE);
-        addRangeEffect(Monster.class, (monster, player, layer) -> {
-            // 修饰符由对账层先行施加，本轮钳制保证血量不高于削弱后的上限
-            if (monster.getHealth() > monster.getMaxHealth()) {
-                monster.setHealth(monster.getMaxHealth());
-            }
-        });
     }
 }

@@ -31,7 +31,8 @@ public final class CollectibleAttributes {
     public static void reconcile(Player player) {
         if (!player.level().isClientSide) {
             var used = Collectibles.getData(player);
-            for (RegistryObject<Item> entry : Collectibles.Collectibles.values()) {
+            boolean healthChanged = false;
+            for (RegistryObject<Item> entry : Collectibles.REGISTRY.values()) {
                 Item item = entry.get();
                 if (item instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     for (CollectibleItem.CustomCollectibleItem.AttributeBonus bonus : collectible.getAttributeBonuses()) {
@@ -50,13 +51,18 @@ public final class CollectibleAttributes {
                                         instance.removeModifier(identity.id());
                                     }
                                     instance.addTransientModifier(new AttributeModifier(identity.id(), identity.name(), expected, bonus.operation()));
+                                    healthChanged |= bonus.attribute() == Attributes.MAX_HEALTH;
                                 }
                             } else if (existing != null) {
                                 instance.removeModifier(identity.id());
+                                healthChanged |= bonus.attribute() == Attributes.MAX_HEALTH;
                             }
                         }
                     }
                 }
+            }
+            if (healthChanged) {
+                syncHealth(player);
             }
         }
     }
@@ -70,7 +76,8 @@ public final class CollectibleAttributes {
             Map<UUID, RangeHit> tracked = RANGE_TRACKER.computeIfAbsent(player.getUUID(), id -> new ConcurrentHashMap<>());
             var used = Collectibles.getData(player);
             Set<UUID> expected = new HashSet<>();
-            for (RegistryObject<Item> entry : Collectibles.Collectibles.values()) {
+            Set<LivingEntity> healthTargets = new HashSet<>();
+            for (RegistryObject<Item> entry : Collectibles.REGISTRY.values()) {
                 Item item = entry.get();
                 if (used != null && used.isUsed(item) && item instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     for (CollectibleItem.CustomCollectibleItem.RangeAttributeBonus bonus : collectible.getRangeAttributeBonuses()) {
@@ -96,13 +103,16 @@ public final class CollectibleAttributes {
                                             modifierId, identity.name(), bonus.amount(), bonus.operation()));
                                     syncHealth(living, bonus.attribute(), oldMax);
                                 }
+                                if (bonus.attribute() == Attributes.MAX_HEALTH) {
+                                    healthTargets.add(living);
+                                }
                             }
                         }
                         RangeHit previous = tracked.get(modifierId);
                         if (previous != null) {
                             for (UUID entityId : previous.entityIds()) {
                                 if (!hitIds.contains(entityId)) {
-                                    removeModifierAt(serverLevel, entityId, previous.attribute(), modifierId);
+                                    removeModifierAt(serverLevel, entityId, previous.attribute(), modifierId, healthTargets);
                                 }
                             }
                         }
@@ -115,10 +125,13 @@ public final class CollectibleAttributes {
                 Map.Entry<UUID, RangeHit> entry = stale.next();
                 if (!expected.contains(entry.getKey())) {
                     for (UUID entityId : entry.getValue().entityIds()) {
-                        removeModifierAt(serverLevel, entityId, entry.getValue().attribute(), entry.getKey());
+                        removeModifierAt(serverLevel, entityId, entry.getValue().attribute(), entry.getKey(), healthTargets);
                     }
                     stale.remove();
                 }
+            }
+            for (LivingEntity living : healthTargets) {
+                syncHealth(living);
             }
         }
     }
@@ -127,35 +140,49 @@ public final class CollectibleAttributes {
     public static void clearRangeModifiers(Player player) {
         Map<UUID, RangeHit> tracked = RANGE_TRACKER.remove(player.getUUID());
         if (tracked != null && player.level() instanceof ServerLevel serverLevel) {
+            Set<LivingEntity> healthTargets = new HashSet<>();
             for (Map.Entry<UUID, RangeHit> entry : tracked.entrySet()) {
                 for (UUID entityId : entry.getValue().entityIds()) {
-                    removeModifierAt(serverLevel, entityId, entry.getValue().attribute(), entry.getKey());
+                    removeModifierAt(serverLevel, entityId, entry.getValue().attribute(), entry.getKey(), healthTargets);
                 }
+            }
+            for (LivingEntity living : healthTargets) {
+                syncHealth(living);
             }
         }
     }
 
-    private static void removeModifierAt(ServerLevel level, UUID entityId, Attribute attribute, UUID modifierId) {
+    private static void removeModifierAt(ServerLevel level, UUID entityId, Attribute attribute, UUID modifierId, Set<LivingEntity> healthTargets) {
         if (level.getEntity(entityId) instanceof LivingEntity living) {
             AttributeInstance instance = living.getAttribute(attribute);
             if (instance != null) {
                 double oldMax = instance.getValue();
                 instance.removeModifier(modifierId);
                 syncHealth(living, attribute, oldMax);
+                if (attribute == Attributes.MAX_HEALTH) {
+                    healthTargets.add(living);
+                }
             }
         }
     }
 
-    /**
-     * 生命上限被修饰符改变后，把高于新上限的当前生命钳制到新上限。
-     * 原版 1.20.1 不在上限变化时修正超标血量，而是留到下一次 hurt 结算：actuallyHurt 里
-     * setHealth(health - damage) 内部 clamp 到 getMaxHealth()，超标部分会在那次伤害中被一并扣掉，
-     * 表现为额外掉血。这里直写 DATA_HEALTH_ID 提前完成钳制，绕过 hurt 流程；
-     * 血量未超标时不动，避免上限升高被观察为无事件回血。
-     */
+    /** 生命上限被修饰符改变后，按比例同步当前生命；旧上限异常时按满血处理，避免除零产生 Infinity/NaN */
     private static void syncHealth(LivingEntity living, Attribute attribute, double oldMax) {
         AttributeInstance instance = living.getAttribute(Attributes.MAX_HEALTH);
         if (attribute == Attributes.MAX_HEALTH && instance != null && !Mth.equal(instance.getValue(), oldMax)) {
+            double newMax = instance.getValue();
+            float ratio = oldMax > 0.0D ? (float) (living.getHealth() / oldMax) : 1.0F;
+            living.getEntityData().set(LivingEntity.DATA_HEALTH_ID,
+                    (float) newMax * Mth.clamp(ratio, 0.0F, 1.0F));
+        }
+    }
+
+    /**
+     * 整轮修饰符增删完成后再钳制，避免中间上限造成额外扣血。
+     */
+    private static void syncHealth(LivingEntity living) {
+        AttributeInstance instance = living.getAttribute(Attributes.MAX_HEALTH);
+        if (instance != null) {
             float newMax = (float) instance.getValue();
             float health = living.getHealth();
             if (health > newMax) {
@@ -175,7 +202,10 @@ public final class CollectibleAttributes {
 
     private static ModifierIdentity modifierIdentity(Item collectible, Attribute attribute, String idSuffix) {
         return MODIFIER_IDENTITIES.computeIfAbsent(new ModifierKey(collectible, attribute, idSuffix), key -> {
-            String name = Collectibles.getIdByItem(key.collectible()) + "/" + ForgeRegistries.ATTRIBUTES.getKey(key.attribute()).getPath() + (key.idSuffix().isEmpty() ? "" : "/" + key.idSuffix());
+            // Item 实例必然已在物品注册表，注册键即稳定唯一标识，无需校验收藏品注册状态
+            String name = ForgeRegistries.ITEMS.getKey(key.collectible())
+                    + "/" + ForgeRegistries.ATTRIBUTES.getKey(key.attribute()).getPath()
+                    + (key.idSuffix().isEmpty() ? "" : "/" + key.idSuffix());
             return new ModifierIdentity(name, UUID.nameUUIDFromBytes(name.getBytes(StandardCharsets.UTF_8)));
         });
     }

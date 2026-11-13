@@ -32,7 +32,7 @@ public class AntiqueCastingItem extends CollectibleItem.CustomCollectibleItem {
     }
 
     @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+    public void onEffectStarted(ItemStack stack, Level level, Player player) {
         if (level instanceof ServerLevel serverLevel) {
             int enchanted = 0;
             for (ItemStack candidate : player.getInventory().items) {

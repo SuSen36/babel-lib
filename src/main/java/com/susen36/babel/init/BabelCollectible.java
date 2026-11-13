@@ -52,7 +52,7 @@ public class BabelCollectible {
     public static RegistryObject<Item> DREAMING_ESSENCE;
     public static RegistryObject<Item> CARRIAGE_WHIP;
     public static RegistryObject<Item> CHILDREN_PUPPET;
-    public static RegistryObject<Item> SECOND_ECONOMIC_REFORM_ACT;
+    public static RegistryObject<Item> SECOND_REFORM_ACT;
     public static RegistryObject<Item> ROYAL_RAPIER;
     public static RegistryObject<Item> AVENGER;
     public static RegistryObject<Item> UNKNOWN_INSTRUMENT;
@@ -149,6 +149,10 @@ public class BabelCollectible {
     public static RegistryObject<Item> JET_BLACK_DANCE_SHOES;
     public static RegistryObject<Item> LIVING_WOODPLATE;
     public static RegistryObject<Item> END_OF_TIMES;
+    public static RegistryObject<Item> SECRET_HR_LETTER;
+    public static RegistryObject<Item> SPEECH_DRAFT;
+    public static RegistryObject<Item> REGIONAL_ACTION_PLAN;
+    public static RegistryObject<Item> COMPREHENSIVE_OPERATION_FILE;
 
     public static final ArrayList<RegistryObject<Item>> BABEL_COLLECTIBLES = new ArrayList<>();
 
@@ -194,7 +198,7 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(DREAMING_ESSENCE = REGISTRY.registerCollectible("dreaming_essence", DreamingEssenceItem::new));
         BABEL_COLLECTIBLES.add(CARRIAGE_WHIP = REGISTRY.registerCollectible("carriage_whip", CarriageWhipItem::new));
         BABEL_COLLECTIBLES.add(CHILDREN_PUPPET = REGISTRY.registerCollectible("children_puppet", ChildrenPuppetItem::new));
-        BABEL_COLLECTIBLES.add(SECOND_ECONOMIC_REFORM_ACT = REGISTRY.registerCollectible("second_economic_reform_act", SecondEconomicReformActItem::new));
+        BABEL_COLLECTIBLES.add(SECOND_REFORM_ACT = REGISTRY.registerCollectible("second_reform_act", SecondReformActItem::new));
         BABEL_COLLECTIBLES.add(ROYAL_RAPIER = REGISTRY.registerCollectible("royal_rapier", RoyalRapierItem::new));
         BABEL_COLLECTIBLES.add(AVENGER = REGISTRY.registerCollectible("avenger", AvengerItem::new));
         BABEL_COLLECTIBLES.add(UNKNOWN_INSTRUMENT = REGISTRY.registerCollectible("unknown_instrument", UnknownInstrumentItem::new));
@@ -291,6 +295,10 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(JET_BLACK_DANCE_SHOES = REGISTRY.registerCollectible("jet_black_dance_shoes", JetBlackDanceShoesItem::new));
         BABEL_COLLECTIBLES.add(LIVING_WOODPLATE = REGISTRY.registerCollectible("living_woodplate", LivingWoodplateItem::new));
         BABEL_COLLECTIBLES.add(END_OF_TIMES = REGISTRY.registerCollectible("end_of_times", EndOfTimesItem::new));
+        BABEL_COLLECTIBLES.add(SECRET_HR_LETTER = REGISTRY.registerCollectible("secret_hr_letter", SecretHrLetterItem::new));
+        BABEL_COLLECTIBLES.add(SPEECH_DRAFT = REGISTRY.registerCollectible("speech_draft", SpeechDraftItem::new));
+        BABEL_COLLECTIBLES.add(REGIONAL_ACTION_PLAN = REGISTRY.registerCollectible("regional_action_plan", RegionalActionPlanItem::new));
+        BABEL_COLLECTIBLES.add(COMPREHENSIVE_OPERATION_FILE = REGISTRY.registerCollectible("comprehensive_operation_file", OperationFileItem::new));
     }
 
     private BabelCollectible() {

@@ -139,7 +139,7 @@ public class CannotMenu extends AbstractContainerMenu {
             Collectibles data = Collectibles.getData(player);
             List<Item> used = new ArrayList<>();
             List<Item> pool = new ArrayList<>();
-            for (RegistryObject<Item> entry : Collectibles.Collectibles.values()) {
+            for (RegistryObject<Item> entry : Collectibles.REGISTRY.values()) {
                 Item candidate = entry.get();
                 if (data != null && data.isUsed(candidate)) {
                     used.add(candidate);
@@ -149,7 +149,7 @@ public class CannotMenu extends AbstractContainerMenu {
                 Item lost = used.get(index);
                 Item gained = LostAndFoundEvent.onPre(serverPlayer, this.traderEntity, lost, pool.get(player.getRandom().nextInt(pool.size())));
                 if (gained != null) {
-                    Collectibles.deactivateAndSync(serverPlayer, lost);
+                    Collectibles.removeAndSync(serverPlayer, lost);
                     Collectibles.activateAndSync(serverPlayer, gained);
                     if (this.traderEntity != null) {
                         this.traderEntity.setHasLostAndFound(false);

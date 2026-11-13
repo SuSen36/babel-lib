@@ -1,6 +1,7 @@
 package com.susen36.babel.collectible;
 
 import com.susen36.babel.api.event.CollectibleRegisterEvent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -11,9 +12,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Supplier;
 
 public class CollectibleBuilder {
+    private final String modid;
     private final DeferredRegister<Item> ITEMS;
 
     private CollectibleBuilder(@NotNull String modid, @NotNull IEventBus bus) {
+        this.modid = modid;
         this.ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, modid);
         ITEMS.register(bus);
         bus.post(new CollectibleRegisterEvent(this));
@@ -60,12 +63,13 @@ public class CollectibleBuilder {
     }
 
     private RegistryObject<Item> save(String name, RegistryObject<Item> item) {
-        RegistryObject<Item> existing = Collectibles.Collectibles.get(name);
+        ResourceLocation id = new ResourceLocation(this.modid, name);
+        RegistryObject<Item> existing = Collectibles.REGISTRY.get(id);
         if (existing != null) {
-            throw new IllegalStateException("Adding duplicate collectible '" + name
+            throw new IllegalStateException("Adding duplicate collectible '" + id
                     + "' to collectible registry, conflicting: '" + existing.getId() + "' and '" + item.getId() + "'");
         }
-        Collectibles.Collectibles.put(name, item);
+        Collectibles.REGISTRY.put(id, item);
         return item;
     }
 }

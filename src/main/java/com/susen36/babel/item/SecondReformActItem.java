@@ -12,8 +12,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-public class SecondEconomicReformActItem extends CollectibleItem.CustomCollectibleItem {
-    public SecondEconomicReformActItem() {
+public class SecondReformActItem extends CollectibleItem.CustomCollectibleItem {
+    public SecondReformActItem() {
         super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
@@ -24,7 +24,7 @@ public class SecondEconomicReformActItem extends CollectibleItem.CustomCollectib
     }
 
     @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+    public void onEffectStarted(ItemStack stack, Level level, Player player) {
         if (!level.isClientSide()) {
             player.addEffect(new MobEffectInstance(MobEffects.HERO_OF_THE_VILLAGE, 6000, 0));
         }

@@ -32,7 +32,7 @@ public class RoyalFateItem extends CollectibleItem.CustomCollectibleItem {
 	}
 
 	@Override
-	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+	public void onEffectStarted(ItemStack stack, Level level, Player player) {
 		int maxLives = LifePointUtils.getMaxLifePoint(player);
 		LifePointUtils.addShieldPoint(player, maxLives);
 		LifePointUtils.addShieldPoint(player,  3);

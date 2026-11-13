@@ -25,7 +25,7 @@ public class OrangeStormItem extends CollectibleItem.CustomCollectibleItem {
 	}
 
 	@Override
-	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+	public void onEffectStarted(ItemStack stack, Level level, Player player) {
 		if (!level.isClientSide())
 			player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 1000, 0));
 	}

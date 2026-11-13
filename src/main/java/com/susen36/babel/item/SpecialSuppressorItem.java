@@ -25,7 +25,7 @@ public class SpecialSuppressorItem extends CollectibleItem.CustomCollectibleItem
     }
 
     @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+    public void onEffectStarted(ItemStack stack, Level level, Player player) {
         LifePointUtils.addLifePoint(player, 2);
         LifePointUtils.healLifePoint(player, 2);
     }

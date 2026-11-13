@@ -32,7 +32,7 @@ public class AncientTreeFruitItem extends CollectibleItem.CustomCollectibleItem 
     }
 
     @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+    public void onEffectStarted(ItemStack stack, Level level, Player player) {
         if (!player.level().isClientSide()) {
             List<RegistryObject<Item>> normalPool = new ArrayList<>();
             for (RegistryObject<Item> holder : BabelCollectible.BABEL_COLLECTIBLES) {

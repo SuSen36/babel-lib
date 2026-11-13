@@ -23,7 +23,7 @@ public class BansheeKissItem extends CollectibleItem.CustomCollectibleItem {
 	}
 
 	@Override
-	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+	public void onEffectStarted(ItemStack stack, Level level, Player player) {
 		player.giveExperienceLevels(8);
 		if (!level.isClientSide())
 			player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 0));

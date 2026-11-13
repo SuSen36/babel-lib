@@ -38,7 +38,7 @@ public class CollectibleItemEvents {
         Collectibles usedData = Collectibles.getData(player);
         if (usedData != null) {
             Collectibles.Layer layerData = Collectibles.getLayerData(player);
-            for (RegistryObject<Item> holder : Collectibles.Collectibles.values()) {
+            for (RegistryObject<Item> holder : Collectibles.REGISTRY.values()) {
                 if (usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     hook.invoke(collectible, player, layerData.getLayer(holder.get()));
                 }
@@ -78,7 +78,7 @@ public class CollectibleItemEvents {
             Collectibles usedData = Collectibles.getData(player);
             Collectibles.Layer layerData = Collectibles.getLayerData(player);
             Map<RangeKey, List<? extends LivingEntity>> rangedEntities = new HashMap<>();
-            for (RegistryObject<Item> holder : Collectibles.Collectibles.values()) {
+            for (RegistryObject<Item> holder : Collectibles.REGISTRY.values()) {
                 if (usedData != null && usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     int layer = layerData.getLayer(holder.get());
                     for (CollectibleItem.CustomCollectibleItem.RangeBinding<?> binding : collectible.getRangeEffects()) {

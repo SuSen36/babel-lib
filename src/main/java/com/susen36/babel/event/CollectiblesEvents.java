@@ -1,10 +1,7 @@
 package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
-import com.susen36.babel.api.event.CollectibleDropEvent;
-import com.susen36.babel.api.event.LifePointConsumeEvent;
-import com.susen36.babel.api.event.LivingAddEffectEvent;
-import com.susen36.babel.api.event.OriginiumIngotDropEvent;
+import com.susen36.babel.api.event.*;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.init.BabelCollectible;
 import com.susen36.babel.item.EndOfTimesItem;
@@ -29,6 +26,14 @@ public class CollectiblesEvents {
     public static void onCollectibleDrop(@NotNull CollectibleDropEvent event) {
         if (event.getKiller() instanceof Player player && Collectibles.isUsed(player, BabelCollectible.FOUR_LEAF_CLOVER_FOSSIL)) {
             event.setChance(event.getChance() * 2.0F);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLostAndFound(LostAndFoundEvent.Post event) {
+        Player player = event.getEntity();
+        if (!player.level().isClientSide() && Collectibles.isUsed(player, BabelCollectible.CANNOT_MARK)) {
+            player.giveExperienceLevels(1);
         }
     }
 

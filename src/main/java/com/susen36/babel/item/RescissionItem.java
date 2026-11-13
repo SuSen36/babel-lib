@@ -37,7 +37,7 @@ public class RescissionItem extends CollectibleItem.CustomCollectibleItem {
 	}
 
 	@Override
-	public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+	public void onEffectStarted(ItemStack stack, Level level, Player player) {
 		player.giveExperienceLevels(4);
 	}
 

@@ -61,7 +61,7 @@ public class PittsAssortedFruitsItem extends CollectibleItem.CustomCollectibleIt
     }
 
     @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+    public void onEffectStarted(ItemStack stack, Level level, Player player) {
         if (!level.isClientSide()) {
             player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 280, 1));
             player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 280, 1));

@@ -14,7 +14,7 @@ public class CollectibleClientEvents {
 
     @SubscribeEvent
     public static void onRegisterItemDecorationsEvent(@NotNull RegisterItemDecorationsEvent event) {
-        var items = Collectibles.Collectibles.values();
+        var items = Collectibles.REGISTRY.values();
         for (var item : items) {
             event.register(item.get(), new CollectiblesDecorator());
         }

@@ -46,8 +46,8 @@ public class EndOfTimesItem extends CollectibleItem.CustomCollectibleItem {
     }
 
     @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
-        resetLossCounter(player);
+    public void onEffectStarted(ItemStack stack, Level level, Player player) {
+        saveLossCounter(player, 0, 0);
     }
 
     @Override
@@ -86,10 +86,6 @@ public class EndOfTimesItem extends CollectibleItem.CustomCollectibleItem {
         player.getPersistentData().put(Player.PERSISTED_NBT_TAG, persisted);
     }
 
-    public static void resetLossCounter(Player player) {
-        saveLossCounter(player, 0, 0);
-    }
-
     public static void revive(Player player) {
         int lostLives = getLostLives(player);
         int lostShields = getLostShields(player);
@@ -101,7 +97,7 @@ public class EndOfTimesItem extends CollectibleItem.CustomCollectibleItem {
             LifePointUtils.addShieldPoint(player, PARTIAL_RESTORE_SHIELD);
         }
         player.setHealth(player.getMaxHealth());
-        resetLossCounter(player);
+        saveLossCounter(player, 0, 0);
         double x = player.getX();
         double y = player.getY();
         double z = player.getZ();
@@ -112,6 +108,6 @@ public class EndOfTimesItem extends CollectibleItem.CustomCollectibleItem {
         if (player instanceof ServerPlayer serverPlayer) {
             BabelNetwork.syncCollectibleUse(serverPlayer, new ItemStack(BabelCollectible.END_OF_TIMES.get()));
         }
-        Collectibles.deactivateAndSync(player, BabelCollectible.END_OF_TIMES.get());
+        Collectibles.removeAndSync(player, BabelCollectible.END_OF_TIMES.get());
     }
 }

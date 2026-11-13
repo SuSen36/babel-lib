@@ -27,7 +27,7 @@ public class LivingWoodplateItem extends CollectibleItem.CustomCollectibleItem {
     }
 
     @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+    public void onEffectStarted(ItemStack stack, Level level, Player player) {
         grantBarrier(player);
     }
 

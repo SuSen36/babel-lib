@@ -25,7 +25,7 @@ public class FlawlessJadestoneItem extends CollectibleItem.CustomCollectibleItem
     }
 
     @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+    public void onEffectStarted(ItemStack stack, Level level, Player player) {
         if (level instanceof ServerLevel) {
             ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(BabelItems.ORIGINIUM_INGOT.get(), 25));
         }

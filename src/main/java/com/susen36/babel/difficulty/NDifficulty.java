@@ -12,9 +12,15 @@ public final class NDifficulty {
     private NDifficulty() {
     }
 
-    /** 当前世界的难度等级。 */
+    /**
+     * 当前世界的难度等级。
+     * <p>
+     * 创造模式搜索树构建物品提示时会传入 null 世界（ItemStack.getTooltipLines(null, ...)），此处回退到最低难度。
+     */
     public static NDifficultyLevel difficultyLevel(LevelAccessor world) {
-        return NDifficultyLevel.of(world.getLevelData().getGameRules().getInt(BabelGameRules.DIFFICULTY_LEVEL));
+        return world == null
+                ? NDifficultyLevel.of(0)
+                : NDifficultyLevel.of(world.getLevelData().getGameRules().getInt(BabelGameRules.DIFFICULTY_LEVEL));
     }
 
     /**

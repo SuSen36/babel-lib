@@ -13,13 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(WitherSkull.class)
 public abstract class WitherSkullMixin {
 
-    @WrapOperation(
-            method = "onHitEntity",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/LivingEntity;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z"
-            )
-    )
+    @WrapOperation(method = "onHitEntity", at = @At(value = "INVOKE",target = "Lnet/minecraft/world/entity/LivingEntity;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean skipWitherEffectWhenElemental(LivingEntity target, MobEffectInstance effect, Entity source, Operation<Boolean> original) {
         WitherSkull skull = (WitherSkull) (Object) this;
         if (skull.isDangerous() || !BabelConfig.witherElementalDamage) {

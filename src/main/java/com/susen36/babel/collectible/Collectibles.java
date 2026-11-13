@@ -28,11 +28,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Collectibles implements INBTSerializable<ListTag> {
     @NotNull
-    public static final HashBiMap<String, RegistryObject<Item>> Collectibles = HashBiMap.create();
+    public static final HashBiMap<ResourceLocation, RegistryObject<Item>> REGISTRY = HashBiMap.create();
 
     private static final String ID = "id";
     private static final String USED = "used";
@@ -168,7 +167,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
     /**
      * 整条移除收藏品状态；unmarkUsed 仅取消激活，层与冷却数据保留。
      */
-    public static void deactivateAndSync(@NotNull Player player, @NotNull Item item) {
+    public static void removeAndSync(@NotNull Player player, @NotNull Item item) {
         Collectibles data = getData(player);
         if (!player.level().isClientSide && data != null) {
             data.remove(item);
@@ -247,30 +246,18 @@ public class Collectibles implements INBTSerializable<ListTag> {
         });
     }
 
-    public static @NotNull String getIdByItem(@NotNull Holder<Item> item) {
-        return getIdByItem(item.value());
-    }
-
-    // 注册表冻结后 item 到 id 的映射不变；Item 为注册期懒创建，无法在注册时直填
-    private static final Map<Item, String> ITEM_ID_CACHE = new ConcurrentHashMap<>();
-
-    // 方法引用 Collectibles::resolveIdByItem 会因同名静态字段被解析为表达式，改用 lambda
-    public static @NotNull String getIdByItem(@NotNull Item item) {
-        return ITEM_ID_CACHE.computeIfAbsent(item, target -> resolveIdByItem(target));
-    }
-
-    private static @NotNull String resolveIdByItem(@NotNull Item item) {
+    private static @Nullable ResourceLocation getIdByItem(@NotNull Item item) {
         ResourceLocation key = BuiltInRegistries.ITEM.getKey(item);
-        RegistryObject<Item> entry = Collectibles.get(key.getPath());
-        if (entry != null && entry.getId() != null && entry.getId().equals(key)) {
-            return key.getPath();
+        RegistryObject<Item> entry = REGISTRY.get(key);
+        if (entry == null) {
+            LogUtils.getLogger().error("try to query {} in Collectibles, but not matched.", item);
+            return null;
         }
-        LogUtils.getLogger().error("try to query {} in Collectibles, but not matched.", item);
-        return "null";
+        return key;
     }
 
-    private static @Nullable Item resolveItem(@NotNull String id) {
-        RegistryObject<Item> entry = Collectibles.get(id);
+    private static @Nullable Item resolveItem(@NotNull ResourceLocation id) {
+        RegistryObject<Item> entry = REGISTRY.get(id);
         Item item = null;
         if (entry != null && entry.isPresent()) {
             item = entry.get();
@@ -282,9 +269,13 @@ public class Collectibles implements INBTSerializable<ListTag> {
     public ListTag serializeNBT() {
         var list = new ListTag();
         for (var entry : states.entrySet()) {
+            ResourceLocation id = getIdByItem(entry.getKey());
+            if (id == null) {
+                continue;
+            }
             var tag = new CompoundTag();
             CollectibleState state = entry.getValue();
-            tag.putString(ID, getIdByItem(entry.getKey()));
+            tag.putString(ID, id.toString());
             tag.putBoolean(USED, state.used);
             tag.putInt(LAYER, state.layer);
             tag.putLong(COOLDOWN, state.cooldownEndTick);
@@ -299,7 +290,11 @@ public class Collectibles implements INBTSerializable<ListTag> {
         states.clear();
         for (Tag element : list) {
             if (element instanceof CompoundTag tag) {
-                Item item = resolveItem(tag.getString(ID));
+                Item item = null;
+                ResourceLocation id = ResourceLocation.tryParse(tag.getString(ID));
+                if (id != null) {
+                    item = resolveItem(id);
+                }
                 if (item == null) {
                     BabelMod.LOGGER.warn("Skipping unknown collectible id in saved data: {}", tag.getString(ID));
                     continue;

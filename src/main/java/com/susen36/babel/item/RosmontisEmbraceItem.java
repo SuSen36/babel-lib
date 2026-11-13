@@ -22,10 +22,5 @@ public class RosmontisEmbraceItem extends CollectibleItem.CustomCollectibleItem 
                         .build());
         addRangeAttributeModifier(Monster.class, Attributes.MAX_HEALTH, -0.10, AttributeModifier.Operation.MULTIPLY_BASE);
         addRangeAttributeModifier(Monster.class, Attributes.ARMOR, -0.20, AttributeModifier.Operation.MULTIPLY_BASE);
-        addRangeEffect(Monster.class, (monster, player, layer) -> {
-            if (monster.getHealth() > monster.getMaxHealth()) {
-                monster.setHealth(monster.getMaxHealth());
-            }
-        });
     }
 }

@@ -24,7 +24,7 @@ public class GoldExpeditionItem extends CollectibleItem.CustomCollectibleItem {
     }
 
     @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+    public void onEffectStarted(ItemStack stack, Level level, Player player) {
         if (level instanceof ServerLevel) {
             player.giveExperienceLevels(6);
             ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.GOLD_INGOT, 12));

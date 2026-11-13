@@ -1,7 +1,6 @@
 package com.susen36.babel.command;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -12,7 +11,9 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.Nullable;
@@ -27,18 +28,18 @@ public class CollectibleCommand {
     private static final LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal("collectible")
             .then(Commands.literal("give").requires(s -> s.hasPermission(2))
                     .then(Commands.argument("targets", EntityArgument.players())
-                            .then(Commands.argument("collectible", StringArgumentType.word())
+                            .then(Commands.argument("collectible", ResourceLocationArgument.id())
                                     .suggests((ctx, builder) ->
-                                            SharedSuggestionProvider.suggest(Collectibles.Collectibles.keySet(), builder))
+                                            SharedSuggestionProvider.suggestResource(Collectibles.REGISTRY.keySet(), builder))
                                     .executes(ctx -> give(ctx, 0))
                                     .then(Commands.argument("layer", IntegerArgumentType.integer(0))
                                             .executes(ctx -> give(ctx, IntegerArgumentType.getInteger(ctx, "layer")))))))
             .then(Commands.literal("clear").requires(s -> s.hasPermission(2))
                     .then(Commands.argument("targets", EntityArgument.players())
                             .executes(CollectibleCommand::clearCollectibles)
-                            .then(Commands.argument("collectible", StringArgumentType.word())
+                            .then(Commands.argument("collectible", ResourceLocationArgument.id())
                                     .suggests((ctx, builder) ->
-                                            SharedSuggestionProvider.suggest(Collectibles.Collectibles.keySet(), builder))
+                                            SharedSuggestionProvider.suggestResource(Collectibles.REGISTRY.keySet(), builder))
                                     .executes(CollectibleCommand::clearCollectible))));
 
     public static LiteralArgumentBuilder<CommandSourceStack> get() {
@@ -46,8 +47,8 @@ public class CollectibleCommand {
     }
 
     private static Item resolveCollectible(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        String id = StringArgumentType.getString(ctx, "collectible");
-        var entry = Collectibles.Collectibles.get(id);
+        ResourceLocation id = ResourceLocationArgument.getId(ctx, "collectible");
+        var entry = Collectibles.REGISTRY.get(id);
         if (entry != null && entry.get() != null) {
             return entry.get();
         }
@@ -71,7 +72,7 @@ public class CollectibleCommand {
         Item item = resolveCollectible(ctx);
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "targets");
         for (ServerPlayer player : targets) {
-            Collectibles.deactivateAndSync(player, item);
+            Collectibles.removeAndSync(player, item);
         }
         sendFeedback(ctx, "command.collectible.remove", targets, item);
         return targets.size();

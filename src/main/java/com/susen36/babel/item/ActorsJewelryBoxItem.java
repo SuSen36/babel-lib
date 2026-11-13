@@ -24,7 +24,7 @@ public class ActorsJewelryBoxItem extends CollectibleItem.CustomCollectibleItem 
     }
 
     @Override
-    public void onEffectStarted(ItemStack stack, Level level, Player player, int layer) {
+    public void onEffectStarted(ItemStack stack, Level level, Player player) {
         if (!player.level().isClientSide()) {
             ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(BabelItems.ORIGINIUM_INGOT.get(), 18));
         }

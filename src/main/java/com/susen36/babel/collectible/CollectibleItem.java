@@ -4,10 +4,12 @@ import com.susen36.babel.BabelConfig;
 import com.susen36.babel.api.event.CollectibleEvent;
 import com.susen36.babel.api.event.ElementEvent;
 import com.susen36.babel.api.event.LifePointConsumeEvent;
+import com.susen36.babel.difficulty.NDifficulty;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -114,7 +116,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
 
     // 稀有度仅由档位决定
     @Override
-    public final Rarity getRarity(ItemStack stack) {
+    public Rarity getRarity(ItemStack stack) {
         return rarityForTier(tier);
     }
 
@@ -129,22 +131,37 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         return super.getName(stack);
     }
 
+
     /**
      * 所有收藏品通用逐行描述：键名按注册名生成，直到 lang 中不存在下一个 description_N 为止。
+     * 每行优先读取 description_N.<难度小写>，缺失时回退 description_N（EASY 默认文案）。
      */
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @NotNull Level level, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         String descKey = this.getDescriptionId() + ".description";
+        // 描述难度变体键：expert 为顶格挡位，险境及以上并入 expert
+        String tierSuffix = "." + switch (NDifficulty.difficultyLevel(level).tier()) {
+            case EASY -> "easy";
+            case NORMAL -> "normal";
+            case HARD -> "hard";
+            case EXPERT, PERILOUS -> "expert";
+        };
         for (int i = 0; ; i++) {
             String key = descKey + "_" + i;
-            Component line = i == 0
-                    ? Component.translatable(key).withStyle(ChatFormatting.AQUA)
-                    : Component.translatable(key).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
+            String tieredKey = key + tierSuffix;
+            MutableComponent tiered = Component.translatable(tieredKey);
+            MutableComponent line = tiered.getString().equals(tieredKey)
+                    ? Component.translatable(key)
+                    : tiered;
             if (line.getString().equals(key)) {
                 break;
             }
-            tooltip.add(line);
+            if (i == 0) {
+                tooltip.add(line.withStyle(ChatFormatting.AQUA));
+            } else {
+                tooltip.add(line.withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+            }
         }
     }
 
@@ -266,8 +283,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         }
         CollectibleEvent.onUsed(player, item);
         playSuccess(level, player, stack);
-        int layer = Collectibles.getLayerData(player).getLayer(item);
-        effect.onEffectStarted(stack, level, player, layer);
+        effect.onEffectStarted(stack, level, player);
         if (level instanceof ServerLevel) {
             BabelNetwork.syncCollectibles(player);
         }
@@ -304,8 +320,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         void onEffectStarted(
                 @NotNull ItemStack stack,
                 @NotNull Level level,
-                @NotNull Player player,
-                int layer
+                @NotNull Player player
         );
     }
 
@@ -584,20 +599,34 @@ public final class CollectibleItem extends Item implements CollectibleLike {
 
         /**
          * 所有收藏品通用逐行描述：键名按注册名生成，直到 lang 中不存在下一个 description_N 为止。
+         * 每行优先读取 description_N.<难度小写>，缺失时回退 description_N（EASY 默认文案）。
          */
         @Override
-        final public void appendHoverText(@NotNull ItemStack stack, @NotNull Level level, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
+        public void appendHoverText(@NotNull ItemStack stack, @NotNull Level level, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltip, flag);
             String descKey = this.getDescriptionId() + ".description";
+            // 描述难度变体键：expert 为顶格挡位，险境及以上并入 expert
+            String tierSuffix = "." + switch (NDifficulty.difficultyLevel(level).tier()) {
+                case EASY -> "easy";
+                case NORMAL -> "normal";
+                case HARD -> "hard";
+                case EXPERT, PERILOUS -> "expert";
+            };
             for (int i = 0; ; i++) {
                 String key = descKey + "_" + i;
-                Component line = i == 0
-                        ? Component.translatable(key).withStyle(ChatFormatting.AQUA)
-                        : Component.translatable(key).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
+                String tieredKey = key + tierSuffix;
+                MutableComponent tiered = Component.translatable(tieredKey);
+                MutableComponent line = tiered.getString().equals(tieredKey)
+                        ? Component.translatable(key)
+                        : tiered;
                 if (line.getString().equals(key)) {
                     break;
                 }
-                tooltip.add(line);
+                if (i == 0) {
+                    tooltip.add(line.withStyle(ChatFormatting.AQUA));
+                } else {
+                    tooltip.add(line.withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+                }
             }
         }
 
@@ -684,8 +713,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
             }
             CollectibleEvent.onUsed(player, item);
             playSuccess(level, player, stack);
-            int layer = Collectibles.getLayerData(player).getLayer(item);
-            onEffectStarted(stack, level, player, layer);
+            onEffectStarted(stack, level, player);
             if (level instanceof ServerLevel) {
                 BabelNetwork.syncCollectibles(player);
             }
@@ -766,8 +794,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         public void onEffectStarted(
                 @NotNull ItemStack stack,
                 @NotNull Level level,
-                @NotNull Player player,
-                int layer
+                @NotNull Player player
         ) {
         }
     }
