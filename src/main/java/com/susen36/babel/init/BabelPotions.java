@@ -2,7 +2,10 @@ package com.susen36.babel.init;
 
 import com.susen36.babel.BabelMod;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionBrewing;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -17,5 +20,12 @@ public class BabelPotions {
     public static final RegistryObject<Potion> STRONG_INVISIBLE = REGISTRY.register("strong_invisible", () -> new Potion("invisible", new MobEffectInstance(BabelMobEffects.INVISIBLE.get(), 9600, 1)));
 
     private BabelPotions() {
+    }
+
+    public static void registerBrewingRecipes() {
+        PotionBrewing.addMix(Potions.INVISIBILITY, Items.INK_SAC, INVISIBLE.get());
+        PotionBrewing.addMix(INVISIBLE.get(), Items.REDSTONE, LONG_INVISIBLE.get());
+        PotionBrewing.addMix(Potions.AWKWARD, Items.ENDER_EYE, MAGIC_DODGE.get());
+        PotionBrewing.addMix(Potions.AWKWARD, Items.ENDER_PEARL, PHYSICAL_DODGE.get());
     }
 }
