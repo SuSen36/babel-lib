@@ -114,6 +114,7 @@ public class BabelCollectible {
     public static RegistryObject<Item> EMPTY_FOWLBEAST;
     public static RegistryObject<Item> TIMEWORN_POETRY_STRIPS;
     public static RegistryObject<Item> RAINBOW_JAR;
+    public static RegistryObject<Item> LITTLE_GRAN_FARO;
     public static RegistryObject<Item> ORIRON_ROUND_SHIELD;
     public static RegistryObject<Item> FRISTON_P;
     public static RegistryObject<Item> STRING_PUPPET;
@@ -258,6 +259,7 @@ public class BabelCollectible {
         BABEL_COLLECTIBLES.add(ANGELINA_INSPIRATION = REGISTRY.registerCollectible("angelina_inspiration", AngelinaInspirationItem::new));
         BABEL_COLLECTIBLES.add(OLD_FAN = REGISTRY.registerCollectible("old_fan", OldFanItem::new));
         BABEL_COLLECTIBLES.add(RAINBOW_JAR = REGISTRY.registerCollectible("rainbow_jar", RainbowJarItem::new));
+        BABEL_COLLECTIBLES.add(LITTLE_GRAN_FARO = REGISTRY.registerCollectible("little_gran_faro", LittleGranFaroItem::new));
         BABEL_COLLECTIBLES.add(ORIRON_ROUND_SHIELD = REGISTRY.registerCollectible("oriron_round_shield", OrironRoundShieldItem::new));
         BABEL_COLLECTIBLES.add(FRISTON_P = REGISTRY.registerCollectible("friston_p", FristonPItem::new));
         BABEL_COLLECTIBLES.add(STRING_PUPPET = REGISTRY.registerCollectible("string_puppet", StringPuppetItem::new));

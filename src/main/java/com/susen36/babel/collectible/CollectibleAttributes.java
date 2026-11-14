@@ -37,8 +37,8 @@ public final class CollectibleAttributes {
                 if (item instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     for (CollectibleItem.CustomCollectibleItem.AttributeBonus bonus : collectible.getAttributeBonuses()) {
                         int stacks = 0;
-                        if (used != null) {
-                            stacks = used.isUsed(item) ? bonus.stacks().getStacks(player, collectible) : 0;
+                        if (!Collectibles.isEffectSuppressed(player) && used != null && used.isUsed(item)) {
+                            stacks = bonus.stacks().getStacks(player, collectible);
                         }
                         AttributeInstance instance = player.getAttribute(bonus.attribute());
                         if (instance != null) {
@@ -79,7 +79,8 @@ public final class CollectibleAttributes {
             Set<LivingEntity> healthTargets = new HashSet<>();
             for (RegistryObject<Item> entry : Collectibles.REGISTRY.values()) {
                 Item item = entry.get();
-                if (used != null && used.isUsed(item) && item instanceof CollectibleItem.CustomCollectibleItem collectible) {
+                // 被总闸压制时按无生效收藏品处理：expected 保持为空，下方的 stale 清理会移除全部遗留范围修饰符
+                if (!Collectibles.isEffectSuppressed(player) && used != null && used.isUsed(item) && item instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     for (CollectibleItem.CustomCollectibleItem.RangeAttributeBonus bonus : collectible.getRangeAttributeBonuses()) {
                         ModifierIdentity identity = modifierIdentity(item, bonus.attribute(), bonus.idSuffix());
                         UUID modifierId = identity.id();

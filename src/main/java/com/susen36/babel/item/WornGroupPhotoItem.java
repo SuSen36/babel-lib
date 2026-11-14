@@ -5,9 +5,9 @@ import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.Item;
 
 public class WornGroupPhotoItem extends CollectibleItem.CustomCollectibleItem {
@@ -20,6 +20,6 @@ public class WornGroupPhotoItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)
                         .showOverlay(true)
                         .build());
-        addRangeAttributeModifier(Monster.class, Attributes.ARMOR, -0.12, AttributeModifier.Operation.MULTIPLY_BASE);
+        addRangeAttributeModifier(Mob.class, Attributes.ARMOR, -0.12, AttributeModifier.Operation.MULTIPLY_BASE, ENEMY_OF_PLAYER);
     }
 }

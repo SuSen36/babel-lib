@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.susen36.babel.init.BabelMobEffects;
-import net.minecraft.ResourceLocationException;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
@@ -19,12 +18,25 @@ import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Robbery {
+    private static final int DEFAULT_SPAWN_RANGE = 4;
+    private static final int DEFAULT_MOBS_PER_WAVE = 6;
+    private static final int DEFAULT_WAVE_COUNT = 5;
+    private static final int DEFAULT_SIMULTANEOUS_MOBS = 4;
+    private static final int DEFAULT_TICKS_BETWEEN_SPAWN = 10;
+    private static final int DEFAULT_INITIAL_SPAWN_COUNT = 3;
+    private static final int DEFAULT_WAVE_INTERVAL_TICKS = 300;
+    private static final int DEFAULT_SUPPORT_INTERVAL_TICKS = 460;
+    private static final float DEFAULT_SUPPORT_RADIUS = 8.0F;
+    private static final float DEFAULT_SUPPORT_HEAL_PER_PULSE = 2.0F;
+
     // 懒加载：静态初始化若早于药水效果注册，RegistryObject.get() 会抛异常
     public static Robbery defaultConfig() {
-        return new Robbery(4, 6, 5, 4, 10, 3, 300,
-                460, 8.0F, 2.0F,
+        return new Robbery(DEFAULT_SPAWN_RANGE, DEFAULT_MOBS_PER_WAVE, DEFAULT_WAVE_COUNT, DEFAULT_SIMULTANEOUS_MOBS,
+                DEFAULT_TICKS_BETWEEN_SPAWN, DEFAULT_INITIAL_SPAWN_COUNT, DEFAULT_WAVE_INTERVAL_TICKS,
+                DEFAULT_SUPPORT_INTERVAL_TICKS, DEFAULT_SUPPORT_RADIUS, DEFAULT_SUPPORT_HEAL_PER_PULSE,
                 List.of(
                         new SpawnEntry(5, EntityType.VINDICATOR, null, 1),
                         new SpawnEntry(3, EntityType.PILLAGER, null, 1)
@@ -82,6 +94,16 @@ public class Robbery {
         if (supportGroups.isEmpty()) {
             throw new IllegalArgumentException("supportGroups cannot be empty");
         }
+        require(spawnRange > 0, "spawnRange must be positive");
+        require(mobsPerWave >= 1, "mobsPerWave must be >= 1");
+        require(waveCount >= 1, "waveCount must be >= 1");
+        require(simultaneousMobs >= 1, "simultaneousMobs must be >= 1");
+        require(ticksBetweenSpawn >= 1, "ticksBetweenSpawn must be >= 1");
+        require(initialSpawnCount >= 0, "initialSpawnCount must be >= 0");
+        require(waveIntervalTicks >= 1, "waveIntervalTicks must be >= 1");
+        require(supportIntervalTicks >= 1, "supportIntervalTicks must be >= 1");
+        require(supportRadius > 0.0F, "supportRadius must be positive");
+        require(supportHealPerPulse >= 0.0F, "supportHealPerPulse must be >= 0");
         this.spawnRange = spawnRange;
         this.mobsPerWave = mobsPerWave;
         this.waveCount = waveCount;
@@ -95,6 +117,12 @@ public class Robbery {
         this.spawnPotentials = List.copyOf(spawnPotentials);
         this.supportGroups = List.copyOf(supportGroups);
         this.bossBarName = bossBarName;
+    }
+
+    private static void require(boolean condition, String message) {
+        if (!condition) {
+            throw new IllegalArgumentException(message);
+        }
     }
 
     public int getSpawnRange() {
@@ -150,16 +178,16 @@ public class Robbery {
     }
 
     public static Robbery fromJson(JsonObject json) {
-        int spawnRange = GsonHelper.getAsInt(json, "spawn_range", 4);
-        int mobsPerWave = GsonHelper.getAsInt(json, "mobs_per_wave", 6);
-        int waveCount = GsonHelper.getAsInt(json, "wave_count", 5);
-        int waveIntervalTicks = GsonHelper.getAsInt(json, "wave_interval_ticks", 300);
-        int supportIntervalTicks = GsonHelper.getAsInt(json, "support_interval_ticks", 460);
-        int simultaneousMobs = GsonHelper.getAsInt(json, "simultaneous_mobs", 4);
-        int ticksBetweenSpawn = GsonHelper.getAsInt(json, "ticks_between_spawn", 10);
-        int initialSpawnCount = GsonHelper.getAsInt(json, "initial_spawn_count", 3);
-        float supportRadius = GsonHelper.getAsFloat(json, "support_radius", 8.0F);
-        float supportHealPerPulse = GsonHelper.getAsFloat(json, "support_heal_per_pulse", 2.0F);
+        int spawnRange = GsonHelper.getAsInt(json, "spawn_range", DEFAULT_SPAWN_RANGE);
+        int mobsPerWave = GsonHelper.getAsInt(json, "mobs_per_wave", DEFAULT_MOBS_PER_WAVE);
+        int waveCount = GsonHelper.getAsInt(json, "wave_count", DEFAULT_WAVE_COUNT);
+        int waveIntervalTicks = GsonHelper.getAsInt(json, "wave_interval_ticks", DEFAULT_WAVE_INTERVAL_TICKS);
+        int supportIntervalTicks = GsonHelper.getAsInt(json, "support_interval_ticks", DEFAULT_SUPPORT_INTERVAL_TICKS);
+        int simultaneousMobs = GsonHelper.getAsInt(json, "simultaneous_mobs", DEFAULT_SIMULTANEOUS_MOBS);
+        int ticksBetweenSpawn = GsonHelper.getAsInt(json, "ticks_between_spawn", DEFAULT_TICKS_BETWEEN_SPAWN);
+        int initialSpawnCount = GsonHelper.getAsInt(json, "initial_spawn_count", DEFAULT_INITIAL_SPAWN_COUNT);
+        float supportRadius = GsonHelper.getAsFloat(json, "support_radius", DEFAULT_SUPPORT_RADIUS);
+        float supportHealPerPulse = GsonHelper.getAsFloat(json, "support_heal_per_pulse", DEFAULT_SUPPORT_HEAL_PER_PULSE);
         List<SpawnEntry> spawnPotentials = new ArrayList<>();
         JsonArray potentials = GsonHelper.getAsJsonArray(json, "spawn_potentials", null);
         if (potentials != null) {
@@ -187,19 +215,32 @@ public class Robbery {
                 bossBarName = parsed;
             }
         }
+        for (SpawnEntry entry : spawnPotentials) {
+            if (entry.minWave() > waveCount) {
+                throw new JsonSyntaxException("spawn entry min_wave " + entry.minWave() + " exceeds wave_count " + waveCount);
+            }
+        }
         return new Robbery(spawnRange, mobsPerWave, waveCount, simultaneousMobs,
                 ticksBetweenSpawn, initialSpawnCount, waveIntervalTicks, supportIntervalTicks, supportRadius,
                 supportHealPerPulse, spawnPotentials, supportGroups, bossBarName);
     }
 
     public record SpawnEntry(int weight, EntityType<?> type, @Nullable CompoundTag tag, int minWave) {
+        public SpawnEntry {
+            Objects.requireNonNull(type, "type");
+            if (weight < 0) {
+                throw new IllegalArgumentException("weight must be >= 0");
+            }
+            if (minWave < 1) {
+                throw new IllegalArgumentException("minWave must be >= 1");
+            }
+        }
+
         private static SpawnEntry fromJson(JsonObject json) {
             int weight = GsonHelper.getAsInt(json, "weight", 1);
             String entityId = GsonHelper.getAsString(json, "entity");
-            ResourceLocation entityKey;
-            try {
-                entityKey = new ResourceLocation(entityId);
-            } catch (ResourceLocationException e) {
+            ResourceLocation entityKey = ResourceLocation.tryParse(entityId);
+            if (entityKey == null) {
                 throw new JsonSyntaxException("Invalid entity id format: " + entityId);
             }
             EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(entityKey);
@@ -211,7 +252,7 @@ public class Robbery {
                 try {
                     tag = TagParser.parseTag(GsonHelper.getAsString(json, "nbt"));
                 } catch (CommandSyntaxException e) {
-                    throw new JsonSyntaxException("Invalid nbt in robbery spawn entry: " + e.getMessage());
+                    throw new JsonSyntaxException("Invalid nbt in robbery spawn entry: " + e.getMessage(), e);
                 }
             }
             int minWave = Math.max(1, GsonHelper.getAsInt(json, "min_wave", 1));
@@ -220,6 +261,13 @@ public class Robbery {
     }
 
     public record SupportGroup(List<SupportEffect> effects) {
+        public SupportGroup {
+            if (effects.isEmpty()) {
+                throw new IllegalArgumentException("effect group requires at least one effect");
+            }
+            effects = List.copyOf(effects);
+        }
+
         private static SupportGroup fromJson(JsonObject json) {
             JsonArray effects = GsonHelper.getAsJsonArray(json, "effects");
             List<SupportEffect> list = new ArrayList<>();
@@ -234,12 +282,20 @@ public class Robbery {
     }
 
     public record SupportEffect(MobEffect effect, int duration, int amplifier) {
+        public SupportEffect {
+            Objects.requireNonNull(effect, "effect");
+            if (duration < 0) {
+                throw new IllegalArgumentException("duration must be >= 0");
+            }
+            if (amplifier < 0) {
+                throw new IllegalArgumentException("amplifier must be >= 0");
+            }
+        }
+
         private static SupportEffect fromJson(JsonObject json) {
             String effectId = GsonHelper.getAsString(json, "effect");
-            ResourceLocation effectKey;
-            try {
-                effectKey = new ResourceLocation(effectId);
-            } catch (ResourceLocationException e) {
+            ResourceLocation effectKey = ResourceLocation.tryParse(effectId);
+            if (effectKey == null) {
                 throw new JsonSyntaxException("Invalid effect id format: " + effectId);
             }
             MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue(effectKey);

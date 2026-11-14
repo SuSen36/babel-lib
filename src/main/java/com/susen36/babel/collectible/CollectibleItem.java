@@ -20,9 +20,12 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -343,7 +346,7 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         }
 
         /**
-         * 层数来源：每 10 tick 对账时按返回层数乘算属性值；未激活的收藏品统一按 0 层处理，此回调不会被调用。
+         * 属性倍率来源：每 10 tick 对账时按返回倍率乘算属性值；未激活的收藏品统一按 0 处理，此回调不会被调用。
          */
         @FunctionalInterface
         public interface AttributeStacks {
@@ -360,16 +363,22 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         public static final AttributeStacks LAYER_STACKS = (player, self) ->
                 Collectibles.getLayerData(player).getLayer(self);
 
+        /** 固定值通道：收藏品激活期间恒定 perStack 加成；注册期即确定数值，不经过运行时上下文，无法读取玩家或世界状态。 */
         protected final CustomCollectibleItem addAttributeModifier(Attribute attribute, double perStack, AttributeModifier.Operation operation) {
             this.attributeBonuses.add(new AttributeBonus(attribute, perStack, operation, ONE_STACK));
             return this;
         }
 
+        /** 叠层通道：层数取收藏品当前叠层数据（如石祭坛的击杀叠层），期望值 = perStack × 叠层数。 */
         protected final CustomCollectibleItem addLayerAttributeModifier(Attribute attribute, double perStack, AttributeModifier.Operation operation) {
             this.attributeBonuses.add(new AttributeBonus(attribute, perStack, operation, LAYER_STACKS));
             return this;
         }
 
+        /**
+         * 条件通道：每 10 tick 对账时以回调重新计算倍率，可读取玩家与世界状态（难度、时间、背包、周围实体等）；
+         * 返回 0 移除修饰符，条件变化自动增删。需要运行时上下文的加成只能走此通道。
+         */
         protected final CustomCollectibleItem addConditionalAttributeModifier(Attribute attribute, double perStack, AttributeModifier.Operation operation, AttributeStacks stacks) {
             this.attributeBonuses.add(new AttributeBonus(attribute, perStack, operation, stacks));
             return this;
@@ -511,11 +520,32 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         /** 归属过滤：仅命中 OwnableEntity 且主人为持有者本人的实体；原版 getOwner 只解析玩家 UUID，驯服者若非玩家会返回 null。 */
         public static final BiPredicate<LivingEntity, Player> OWNED_BY_PLAYER = (entity, player) -> entity instanceof OwnableEntity ownable && ownable.getOwner() == player;
 
+        /** 归属过滤：玩家创建的铁傀儡；原版傀儡不实现 OwnableEntity 且无主人概念，需与随从判定分开单列。 */
+        public static final BiPredicate<LivingEntity, Player> PLAYER_CREATED = (entity, player) -> entity instanceof IronGolem golem && golem.isPlayerCreated();
+
+        /** 归属过滤：召唤物 = 玩家的宠物（含傀儡类 OwnableEntity）与玩家创建的铁傀儡。 */
+        public static final BiPredicate<LivingEntity, Player> SUMMON_OF_PLAYER = (entity, player) ->
+                OWNED_BY_PLAYER.test(entity, player) || PLAYER_CREATED.test(entity, player);
+
+        /** 归属过滤：友方单位 = 干员（玩家）、召唤物，或记分板队伍 isAlliedTo 命中的同阵营实体。 */
+        public static final BiPredicate<LivingEntity, Player> ALLIED_WITH_PLAYER = (entity, player) ->
+                entity instanceof Player || entity.isAlliedTo(player) || SUMMON_OF_PLAYER.test(entity, player);
+
+        /** 归属过滤：敌方实体 = 原版 Enemy 敌对类型或正在锁定玩家，且非友方单位。 */
+        public static final BiPredicate<LivingEntity, Player> ENEMY_OF_PLAYER = (entity, player) ->
+                (entity instanceof Enemy || (entity instanceof Mob mob && mob.getTarget() == player))
+                        && !ALLIED_WITH_PLAYER.test(entity, player);
+
         private final List<RangeAttributeBonus> rangeAttributeBonuses = new ArrayList<>();
 
         /** 注册范围属性修饰符：由 CollectibleAttributes 每 20 tick 对账增删，实体离开范围、收藏品失效或玩家登出后自动移除。 */
         protected final <T extends LivingEntity> void addRangeAttributeModifier(Class<T> entityType, double range, Attribute attribute, double amount, AttributeModifier.Operation operation) {
             this.rangeAttributeBonuses.add(new RangeAttributeBonus(entityType, range, attribute, amount, operation));
+        }
+
+        /** 注册范围属性修饰符（显式范围 + 归属过滤）：范围偏离 MONSTER_RANGE 默认值时使用。 */
+        protected final <T extends LivingEntity> void addRangeAttributeModifier(Class<T> entityType, double range, Attribute attribute, double amount, AttributeModifier.Operation operation, @Nullable BiPredicate<LivingEntity, Player> ownerFilter) {
+            this.rangeAttributeBonuses.add(new RangeAttributeBonus(entityType, range, attribute, amount, operation, ownerFilter));
         }
 
         /** 注册范围属性修饰符（带归属过滤，默认 MONSTER_RANGE）：仅对 ownerFilter 判定通过的实体生效。 */

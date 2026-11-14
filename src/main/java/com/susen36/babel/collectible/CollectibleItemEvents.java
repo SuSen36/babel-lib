@@ -35,7 +35,7 @@ public class CollectibleItemEvents {
     // 必须按注册顺序遍历：攻击/击杀钩子共用玩家随机数，遍历顺序变化会改变掷骰结果
     // 玩家死亡瞬间 Capability 可能已被注销（removed=KILLED），此时静默跳过
     private static void forEachUsedCollectible(Player player, UsedCollectibleHook hook) {
-        Collectibles usedData = Collectibles.getData(player);
+        Collectibles usedData = Collectibles.isEffectSuppressed(player) ? null : Collectibles.getData(player);
         if (usedData != null) {
             Collectibles.Layer layerData = Collectibles.getLayerData(player);
             for (RegistryObject<Item> holder : Collectibles.REGISTRY.values()) {
@@ -79,7 +79,7 @@ public class CollectibleItemEvents {
             Collectibles.Layer layerData = Collectibles.getLayerData(player);
             Map<RangeKey, List<? extends LivingEntity>> rangedEntities = new HashMap<>();
             for (RegistryObject<Item> holder : Collectibles.REGISTRY.values()) {
-                if (usedData != null && usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible) {
+                if (!Collectibles.isEffectSuppressed(player) && usedData != null && usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     int layer = layerData.getLayer(holder.get());
                     for (CollectibleItem.CustomCollectibleItem.RangeBinding<?> binding : collectible.getRangeEffects()) {
                         dispatchRange(binding, rangedEntities, player, layer);

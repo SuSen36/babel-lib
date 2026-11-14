@@ -6,7 +6,7 @@ import com.susen36.babel.collectible.CollectibleTiers;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 
 public class StandardRiotGearItem extends CollectibleItem.CustomCollectibleItem {
@@ -20,7 +20,7 @@ public class StandardRiotGearItem extends CollectibleItem.CustomCollectibleItem 
                         .particle(ParticleTypes.CLOUD, 72)
                         .showOverlay(true)
                         .build());
-        addDamageEffect(Monster.class, (event, player, target, layer) -> {
+        addDamageEffect(Mob.class, (event, player, target, layer) -> {
             if (!event.isCanceled() && target.isAlive() && EXTRA_DAMAGE_TARGET.get() != target) {
                 EXTRA_DAMAGE_TARGET.set(target);
                 int savedInvulnerable = target.invulnerableTime;
@@ -32,6 +32,6 @@ public class StandardRiotGearItem extends CollectibleItem.CustomCollectibleItem 
                     target.invulnerableTime = Math.max(savedInvulnerable, target.invulnerableTime);
                 }
             }
-        });
+        }, ENEMY_OF_PLAYER);
     }
 }

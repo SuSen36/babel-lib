@@ -5,9 +5,9 @@ import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.Item;
 
 public class ShallowsWhispersItem extends CollectibleItem.CustomCollectibleItem {
@@ -19,9 +19,9 @@ public class ShallowsWhispersItem extends CollectibleItem.CustomCollectibleItem 
                         .particle(ParticleTypes.SMOKE, 72)
                         .autoUseOnGain(true)
                         .build());
-        addRangeAttributeModifier(Monster.class, Double.POSITIVE_INFINITY, Attributes.ATTACK_DAMAGE, 0.08D, AttributeModifier.Operation.MULTIPLY_BASE);
-        addRangeAttributeModifier(Monster.class, Double.POSITIVE_INFINITY, Attributes.ARMOR, 0.08D, AttributeModifier.Operation.MULTIPLY_BASE);
-        addRangeAttributeModifier(Monster.class, Double.POSITIVE_INFINITY, Attributes.MAX_HEALTH, 0.08D, AttributeModifier.Operation.MULTIPLY_BASE);
+        addRangeAttributeModifier(Mob.class, Double.POSITIVE_INFINITY, Attributes.ATTACK_DAMAGE, 0.08D, AttributeModifier.Operation.MULTIPLY_BASE, ENEMY_OF_PLAYER);
+        addRangeAttributeModifier(Mob.class, Double.POSITIVE_INFINITY, Attributes.ARMOR, 0.08D, AttributeModifier.Operation.MULTIPLY_BASE, ENEMY_OF_PLAYER);
+        addRangeAttributeModifier(Mob.class, Double.POSITIVE_INFINITY, Attributes.MAX_HEALTH, 0.08D, AttributeModifier.Operation.MULTIPLY_BASE, ENEMY_OF_PLAYER);
         addAttributeModifier(Attributes.MAX_HEALTH, -0.15D, AttributeModifier.Operation.MULTIPLY_BASE);
     }
 }

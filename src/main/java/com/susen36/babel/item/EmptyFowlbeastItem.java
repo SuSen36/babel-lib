@@ -7,7 +7,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
@@ -26,19 +25,19 @@ public class EmptyFowlbeastItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.SNOWFLAKE, 72)
                         .showOverlay(true)
                         .build());
-        addRangeAttributeModifier(LivingEntity.class, Attributes.MAX_HEALTH, 0.30D, AttributeModifier.Operation.MULTIPLY_BASE, OWNED_BY_PLAYER);
-        addRangeAttributeModifier(LivingEntity.class, Attributes.ATTACK_DAMAGE, 0.30D, AttributeModifier.Operation.MULTIPLY_BASE, OWNED_BY_PLAYER);
-        addConditionalAttributeModifier(Attributes.ATTACK_DAMAGE, 0.60D, AttributeModifier.Operation.MULTIPLY_BASE, OWNED_PET_IN_RANGE);
+        addRangeAttributeModifier(LivingEntity.class, Attributes.MAX_HEALTH, 0.30D, AttributeModifier.Operation.MULTIPLY_BASE, SUMMON_OF_PLAYER);
+        addRangeAttributeModifier(LivingEntity.class, Attributes.ATTACK_DAMAGE, 0.30D, AttributeModifier.Operation.MULTIPLY_BASE, SUMMON_OF_PLAYER);
+        addConditionalAttributeModifier(Attributes.ATTACK_DAMAGE, 0.60D, AttributeModifier.Operation.MULTIPLY_BASE, SUMMON_IN_RANGE);
     }
 
-    // 仅当范围内存在主人本人的宠物时返回 1 层
-    private static final AttributeStacks OWNED_PET_IN_RANGE = (player, self) -> {
+    // 仅当范围内存在召唤物（玩家的宠物或玩家创建的铁傀儡）时返回 1 层
+    private static final AttributeStacks SUMMON_IN_RANGE = (player, self) -> {
         int stacks = 0;
         if (player.level() instanceof ServerLevel serverLevel) {
             List<? extends LivingEntity> entities = serverLevel.getEntitiesOfClass(LivingEntity.class,
                     new AABB(player.position(), player.position()).inflate(MONSTER_RANGE));
             for (LivingEntity living : entities) {
-                if (living instanceof OwnableEntity ownable && ownable.getOwner() == player) {
+                if (SUMMON_OF_PLAYER.test(living, player)) {
                     stacks = 1;
                     break;
                 }

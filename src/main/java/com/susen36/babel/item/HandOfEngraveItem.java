@@ -14,10 +14,9 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -45,7 +44,7 @@ public class HandOfEngraveItem extends CollectibleItem.CustomCollectibleItem {
 
     @Override
     public void onPlayerKill(LivingDeathEvent event, Player player, Entity victim, int layer) {
-        if (layer >= 0 && layer < 99 && (victim instanceof Monster || (victim instanceof Mob mob && mob.getTarget() == player))) {
+        if (layer >= 0 && layer < 99 && victim instanceof LivingEntity living && ENEMY_OF_PLAYER.test(living, player)) {
             ItemStack mainHandItem = player.getMainHandItem();
             boolean validWeapon = mainHandItem.is(Items.TRIDENT) || mainHandItem.is(FORGE_TRIDENTS) || mainHandItem.is(ItemTags.AXES) || event.getSource().is(DamageTypes.TRIDENT)
                     || matchesConfigured(BabelConfig.handEngraveRecognizable,

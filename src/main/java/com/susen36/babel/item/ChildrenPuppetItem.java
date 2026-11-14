@@ -6,7 +6,7 @@ import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.init.BabelMobEffects;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 
@@ -20,13 +20,13 @@ public class ChildrenPuppetItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.ENCHANT, 72)
                         .showOverlay(true)
                         .build());
-        addRangeEffect(Monster.class, (monster, player, layer) -> {
+        addRangeEffect(Mob.class, (monster, player, layer) -> {
             Level level = monster.level();
             if (monster.hasEffect(BabelMobEffects.STUN.get())
                     || monster.hasEffect(BabelMobEffects.FROZEN.get())
                     || monster.hasEffect(BabelMobEffects.BIND.get())) {
                 monster.hurt(level.damageSources().indirectMagic(player, player), 7.5F);
             }
-        });
+        }, ENEMY_OF_PLAYER);
     }
 }

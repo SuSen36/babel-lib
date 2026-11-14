@@ -8,10 +8,9 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -33,7 +32,8 @@ public class CobblestoneAltarItem extends CollectibleItem.CustomCollectibleItem 
     @Override
     public void onPlayerKill(LivingDeathEvent event, Player player, Entity victim, int layer) {
         if (layer >= 0 && layer < 10
-                && (victim instanceof Monster || (victim instanceof Mob mob ? mob.getTarget() : null) == player)
+                && victim instanceof LivingEntity living
+                && ENEMY_OF_PLAYER.test(living, player)
                 && Math.random() < 0.075) {
             if (player != null) {
                 Collectibles.addLayerAndSync(player, this, 1);

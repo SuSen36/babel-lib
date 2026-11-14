@@ -6,7 +6,7 @@ import com.susen36.babel.collectible.CollectibleTiers;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 
 public class ScoutsScopeItem extends CollectibleItem.CustomCollectibleItem {
@@ -21,9 +21,9 @@ public class ScoutsScopeItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)
                         .showOverlay(true)
                         .build());
-        addDamageEffect(Monster.class, (event, player, target, layer) -> {
+        addDamageEffect(Mob.class, (event, player, target, layer) -> {
             float bonus = Mth.clamp(target.distanceTo(player) / MAX_RANGE, 0.0F, 1.0F);
             event.setAmount(event.getAmount() * (1.0F + bonus));
-        });
+        }, ENEMY_OF_PLAYER);
     }
 }

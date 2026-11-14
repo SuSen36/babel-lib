@@ -103,6 +103,11 @@ public class Collectibles implements INBTSerializable<ListTag> {
         original.invalidateCaps();
     }
 
+    /** 收藏品效果总闸：命中即全部停效（自身属性、范围光环、事件钩子、效果 tick）； */
+    public static boolean isEffectSuppressed(@NotNull Player player) {
+        return player.isSpectator();
+    }
+
     @Nullable
     public static Collectibles getData(@NotNull Player player) {
         CollectibleCapability cap = CollectibleCapability.of(player);

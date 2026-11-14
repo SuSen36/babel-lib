@@ -20,8 +20,8 @@ public class TimewornPoetryStripsItem extends CollectibleItem.CustomCollectibleI
                         .particle(ParticleTypes.ENCHANT, 72)
                         .showOverlay(true)
                         .build());
-        addRangeAttributeModifier(LivingEntity.class, Attributes.MAX_HEALTH, 0.30D, AttributeModifier.Operation.MULTIPLY_BASE, OWNED_BY_PLAYER);
-        addRangeAttributeModifier(LivingEntity.class, Attributes.ATTACK_DAMAGE, 0.30D, AttributeModifier.Operation.MULTIPLY_BASE, OWNED_BY_PLAYER);
+        addRangeAttributeModifier(LivingEntity.class, Attributes.MAX_HEALTH, 0.30D, AttributeModifier.Operation.MULTIPLY_BASE, SUMMON_OF_PLAYER);
+        addRangeAttributeModifier(LivingEntity.class, Attributes.ATTACK_DAMAGE, 0.30D, AttributeModifier.Operation.MULTIPLY_BASE, SUMMON_OF_PLAYER);
         // 主人对自家宠物的伤害按最终伤害削减 99%
         addDamageEffect(LivingEntity.class, (event, player, target, layer) -> {
             event.setAmount(event.getAmount() * 0.01F);

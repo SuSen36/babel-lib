@@ -8,7 +8,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -31,14 +30,10 @@ public class OperationFileItem extends CollectibleItem.CustomCollectibleItem {
                         .build());
         addRangeAttributeModifier(IronGolem.class, Attributes.MAX_HEALTH,
                 0.5D, AttributeModifier.Operation.MULTIPLY_BASE,
-                OperationFileItem::playerCreated);
+                PLAYER_CREATED);
         addRangeAttributeModifier(IronGolem.class, Attributes.ATTACK_DAMAGE,
                 0.5D, AttributeModifier.Operation.MULTIPLY_BASE,
-                OperationFileItem::playerCreated);
-    }
-
-    private static boolean playerCreated(LivingEntity entity, Player player) {
-        return entity instanceof IronGolem golem && golem.isPlayerCreated();
+                PLAYER_CREATED);
     }
 
     @Override

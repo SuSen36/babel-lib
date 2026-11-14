@@ -7,7 +7,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -41,7 +40,7 @@ public class RockHornItem extends CollectibleItem.CustomCollectibleItem {
             Scan scan = NEARBY_SCANS.get(player);
             int count = scan != null && scan.tick() == player.tickCount ? scan.count() : 0;
             NEARBY_SCANS.put(player, new Scan(player.tickCount, count + 1));
-        }, (nearby, player) -> nearby instanceof Player || (nearby instanceof OwnableEntity ownable && ownable.getOwner() == player));
+        }, ALLIED_WITH_PLAYER);
         addConditionalAttributeModifier(Attributes.ATTACK_DAMAGE, 0.2, AttributeModifier.Operation.MULTIPLY_BASE,
                 (player, self) -> nearbyAllyStacks(player));
     }

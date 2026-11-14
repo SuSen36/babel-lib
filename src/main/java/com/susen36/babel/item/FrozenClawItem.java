@@ -6,10 +6,9 @@ import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.util.DataUtils;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.Item;
 
 public class FrozenClawItem extends CollectibleItem.CustomCollectibleItem {
@@ -22,12 +21,12 @@ public class FrozenClawItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.PORTAL, 99)
                         .autoUseOnGain(true)
                         .build());
-        addRangeAttributeModifier(Monster.class, Attributes.ATTACK_DAMAGE, 0.12D, AttributeModifier.Operation.MULTIPLY_BASE);
-        addRangeAttributeModifier(Monster.class, Attributes.ARMOR, 0.12D, AttributeModifier.Operation.MULTIPLY_BASE);
-        addRangeAttributeModifier(Monster.class, Attributes.MAX_HEALTH, 0.12D, AttributeModifier.Operation.MULTIPLY_BASE);
-        // 首领还会额外加成,末影龙不是 Monster 子类，故走 LivingEntity 通道
-        addRangeAttributeModifier(LivingEntity.class, Attributes.ATTACK_DAMAGE, 0.16D, AttributeModifier.Operation.MULTIPLY_BASE, (entity2, player2) -> DataUtils.isBoss(entity2), "boss");
-        addRangeAttributeModifier(LivingEntity.class, Attributes.ARMOR, 0.16D, AttributeModifier.Operation.MULTIPLY_BASE, (entity1, player1) -> DataUtils.isBoss(entity1), "boss");
-        addRangeAttributeModifier(LivingEntity.class, Attributes.MAX_HEALTH, 0.20D, AttributeModifier.Operation.MULTIPLY_BASE, (entity, player) -> DataUtils.isBoss(entity), "boss");
+        addRangeAttributeModifier(Mob.class, Attributes.ATTACK_DAMAGE, 0.12D, AttributeModifier.Operation.MULTIPLY_BASE, ENEMY_OF_PLAYER);
+        addRangeAttributeModifier(Mob.class, Attributes.ARMOR, 0.12D, AttributeModifier.Operation.MULTIPLY_BASE, ENEMY_OF_PLAYER);
+        addRangeAttributeModifier(Mob.class, Attributes.MAX_HEALTH, 0.12D, AttributeModifier.Operation.MULTIPLY_BASE, ENEMY_OF_PLAYER);
+        // 首领额外加成；
+        addRangeAttributeModifier(Mob.class, Attributes.ATTACK_DAMAGE, 0.16D, AttributeModifier.Operation.MULTIPLY_BASE, (entity2, player2) -> DataUtils.isBoss(entity2), "boss");
+        addRangeAttributeModifier(Mob.class, Attributes.ARMOR, 0.16D, AttributeModifier.Operation.MULTIPLY_BASE, (entity1, player1) -> DataUtils.isBoss(entity1), "boss");
+        addRangeAttributeModifier(Mob.class, Attributes.MAX_HEALTH, 0.20D, AttributeModifier.Operation.MULTIPLY_BASE, (entity, player) -> DataUtils.isBoss(entity), "boss");
     }
 }
