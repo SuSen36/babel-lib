@@ -36,8 +36,8 @@ public class ChurchAlmsVoucherItem extends CollectibleItem.CustomCollectibleItem
     @Override
     public void onEffectStarted(ItemStack stack, Level level, Player player) {
         if (!level.isClientSide()) {
-            float[] effectMultiplier = {1.000f,1.167f,1.333f,1.667f};
-            int effectDuration = NDifficulty.multiplier(level, 500, effectMultiplier);
+            float[] effectMultiplier = {6f,7f,8f,10f};
+            int effectDuration = NDifficulty.multiplier(level, 50, effectMultiplier);
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, effectDuration, 1));
         }
     }

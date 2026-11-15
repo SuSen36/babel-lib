@@ -31,8 +31,8 @@ public class BansheeKissItem extends CollectibleItem.CustomCollectibleItem {
 		player.giveExperienceLevels(expLevelND);
 
 		if (!level.isClientSide()){
-			float[] effectMultiplier = {1.000f,1.125f,1.250f,1.500f,1.500f};
-			int effectDuration = NDifficulty.multiplier(level, 100, effectMultiplier);
+			float[] effectMultiplier = {8f,9f,10f,12f};
+			int effectDuration = NDifficulty.multiplier(level, 10, effectMultiplier);
 			player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, effectDuration, 0));
 		}
 	}

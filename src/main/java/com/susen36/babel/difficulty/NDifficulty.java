@@ -1,7 +1,6 @@
 package com.susen36.babel.difficulty;
 
 import com.susen36.babel.init.BabelGameRules;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 

@@ -38,8 +38,8 @@ public class CoffeeCandyItem extends CollectibleItem.CustomCollectibleItem {
 	public void onEffectStarted(ItemStack stack, Level level, Player player) {
 		if (!level.isClientSide()){
 			float[] effectMultiplier = {2f,4f,6f,8f};
-			int effectDurationND = NDifficulty.multiplier(level,90, effectMultiplier);
-			player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 960, 1));
+			int effectDurationND = NDifficulty.multiplier(level,160, effectMultiplier);
+			player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, effectDurationND, 1));
 		}
 	}
 }
