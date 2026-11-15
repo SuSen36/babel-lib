@@ -3,6 +3,7 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.difficulty.NDifficulty;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -15,6 +16,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -34,6 +37,13 @@ public class RescissionItem extends CollectibleItem.CustomCollectibleItem {
 						.particle(ParticleTypes.ASH, 72)
 						.showOverlay(true)
 						.build());
+		addConditionalAttributeModifier(Attributes.ATTACK_DAMAGE, 0.01, AttributeModifier.Operation.MULTIPLY_BASE,
+				(player, self) -> switch (NDifficulty.difficultyLevel(player.level()).tier()) {
+					case EASY -> 0;
+					case NORMAL -> 3;
+					case HARD -> 5;
+					case EXPERT, PERILOUS -> 7;
+				});
 	}
 
 	@Override

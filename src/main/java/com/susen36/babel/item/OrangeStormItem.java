@@ -3,6 +3,7 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.difficulty.NDifficulty;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -26,7 +27,9 @@ public class OrangeStormItem extends CollectibleItem.CustomCollectibleItem {
 
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player) {
-		if (!level.isClientSide())
-			player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 1000, 0));
+		if (!level.isClientSide()){
+			float[] effectMultiplier = {1f,3f,5f,7f};
+			int effectDurationND = NDifficulty.multiplier(level,200, effectMultiplier);
+			player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, effectDurationND, 0));}
 	}
 }

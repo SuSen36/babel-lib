@@ -3,6 +3,7 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.difficulty.NDifficulty;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -24,12 +25,21 @@ public class CoffeeCandyItem extends CollectibleItem.CustomCollectibleItem {
 						.particle(ParticleTypes.HAPPY_VILLAGER, 72)
 						.showOverlay(true)
 						.build());
-		addAttributeModifier(Attributes.MOVEMENT_SPEED, 0.06, AttributeModifier.Operation.MULTIPLY_BASE);
+		addConditionalAttributeModifier(Attributes.MOVEMENT_SPEED, 0.01, AttributeModifier.Operation.MULTIPLY_BASE,
+				(player, self) -> switch (NDifficulty.difficultyLevel(player.level()).tier()) {
+					case EASY -> 2;
+					case NORMAL -> 4;
+					case HARD -> 6;
+					case EXPERT, PERILOUS -> 8;
+				});
 	}
 
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player) {
-		if (!level.isClientSide())
+		if (!level.isClientSide()){
+			float[] effectMultiplier = {2f,4f,6f,8f};
+			int effectDurationND = NDifficulty.multiplier(level,90, effectMultiplier);
 			player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 960, 1));
+		}
 	}
 }

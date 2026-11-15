@@ -3,6 +3,7 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.difficulty.NDifficulty;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -21,7 +22,13 @@ public class ForestNightWhispersItem extends CollectibleItem.CustomCollectibleIt
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)
                         .showOverlay(true)
                         .build());
-        addAttributeModifier(Attributes.ARMOR, 0.10D, AttributeModifier.Operation.MULTIPLY_BASE);
+        addConditionalAttributeModifier(Attributes.ARMOR, 0.01, AttributeModifier.Operation.MULTIPLY_BASE,
+                (player, self) -> switch (NDifficulty.difficultyLevel(player.level()).tier()) {
+                    case EASY -> 6;
+                    case NORMAL -> 7;
+                    case HARD -> 8;
+                    case EXPERT, PERILOUS -> 10;
+                });
     }
 
     @Override

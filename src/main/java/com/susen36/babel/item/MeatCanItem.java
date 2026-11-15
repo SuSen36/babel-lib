@@ -3,6 +3,7 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.difficulty.NDifficulty;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -29,8 +30,11 @@ public class MeatCanItem extends CollectibleItem.CustomCollectibleItem {
 
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player) {
-		if (!level.isClientSide())
-			player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 900, 0));
+		if (!level.isClientSide()){
+			float[] effectMultiplier = {3f,5f,8f,10f};
+			int effectDurationND = NDifficulty.multiplier(level,90, effectMultiplier);
+			player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, effectDurationND, 0));
+		}
 		Item emptyCan = BuiltInRegistries.ITEM.get(new ResourceLocation("caerula_arbor", "empty_can"));
 		ItemStack setstack = new ItemStack(emptyCan).copy();
 		ItemHandlerHelper.giveItemToPlayer(player, setstack);

@@ -3,6 +3,7 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.difficulty.NDifficulty;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -24,8 +25,15 @@ public class BansheeKissItem extends CollectibleItem.CustomCollectibleItem {
 
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player) {
-		player.giveExperienceLevels(8);
-		if (!level.isClientSide())
-			player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 0));
+
+		int[] expLevel = {8,9,10,12};
+		int expLevelND = NDifficulty.setValue(level,8,expLevel);
+		player.giveExperienceLevels(expLevelND);
+
+		if (!level.isClientSide()){
+			float[] effectMultiplier = {1.000f,1.125f,1.250f,1.500f,1.500f};
+			int effectDuration = NDifficulty.multiplier(level, 100, effectMultiplier);
+			player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, effectDuration, 0));
+		}
 	}
 }

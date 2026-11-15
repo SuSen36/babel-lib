@@ -1,6 +1,7 @@
 package com.susen36.babel.difficulty;
 
 import com.susen36.babel.init.BabelGameRules;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.level.LevelAccessor;
 
 /**
@@ -32,5 +33,41 @@ public final class NDifficulty {
             return 0.0;
         }
         return 1 + 0.01 * dl.value() * 2;
+    }
+
+    /**
+     * 返回对应难度下的 {@code Default * multiplier[?]} <p>
+     * 数组长度必须为4 <p>
+     * 否则返回{@code Default}
+     */
+    public static int multiplier(LevelAccessor world,int Default,float[] multiplier){
+        int effectDuration = Default;
+        if (multiplier.length != 4) return effectDuration;
+
+        effectDuration = switch (NDifficulty.difficultyLevel(world).tier()) {
+            case EASY -> Math.round(Default * multiplier[0]);
+            case NORMAL -> Math.round(Default * multiplier[1]);
+            case HARD -> Math.round(Default * multiplier[2]);
+            case EXPERT , PERILOUS -> Math.round(Default * multiplier[3]);
+        };
+        return effectDuration;
+    }
+
+    /**
+     * 返回对应难度下的 {@code value[?]} <p>
+     * 数组长度必须为4 <p>
+     * 否则返回{@code Default}
+     */
+    public static int setValue(LevelAccessor world,int Default,int[] value){
+        int valueND = Default;
+        if (value.length != 4) return valueND;
+
+        valueND = switch (NDifficulty.difficultyLevel(world).tier()) {
+            case EASY -> value[0];
+            case NORMAL -> value[1];
+            case HARD -> value[2];
+            case EXPERT , PERILOUS -> value[3];
+        };
+        return valueND;
     }
 }

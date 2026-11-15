@@ -3,6 +3,7 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.difficulty.NDifficulty;
 import com.susen36.babel.init.BabelItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
@@ -26,7 +27,9 @@ public class ActorsJewelryBoxItem extends CollectibleItem.CustomCollectibleItem 
     @Override
     public void onEffectStarted(ItemStack stack, Level level, Player player) {
         if (!player.level().isClientSide()) {
-            ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(BabelItems.ORIGINIUM_INGOT.get(), 18));
+            int[] ingotQuantity = {18,18,19,20};
+            int ingotQuantityND = NDifficulty.setValue(level,18, ingotQuantity);
+            ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(BabelItems.ORIGINIUM_INGOT.get(), ingotQuantityND));
         }
     }
 }

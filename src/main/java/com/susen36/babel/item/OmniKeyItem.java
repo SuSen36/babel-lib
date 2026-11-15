@@ -3,6 +3,7 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.difficulty.NDifficulty;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -32,7 +33,9 @@ public class OmniKeyItem extends CollectibleItem.CustomCollectibleItem {
 
     @Override
     public void onEffectStarted(ItemStack stack, Level level, Player player) {
-        player.giveExperienceLevels(3);
+        int[] expLevel = {6,6,7,7};
+        int expLevelND = NDifficulty.setValue(level,6,expLevel);
+        player.giveExperienceLevels(expLevelND);
     }
 
     @Override

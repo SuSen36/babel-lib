@@ -3,6 +3,7 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.difficulty.NDifficulty;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -21,7 +22,13 @@ public class SheetMusicItem extends CollectibleItem.CustomCollectibleItem {
                         .particle(ParticleTypes.NOTE, 72)
                         .showOverlay(true)
                         .build());
-        addAttributeModifier(Attributes.ATTACK_SPEED, 0.6, AttributeModifier.Operation.ADDITION);
+        addConditionalAttributeModifier(Attributes.ATTACK_SPEED, 0.1, AttributeModifier.Operation.ADDITION,
+                (player, self) -> switch (NDifficulty.difficultyLevel(player.level()).tier()) {
+                    case EASY -> 0;
+                    case NORMAL -> 4;
+                    case HARD -> 5;
+                    case EXPERT, PERILOUS -> 6;
+                });
     }
 
     @Override

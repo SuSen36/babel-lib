@@ -3,6 +3,7 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.difficulty.NDifficulty;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -63,9 +64,13 @@ public class PittsAssortedFruitsItem extends CollectibleItem.CustomCollectibleIt
     @Override
     public void onEffectStarted(ItemStack stack, Level level, Player player) {
         if (!level.isClientSide()) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 280, 1));
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 280, 1));
-            player.addEffect(new MobEffectInstance(MobEffects.HEALTH_BOOST, 560, 1));
+            float[] effectMultiplier = {3f,4f,5f,7f};
+            int resistanceEffectDurationND = NDifficulty.multiplier(level,40, effectMultiplier);
+            int damageBoostEffectDurationND = NDifficulty.multiplier(level,40, effectMultiplier);
+            int healthBoostEffectDurationND = NDifficulty.multiplier(level,80, effectMultiplier);
+            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, resistanceEffectDurationND, 1));
+            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, damageBoostEffectDurationND, 1));
+            player.addEffect(new MobEffectInstance(MobEffects.HEALTH_BOOST, healthBoostEffectDurationND, 1));
         }
     }
 }
