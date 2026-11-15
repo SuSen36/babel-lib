@@ -3,12 +3,14 @@ package com.susen36.babel.network;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.network.receive.*;
+import com.susen36.babel.network.record.NDifficultySyncPacket;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -38,6 +40,7 @@ public class BabelNetwork {
         CHANNEL.registerMessage(packetId++, CollectibleItemUseMessage.class, CollectibleItemUseMessage.ENCODER, CollectibleItemUseMessage.DECODER, CollectibleItemUseMessage.HANDLER, Optional.empty());
         CHANNEL.registerMessage(packetId++, CooldownSyncMessage.class, CooldownSyncMessage.ENCODER, CooldownSyncMessage.DECODER, CooldownSyncMessage.HANDLER, Optional.empty());
         CHANNEL.registerMessage(packetId++, FireworkParticleMessage.class, FireworkParticleMessage.ENCODER, FireworkParticleMessage.DECODER, FireworkParticleMessage.HANDLER, Optional.empty());
+        CHANNEL.messageBuilder(NDifficultySyncPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT).encoder(NDifficultySyncPacket::encode).decoder(NDifficultySyncPacket::decode).consumerMainThread(NDifficultySyncPacket::handle).add();
     }
 
     public static void sendTo(Object message, ServerPlayer player) {

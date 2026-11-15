@@ -2,6 +2,7 @@ package com.susen36.babel.difficulty;
 
 import com.susen36.babel.init.BabelGameRules;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 
 /**
@@ -13,15 +14,26 @@ public final class NDifficulty {
     private NDifficulty() {
     }
 
+    //同步NDifficultyValue
+    private static volatile int syncedValue = -1;
+    /**设置{@code 同步NDifficultyValue}*/
+    public static void acceptSynced(int value) { syncedValue = value; }
+    /**清除{@code 同步NDifficultyValue}*/
+    public static void clearSynced()          { syncedValue = -1; }
+
     /**
      * 当前世界的难度等级。
      * <p>
      * 创造模式搜索树构建物品提示时会传入 null 世界（ItemStack.getTooltipLines(null, ...)），此处回退到最低难度。
+     * <p>
+     * 仅客户端时将会使用缓存值
      */
     public static NDifficultyLevel difficultyLevel(LevelAccessor world) {
-        return world == null
-                ? NDifficultyLevel.of(0)
-                : NDifficultyLevel.of(world.getLevelData().getGameRules().getInt(BabelGameRules.DIFFICULTY_LEVEL));
+        if (world == null || (world instanceof Level lv && lv.isClientSide)) {
+            return NDifficultyLevel.of(Math.max(syncedValue, 0));
+        }
+        return NDifficultyLevel.of(
+                world.getLevelData().getGameRules().getInt(BabelGameRules.DIFFICULTY_LEVEL));
     }
 
     /**
