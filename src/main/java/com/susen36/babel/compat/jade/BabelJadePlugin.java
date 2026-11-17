@@ -15,7 +15,6 @@ public class BabelJadePlugin implements IWailaPlugin {
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         registration.registerEntityComponent(EPProvider.INSTANCE, LivingEntity.class);
-        registration.registerEntityComponent(EntityStatusProvider.INSTANCE, LivingEntity.class);
         registration.registerEntityComponent(AttributeProvider.INSTANCE, LivingEntity.class);
     }
 }

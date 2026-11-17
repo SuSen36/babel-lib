@@ -22,7 +22,7 @@ public class CoffeeCandyItem extends CollectibleItem.CustomCollectibleItem {
 		super(new Item.Properties().stacksTo(1).food(new FoodProperties.Builder().nutrition(2).saturationMod(1f).build()), 30, false, CollectibleTiers.RARE, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
-						.particle(ParticleTypes.HAPPY_VILLAGER, 72)
+						.particle(ParticleTypes.WAX_OFF, 72)
 						.showOverlay(true)
 						.build());
 		addConditionalAttributeModifier(Attributes.MOVEMENT_SPEED, 0.01, AttributeModifier.Operation.MULTIPLY_BASE,

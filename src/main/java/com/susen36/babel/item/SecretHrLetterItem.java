@@ -34,7 +34,7 @@ public class SecretHrLetterItem extends CollectibleItem.CustomCollectibleItem {
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.VILLAGER_YES, 2F, 1F)
-                        .particle(ParticleTypes.HAPPY_VILLAGER, 30)
+                        .particle(ParticleTypes.WAX_OFF, 30)
                         .build());
     }
 

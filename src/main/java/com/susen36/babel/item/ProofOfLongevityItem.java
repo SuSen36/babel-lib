@@ -18,7 +18,7 @@ public class ProofOfLongevityItem extends CollectibleItem.CustomCollectibleItem 
 		super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.AMBIENT_WARPED_FOREST_MOOD.value(), 3.5F, 1F)
-						.particle(ParticleTypes.HAPPY_VILLAGER, 72)
+						.particle(ParticleTypes.WAX_OFF, 72)
 						.showOverlay(true)
 						.build());
 		addAttributeModifier(BabelAttributes.MAX_LIFE_POINT.get(), 6, AttributeModifier.Operation.ADDITION);

@@ -80,7 +80,7 @@ public class BabelCollectible {
     public static RegistryObject<Item> PROOF_OF_LONGEVITY;
     public static RegistryObject<Item> HEMOST;
     public static RegistryObject<Item> SOLO_MUSIC_BOX;
-    public static RegistryObject<Item> TOPONYM_TEXTOLOGY;
+    public static RegistryObject<Item> TOPONYM_ORIGINS;
     public static RegistryObject<Item> YEARNING;
     public static RegistryObject<Item> ALLAY_SCULPTURE;
     public static RegistryObject<Item> CHURCH_ALMS_VOUCHER;
@@ -159,6 +159,7 @@ public class BabelCollectible {
     public static RegistryObject<Item> PURE_WHITE_DANCE_SHOES;
     public static RegistryObject<Item> JET_BLACK_DANCE_SHOES;
     public static RegistryObject<Item> LIVING_WOODPLATE;
+    public static RegistryObject<Item> MEDICINE_STICKS;
     public static RegistryObject<Item> END_OF_TIMES;
     public static RegistryObject<Item> SECRET_HR_LETTER;
     public static RegistryObject<Item> SPEECH_DRAFT;
@@ -174,6 +175,11 @@ public class BabelCollectible {
     public static RegistryObject<Item> SPATIAL_ART_DISPLAY;
     public static RegistryObject<Item> DISASTERS_ORIGIN;
     public static RegistryObject<Item> NORTHWIND_CONSTRUCT;
+    public static RegistryObject<Item> PRIED_OPEN_TOOLBOX;
+    public static RegistryObject<Item> URSUS_BIG_BREAD;
+    public static RegistryObject<Item> BLUE_SILK_SCARF;
+    public static RegistryObject<Item> GLORIOUS_KAZIMIERZ;
+    public static RegistryObject<Item> THE_RETURN;
 
     public static void register(IEventBus bus) {
         REGISTRY = CollectibleBuilder.create(BabelMod.MODID, bus);
@@ -230,7 +236,7 @@ public class BabelCollectible {
         PROOF_OF_LONGEVITY = REGISTRY.registerCollectible("proof_of_longevity", ProofOfLongevityItem::new);
         HEMOST = REGISTRY.registerCollectible("hemost", SmellyHemostaticItem::new);
         SOLO_MUSIC_BOX = REGISTRY.registerCollectible("solo_music_box", SoloMusicBoxItem::new);
-        TOPONYM_TEXTOLOGY = REGISTRY.registerCollectible("toponym_textology", ToponymTextologyItem::new);
+        TOPONYM_ORIGINS = REGISTRY.registerCollectible("toponym_origins", ToponymOriginsItem::new);
         YEARNING = REGISTRY.registerCollectible("yearning", UnripeYearningItem::new);
         ALLAY_SCULPTURE = REGISTRY.registerCollectible("allay_sculpture", AlleySculptureItem::new);
         CHURCH_ALMS_VOUCHER = REGISTRY.registerCollectible("church_alms_voucher", ChurchAlmsVoucherItem::new);
@@ -309,6 +315,7 @@ public class BabelCollectible {
         PURE_WHITE_DANCE_SHOES = REGISTRY.registerCollectible("pure_white_dance_shoes", PureWhiteDanceShoesItem::new);
         JET_BLACK_DANCE_SHOES = REGISTRY.registerCollectible("jet_black_dance_shoes", JetBlackDanceShoesItem::new);
         LIVING_WOODPLATE = REGISTRY.registerCollectible("living_woodplate", LivingWoodplateItem::new);
+        MEDICINE_STICKS = REGISTRY.registerCollectible("medicine_sticks", MedicineSticksItem::new);
         END_OF_TIMES = REGISTRY.registerCollectible("end_of_times", EndOfTimesItem::new);
         SECRET_HR_LETTER = REGISTRY.registerCollectible("secret_hr_letter", SecretHrLetterItem::new);
         SPEECH_DRAFT = REGISTRY.registerCollectible("speech_draft", SpeechDraftItem::new);
@@ -324,9 +331,14 @@ public class BabelCollectible {
         SPATIAL_ART_DISPLAY = REGISTRY.registerCollectible("spatial_art_display", SpatialArtDisplayItem::new);
         DISASTERS_ORIGIN = REGISTRY.registerCollectible("disasters_origin", DisastersOriginItem::new);
         NORTHWIND_CONSTRUCT = REGISTRY.registerCollectible("northwind_construct", NorthwindConstructItem::new);
+        PRIED_OPEN_TOOLBOX = REGISTRY.registerCollectible("pried_open_toolbox", PriedOpenToolboxItem::new);
+        URSUS_BIG_BREAD = REGISTRY.registerCollectible("ursus_big_bread", UrsusBigBreadItem::new);
+        BLUE_SILK_SCARF = REGISTRY.registerCollectible("blue_silk_scarf", BlueSilkScarfItem::new);
+        GLORIOUS_KAZIMIERZ = REGISTRY.registerCollectible("glorious_kazimierz", GloriousKazimierzItem::new);
+        THE_RETURN = REGISTRY.registerCollectible("the_return", TheReturnItem::new);
 
         GOLD_EXPEDITION = REGISTRY.registerCollectible("gold_expedition", 25, false, CollectibleTiers.ADVANCED, new Levels(0, 1, 0),
-                CollectibleActivation.builder().sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F).particle(ParticleTypes.HAPPY_VILLAGER, 72).showOverlay(true).build(),
+                CollectibleActivation.builder().sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F).particle(ParticleTypes.WAX_OFF, 72).showOverlay(true).build(),
                 (ItemStack stack, Level level, Player player) -> {
                     if (level instanceof ServerLevel) {
                         player.giveExperienceLevels(6);
@@ -334,7 +346,7 @@ public class BabelCollectible {
                     }
                 });
         GAULISH_SILVER_COIN = REGISTRY.registerCollectible("gaulish_silver_coin", 25, false, CollectibleTiers.NORMAL, new Levels(0, 1, 0),
-                CollectibleActivation.builder().sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F).particle(ParticleTypes.HAPPY_VILLAGER, 72).showOverlay(true).build(),
+                CollectibleActivation.builder().sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F).particle(ParticleTypes.WAX_OFF, 72).showOverlay(true).build(),
                 (ItemStack stack, Level level, Player player) -> {
                     if (!level.isClientSide()) {
                         ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.EMERALD, 6));
@@ -342,7 +354,7 @@ public class BabelCollectible {
                 });
         GAULISH_BANK_CHECK = REGISTRY.registerCollectible("gaulish_bank_check",
                 25, false, CollectibleTiers.RARE, new Levels(0, 1, 0),
-                CollectibleActivation.builder().sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F).particle(ParticleTypes.HAPPY_VILLAGER, 72).showOverlay(true).build(),
+                CollectibleActivation.builder().sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F).particle(ParticleTypes.WAX_OFF, 72).showOverlay(true).build(),
                 (ItemStack stack, Level level, Player player) -> {
                     if (!level.isClientSide()) {
                         ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.EMERALD, 12));
@@ -353,7 +365,7 @@ public class BabelCollectible {
                         CollectibleActivation.builder().sound(SoundEvents.AMETHYST_BLOCK_CHIME, 2F, 1F).particle(ParticleTypes.ENCHANT, 72).showOverlay(true).build()));
         LUCKY_COIN = REGISTRY.registerCollectible("lucky_coin", () -> new CollectibleItem(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.NORMAL,
                         new Levels(0, 1, 0),
-                        CollectibleActivation.builder().sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F).particle(ParticleTypes.HAPPY_VILLAGER, 72).showOverlay(true).build()));
+                        CollectibleActivation.builder().sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F).particle(ParticleTypes.WAX_OFF, 72).showOverlay(true).build()));
     }
 
     private BabelCollectible() {

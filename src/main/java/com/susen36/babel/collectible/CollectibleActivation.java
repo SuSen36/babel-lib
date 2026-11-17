@@ -114,7 +114,7 @@ public final class CollectibleActivation {
         private SoundEvent soundEvent = SoundEvents.PLAYER_BURP;
         private float volume = 1.5F;
         private float pitch = 1F;
-        private ParticleOptions particle = ParticleTypes.HAPPY_VILLAGER;
+        private ParticleOptions particle = ParticleTypes.WAX_OFF;
         private int particleCount = 72;
         private double particleYOffset = 0D;
         private double particleSpeed = 1D;

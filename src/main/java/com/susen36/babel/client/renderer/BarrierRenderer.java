@@ -26,11 +26,13 @@ public final class BarrierRenderer {
     }
 
     public static void render(LivingEntity entity, float partialTicks, PoseStack poseStack, MultiBufferSource buffer) {
-        AttributeInstance attribute = entity.getAttribute(BabelAttributes.BARRIER.get());
-        double barrier = attribute == null ? 0.0 : attribute.getValue();
+        AttributeInstance barrierAttribute = entity.getAttribute(BabelAttributes.BARRIER.get());
+        AttributeInstance shieldAttribute = entity.getAttribute(BabelAttributes.SHIELD.get());
+        double barrier = barrierAttribute == null ? 0.0 : barrierAttribute.getValue();
+        double shield = shieldAttribute == null ? 0.0 : shieldAttribute.getValue();
         float entityWidth = entity.getBbWidth();
         float entityHeight = entity.getBbHeight();
-        if (barrier > 0.0 && entityWidth > 0.0F && entityHeight > 0.0F) {
+        if ((barrier > 0.0 || shield > 0.0) && entityWidth > 0.0F && entityHeight > 0.0F) {
             float time = entity.tickCount + partialTicks;
             float halfWidth = entityWidth * (1.25F + 0.125F * Mth.sin(Mth.DEG_TO_RAD * time * 4.5F)) * 0.5F;
             float height = entityHeight * 1.1F;

@@ -36,7 +36,7 @@ public class RegionalActionPlanItem extends CollectibleItem.CustomCollectibleIte
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.BOOK_PAGE_TURN, 2F, 1F)
-                        .particle(ParticleTypes.HAPPY_VILLAGER, 30)
+                        .particle(ParticleTypes.WAX_OFF, 30)
                         .build());
     }
 

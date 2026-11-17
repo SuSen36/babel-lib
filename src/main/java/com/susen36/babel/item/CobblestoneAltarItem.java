@@ -22,7 +22,7 @@ public class CobblestoneAltarItem extends CollectibleItem.CustomCollectibleItem 
                 new CollectibleItem.Levels(0, 10, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
-                        .particle(ParticleTypes.HAPPY_VILLAGER, 72)
+                        .particle(ParticleTypes.WAX_OFF, 72)
                         .showOverlay(true)
                         .build());
         addLayerAttributeModifier(Attributes.ATTACK_DAMAGE, 0.05, AttributeModifier.Operation.MULTIPLY_BASE);

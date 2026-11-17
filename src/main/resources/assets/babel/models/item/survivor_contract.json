@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "babel:item/survvvcontrafv"
+    "layer0": "babel:item/survivor_contract"
   }
 }

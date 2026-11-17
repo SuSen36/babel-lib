@@ -17,7 +17,7 @@ public class FissuredRestraintsItem extends CollectibleItem.CustomCollectibleIte
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
-                        .particle(ParticleTypes.HAPPY_VILLAGER, 72)
+                        .particle(ParticleTypes.WAX_OFF, 72)
                         .showOverlay(true)
                         .build());
         addRangeAttributeModifier(Mob.class, Attributes.ATTACK_DAMAGE, -0.07, AttributeModifier.Operation.MULTIPLY_BASE, ENEMY_OF_PLAYER);

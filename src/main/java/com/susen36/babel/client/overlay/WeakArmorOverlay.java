@@ -7,6 +7,7 @@ import com.susen36.babel.init.BabelMobEffects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiEvent;
@@ -18,47 +19,51 @@ import net.minecraftforge.fml.common.Mod;
 public class WeakArmorOverlay {
 	@SubscribeEvent(priority = EventPriority.NORMAL)
 	public static void eventHandler(RenderGuiEvent.Pre event) {
-		Player player = Minecraft.getInstance().player;
-		ResourceLocation texture = null;
-		boolean hasArmor = player.hasEffect(BabelMobEffects.LESS_ARMOR.get());
-		boolean hasMagic = player.hasEffect(BabelMobEffects.WEAK_MAGIC_RESISTANCE.get());
-		int amplifier;
-		if (hasArmor && hasMagic) {
-			amplifier = (player.getEffect(BabelMobEffects.LESS_ARMOR.get()).getAmplifier()
-					+ player.getEffect(BabelMobEffects.WEAK_MAGIC_RESISTANCE.get()).getAmplifier()) / 2;
-		} else if (hasArmor) {
-			amplifier = player.getEffect(BabelMobEffects.LESS_ARMOR.get()).getAmplifier();
-		} else if (hasMagic) {
-			amplifier = player.getEffect(BabelMobEffects.WEAK_MAGIC_RESISTANCE.get()).getAmplifier();
-		} else {
-			amplifier = 0;
-		}
-		boolean least = amplifier > 9;
-		if (hasArmor && hasMagic) {
-			texture = new ResourceLocation(BabelMod.MODID,
-					"textures/gui/overlay/" + (least ? "least" : "less") + "_armor_and_magic_resistance.png");
-		} else if (hasArmor) {
-			texture = new ResourceLocation(BabelMod.MODID,
-					"textures/gui/overlay/" + (least ? "least" : "less") + "_armor.png");
-		} else if (hasMagic) {
-			texture = new ResourceLocation(BabelMod.MODID,
-					"textures/gui/overlay/" + (least ? "weakest" : "weak") + "_magic_resistance.png");
-		}
-		if (texture != null) {
-			int width = Minecraft.getInstance().getWindow().getGuiScaledWidth();
-			int height = Minecraft.getInstance().getWindow().getGuiScaledHeight();
-			RenderSystem.disableDepthTest();
-			RenderSystem.depthMask(false);
-			RenderSystem.enableBlend();
-			RenderSystem.setShader(GameRenderer::getPositionTexShader);
-			RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-			RenderSystem.setShaderColor(1, 1, 1, 1);
-			event.getGuiGraphics().blit(texture, 0, 0, 0, 0, width, height, width, height);
-			RenderSystem.depthMask(true);
-			RenderSystem.defaultBlendFunc();
-			RenderSystem.enableDepthTest();
-			RenderSystem.disableBlend();
-			RenderSystem.setShaderColor(1, 1, 1, 1);
+		Minecraft mc = Minecraft.getInstance();
+		Player player = mc.player;
+		if (player != null) {
+			ResourceLocation texture = null;
+			MobEffectInstance armorEffect = player.getEffect(BabelMobEffects.LESS_ARMOR.get());
+			MobEffectInstance magicEffect = player.getEffect(BabelMobEffects.WEAK_MAGIC_RESISTANCE.get());
+			boolean hasArmor = armorEffect != null;
+			boolean hasMagic = magicEffect != null;
+			int amplifier;
+			if (hasArmor && hasMagic) {
+				amplifier = (armorEffect.getAmplifier() + magicEffect.getAmplifier()) / 2;
+			} else if (hasArmor) {
+				amplifier = armorEffect.getAmplifier();
+			} else if (hasMagic) {
+				amplifier = magicEffect.getAmplifier();
+			} else {
+				amplifier = 0;
+			}
+			boolean least = amplifier > 9;
+			if (hasArmor && hasMagic) {
+				texture = new ResourceLocation(BabelMod.MODID,
+						"textures/gui/overlay/" + (least ? "least" : "less") + "_armor_and_magic_resistance.png");
+			} else if (hasArmor) {
+				texture = new ResourceLocation(BabelMod.MODID,
+						"textures/gui/overlay/" + (least ? "least" : "less") + "_armor.png");
+			} else if (hasMagic) {
+				texture = new ResourceLocation(BabelMod.MODID,
+						"textures/gui/overlay/" + (least ? "weakest" : "weak") + "_magic_resistance.png");
+			}
+			if (texture != null) {
+				int width = mc.getWindow().getGuiScaledWidth();
+				int height = mc.getWindow().getGuiScaledHeight();
+				RenderSystem.disableDepthTest();
+				RenderSystem.depthMask(false);
+				RenderSystem.enableBlend();
+				RenderSystem.setShader(GameRenderer::getPositionTexShader);
+				RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+				RenderSystem.setShaderColor(1, 1, 1, 1);
+				event.getGuiGraphics().blit(texture, 0, 0, 0, 0, width, height, width, height);
+				RenderSystem.depthMask(true);
+				RenderSystem.defaultBlendFunc();
+				RenderSystem.enableDepthTest();
+				RenderSystem.disableBlend();
+				RenderSystem.setShaderColor(1, 1, 1, 1);
+			}
 		}
 	}
 }

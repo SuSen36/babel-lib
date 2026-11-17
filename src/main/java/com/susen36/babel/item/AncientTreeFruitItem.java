@@ -22,7 +22,7 @@ public class AncientTreeFruitItem extends CollectibleItem.CustomCollectibleItem 
                 new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.AMETHYST_BLOCK_CHIME, 2F, 1F)
-                        .particle(ParticleTypes.HAPPY_VILLAGER, 72)
+                        .particle(ParticleTypes.WAX_OFF, 72)
                         .showOverlay(true)
                         .build());
     }

@@ -28,6 +28,7 @@ public class BabelAttributes {
     public static final RegistryObject<Attribute> MAGIC_MISS_RATE = simpleRangedAttr("magic_missrate", 0.0, 95.0, 0.0);
     public static final RegistryObject<Attribute> PHYSICAL_MISS_RATE = simpleRangedAttr("physical_missrate", 0.0, 95.0, 0.0);
     public static final RegistryObject<Attribute> BARRIER = simpleRangedAttr("barrier", 0.0, 214748364.0, 0.0);
+    public static final RegistryObject<Attribute> SHIELD = simpleRangedAttr("shield", 0.0, 214748364.0, 0.0);
     public static final RegistryObject<Attribute> MAX_LIFE_POINT = simpleRangedAttr("max_life_point", 1.0, 214748364.0, BabelConfig.LIFE_POINT_INIT.getDefault());
 
     private static final List<RegistryObject<Attribute>> LIVING_ATTRIBUTES = List.of(
@@ -39,6 +40,7 @@ public class BabelAttributes {
             MAGIC_MISS_RATE,
             PHYSICAL_MISS_RATE,
             BARRIER,
+            SHIELD,
             MAX_LIFE_POINT
     );
 

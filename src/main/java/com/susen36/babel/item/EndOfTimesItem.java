@@ -32,8 +32,6 @@ public class EndOfTimesItem extends CollectibleItem.CustomCollectibleItem {
     private static final String SHIELD_LOST_TAG = "shield_lost";
 
     private static final int RESTORE_ALL_LOSS_THRESHOLD = 10;
-    private static final int PARTIAL_RESTORE_LIVES = 1;
-    private static final int PARTIAL_RESTORE_SHIELD = 9;
 
     public EndOfTimesItem() {
         super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
@@ -93,8 +91,7 @@ public class EndOfTimesItem extends CollectibleItem.CustomCollectibleItem {
             LifePointUtils.addLifePoint(player, lostLives);
             LifePointUtils.addShieldPoint(player, lostShields);
         } else {
-            LifePointUtils.addLifePoint(player, PARTIAL_RESTORE_LIVES);
-            LifePointUtils.addShieldPoint(player, PARTIAL_RESTORE_SHIELD);
+            LifePointUtils.addShieldPoint(player, RESTORE_ALL_LOSS_THRESHOLD);
         }
         player.setHealth(player.getMaxHealth());
         saveLossCounter(player, 0, 0);

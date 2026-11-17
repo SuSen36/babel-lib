@@ -27,7 +27,7 @@ public class FristonPItem extends CollectibleItem.CustomCollectibleItem {
                 new CollectibleItem.Levels(0, MAX_LAYERS, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
-                        .particle(ParticleTypes.HAPPY_VILLAGER, 72)
+                        .particle(ParticleTypes.WAX_OFF, 72)
                         .showOverlay(true)
                         .build());
         addLayerAttributeModifier(Attributes.ATTACK_SPEED, ATTACK_SPEED_PER_LAYER, AttributeModifier.Operation.ADDITION);

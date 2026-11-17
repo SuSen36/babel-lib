@@ -3,9 +3,14 @@ package com.susen36.babel.event;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.difficulty.NDifficulty;
 import com.susen36.babel.init.BabelEntityTypeTags;
+import com.susen36.babel.init.BabelGameRules;
+import com.susen36.babel.network.BabelNetwork;
+import com.susen36.babel.network.record.NDifficultySyncPacket;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -18,11 +23,18 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 /**
  * 难度（探索等级）通用实体应用逻辑。
@@ -109,6 +121,54 @@ public class NDifficultyEvent {
 
                 data.putBoolean("NDifficultyApplied", true);
             }
+        }
+    }
+
+    private static int lastSent = Integer.MIN_VALUE;
+
+    @SubscribeEvent
+    public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer sp) {
+            push(sp.server, PacketDistributor.PLAYER.with(() -> sp));
+        }
+    }
+
+    /** 每20tick更新一次 */
+    @SubscribeEvent
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            if (server != null && server.getTickCount() % 20 == 0) {
+                int value = current(server);
+                if (value != lastSent) {
+                    lastSent = value;
+                    BabelNetwork.CHANNEL.send(PacketDistributor.ALL.noArg(), new NDifficultySyncPacket(value));
+                }
+            }
+        }
+    }
+
+    /**服务器关闭时设置为初始值*/
+    @SubscribeEvent
+    public static void onServerStopped(ServerStoppedEvent event) {
+        lastSent = Integer.MIN_VALUE;
+    }
+
+    private static int current(MinecraftServer server) {
+        return server.overworld().getGameRules().getInt(BabelGameRules.DIFFICULTY_LEVEL);
+    }
+
+    private static void push(MinecraftServer server, PacketDistributor.PacketTarget target) {
+        lastSent = current(server);
+        BabelNetwork.CHANNEL.send(target, new NDifficultySyncPacket(lastSent));
+    }
+
+    @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = BabelMod.MODID)
+    public static class ClientEvents {
+        /**客户端玩家登出时清除{@code 同步NDifficultyValue}*/
+        @SubscribeEvent
+        public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+            NDifficulty.clearSynced();
         }
     }
 }

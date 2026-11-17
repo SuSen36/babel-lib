@@ -19,7 +19,7 @@ public class WrathOfSiracusansItem extends CollectibleItem.CustomCollectibleItem
 		super(new Item.Properties().stacksTo(1).food(new FoodProperties.Builder().nutrition(10).saturationMod(0.6f).alwaysEat().build()), 25, false, CollectibleTiers.ADVANCED, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
-						.particle(ParticleTypes.HAPPY_VILLAGER, 72)
+						.particle(ParticleTypes.WAX_OFF, 72)
 						.showOverlay(true)
 						.build());
 	}

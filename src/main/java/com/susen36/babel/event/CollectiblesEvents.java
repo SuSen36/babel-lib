@@ -4,10 +4,7 @@ import com.susen36.babel.BabelMod;
 import com.susen36.babel.api.event.*;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.init.BabelCollectible;
-import com.susen36.babel.item.AncientFrescoItem;
-import com.susen36.babel.item.EndOfTimesItem;
-import com.susen36.babel.item.NorthwindConstructItem;
-import com.susen36.babel.item.TherapyTapeItem;
+import com.susen36.babel.item.*;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,6 +38,18 @@ public class CollectiblesEvents {
         Player player = event.getEntity();
         if (!player.level().isClientSide() && Collectibles.isUsed(player, BabelCollectible.CANNOT_MARK)) {
             player.giveExperienceLevels(1);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onDodge(@NotNull DodgeEvent event) {
+        if (event.getEntity() instanceof Player player && !player.level().isClientSide()) {
+            if (Collectibles.isUsed(player, BabelCollectible.GLORIOUS_KAZIMIERZ)) {
+                GloriousKazimierzItem.startBuff(player);
+            }
+            if (Collectibles.isUsed(player, BabelCollectible.THE_RETURN)) {
+                TheReturnItem.startBuff(player);
+            }
         }
     }
 

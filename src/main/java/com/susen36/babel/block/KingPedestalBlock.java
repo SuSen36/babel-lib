@@ -126,6 +126,19 @@ public class KingPedestalBlock extends Block implements SimpleWaterloggedBlock, 
     }
 
     @Override
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (level instanceof ServerLevel serverLevel && level.getBlockEntity(pos) instanceof KingPedestalBlockEntity pedestal && !pedestal.getItem().isEmpty()) {
+            if (!player.getAbilities().instabuild) {
+                ItemEntity itemEntity = new ItemEntity(serverLevel, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, pedestal.getItem());
+                itemEntity.setPickUpDelay(10);
+                serverLevel.addFreshEntity(itemEntity);
+            }
+            pedestal.setItem(ItemStack.EMPTY);
+        }
+        super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
     public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock()) && world instanceof ServerLevel level && world.getBlockEntity(pos) instanceof KingPedestalBlockEntity pedestal && !pedestal.getItem().isEmpty()) {
             ItemEntity itemEntity = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, pedestal.getItem());
