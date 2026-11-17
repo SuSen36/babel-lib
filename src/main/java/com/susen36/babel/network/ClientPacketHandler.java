@@ -6,6 +6,7 @@ import com.susen36.babel.capability.health.HealthCapability;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.network.receive.*;
 import com.susen36.babel.util.CooldownUtils;
+import com.susen36.babel.util.RobberyClientUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Entity;
@@ -32,7 +33,7 @@ public class ClientPacketHandler {
         }
     }
 
-    public static void handle(HealthSyncMessage message) {
+    public static void handle(LivesSyncMessage message) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level != null) {
             Entity entity = mc.level.getEntity(message.entityId);
@@ -64,6 +65,10 @@ public class ClientPacketHandler {
 
     public static void handle(CooldownSyncMessage message) {
         CooldownUtils.setServerCurrentTick(message.currentTick);
+    }
+
+    public static void handle(RobberyRestrictionSyncMessage message) {
+        RobberyClientUtils.setRestrictedUntilTick(message.restrictedUntilTick);
     }
 
     public static void handle(FireworkParticleMessage message) {

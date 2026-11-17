@@ -38,7 +38,7 @@ public class BabelConfig {
             .defineList("hand_engrave_recognizable", List.of("iceandfire:tide_trident"), entry -> true);
 
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ROYAL_ALLIANCE_TREATY_RECOGNIZABLE = BUILDER
-            .comment("其它能使收藏品王庭盟约生效的生物。最好来自下界。")
+            .comment("其它能使收藏品王庭盟约生效的生物。最好是萨卡兹或来自下界。")
             .defineList("royal_alliance_treaty_recognizable", List.of("cataclysm:ignis", "cataclysm:netherite_monstrosity"), entry -> true);
 
     public static final ForgeConfigSpec.DoubleValue EP_X_OFFSET = BUILDER

@@ -32,7 +32,7 @@ public class KingsStaffItem extends CollectibleItem.CustomCollectibleItem {
 
 	@Override
 	public boolean shouldApplyEffectTickThisTick(int tickCount, int layer) {
-		return tickCount % 260 == 0;
+		return tickCount % 240 == 0;
 	}
 
 	@Override

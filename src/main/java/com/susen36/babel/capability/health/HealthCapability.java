@@ -4,7 +4,7 @@ import com.susen36.babel.BabelConfig;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.init.BabelAttributes;
 import com.susen36.babel.network.BabelNetwork;
-import com.susen36.babel.network.receive.HealthSyncMessage;
+import com.susen36.babel.network.receive.LivesSyncMessage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -86,7 +86,7 @@ public class HealthCapability implements INBTSerializable<CompoundTag> {
 
     public void sync() {
         if (entity != null && !entity.level().isClientSide) {
-            BabelNetwork.sendToTrackingAndSelf(entity, new HealthSyncMessage(entity.getId(), serializeNBT()));
+            BabelNetwork.sendToTrackingAndSelf(entity, new LivesSyncMessage(entity.getId(), serializeNBT()));
         }
     }
 

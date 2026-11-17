@@ -42,8 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiPredicate;
 
-public final class CollectibleItem extends Item implements CollectibleLike {
-    private final CollectibleEffect effect;
+public class CollectibleItem extends Item implements CollectibleLike {
     private final int useTicks;
     private final boolean canAlwaysUse;
     private final CollectibleTiers tier;
@@ -51,37 +50,8 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     private final CollectibleActivation activation;
     private static final double REPEAT_USE_DURATION_MULTIPLIER = 1.75D;
 
-    public CollectibleItem(CollectibleEffect effect) {
-        this(effect, 25, false, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
-    }
-
-    public CollectibleItem(CollectibleEffect effect, boolean canAlwaysUse) {
-        this(effect, 25, canAlwaysUse, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
-    }
-
-    public CollectibleItem(CollectibleEffect effect, int useTicks) {
-        this(effect, useTicks, false, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
-    }
-
-    public CollectibleItem(CollectibleEffect effect, int useTicks, boolean canAlwaysUse) {
-        this(effect, useTicks, canAlwaysUse, CollectibleTiers.NORMAL, new Levels(0, 1, 0), CollectibleActivation.forTier(CollectibleTiers.NORMAL));
-    }
-
-    public CollectibleItem(CollectibleEffect effect, boolean canAlwaysUse, Levels levels) {
-        this(effect, 25, canAlwaysUse, CollectibleTiers.NORMAL, levels, CollectibleActivation.forTier(CollectibleTiers.NORMAL));
-    }
-
-    public CollectibleItem(CollectibleEffect effect, int useTicks, Levels levels) {
-        this(effect, useTicks, false, CollectibleTiers.NORMAL, levels, CollectibleActivation.forTier(CollectibleTiers.NORMAL));
-    }
-
-    public CollectibleItem(CollectibleEffect effect, int useTicks, boolean canAlwaysUse, Levels levels) {
-        this(effect, useTicks, canAlwaysUse, CollectibleTiers.NORMAL, levels, CollectibleActivation.forTier(CollectibleTiers.NORMAL));
-    }
-
-    public CollectibleItem(CollectibleEffect effect, int useTicks, boolean canAlwaysUse, CollectibleTiers tier, Levels levels, CollectibleActivation activation) {
-        super(collectibleProperties(tier));
-        this.effect = effect;
+    public CollectibleItem(Properties properties, int useTicks, boolean canAlwaysUse, CollectibleTiers tier, Levels levels, CollectibleActivation activation) {
+        super(properties.rarity(rarityForTier(tier)));// 稀有度统一由等级映射，覆盖调用方在 Properties 中手动设置的原版稀有度
         this.useTicks = useTicks;
         this.canAlwaysUse = canAlwaysUse;
         this.tier = tier;
@@ -90,36 +60,30 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     }
 
     /**
-     * 收藏品统一物品属性：堆叠 1，稀有度按等级映射。
-     */
-    private static Item.Properties collectibleProperties(CollectibleTiers tier) {
-        return new Item.Properties().stacksTo(1).rarity(rarityForTier(tier));
-    }
-
-    /**
      * 等级 → 原版稀有度：高稀有度（ADVANCED）为 EPIC，稀有为 RARE，诅咒对齐原版诅咒附魔书为 UNCOMMON，其余为 COMMON（诅咒另染红）。
      */
     private static Rarity rarityForTier(CollectibleTiers tier) {
+        Rarity rarity;
         if (tier == CollectibleTiers.CURSED) {
-            return Rarity.UNCOMMON;
+            rarity = Rarity.UNCOMMON;
+        } else if (tier == CollectibleTiers.RARE) {
+            rarity = Rarity.RARE;
+        } else if (tier == CollectibleTiers.ADVANCED) {
+            rarity = Rarity.EPIC;
+        } else {
+            rarity = Rarity.COMMON;
         }
-        if (tier == CollectibleTiers.RARE) {
-            return Rarity.RARE;
-        }
-        if (tier == CollectibleTiers.ADVANCED) {
-            return Rarity.EPIC;
-        }
-        return Rarity.COMMON;
+        return rarity;
     }
 
     @Override
-    public CollectibleTiers getTier() {
+    public final CollectibleTiers getTier() {
         return tier;
     }
 
     // 稀有度仅由档位决定
     @Override
-    public Rarity getRarity(ItemStack stack) {
+    public final Rarity getRarity(ItemStack stack) {
         return rarityForTier(tier);
     }
 
@@ -127,13 +91,15 @@ public final class CollectibleItem extends Item implements CollectibleLike {
      * 诅咒级收藏品物品名染红（同原版负面附魔），其余沿用等级稀有度颜色。
      */
     @Override
-    public @NotNull Component getName(@NotNull ItemStack stack) {
+    public final @NotNull Component getName(@NotNull ItemStack stack) {
+        Component name;
         if (tier == CollectibleTiers.CURSED) {
-            return Component.translatable(this.getDescriptionId(stack)).withStyle(ChatFormatting.RED);
+            name = Component.translatable(this.getDescriptionId(stack)).withStyle(ChatFormatting.RED);
+        } else {
+            name = super.getName(stack);
         }
-        return super.getName(stack);
+        return name;
     }
-
 
     /**
      * 所有收藏品通用逐行描述：键名按注册名生成，直到 lang 中不存在下一个 description_N 为止。
@@ -169,17 +135,17 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     }
 
     @Override
-    public int minLevel() {
+    public final int minLevel() {
         return levels.minLevel();
     }
 
     @Override
-    public int maxLevel() {
+    public final int maxLevel() {
         return levels.maxLevel();
     }
 
     @Override
-    public int defaultLevel() {
+    public final int defaultLevel() {
         return levels.defaultLevel();
     }
 
@@ -192,55 +158,58 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(
+    public final @NotNull InteractionResultHolder<ItemStack> use(
             @NotNull Level level,
             @NotNull Player player,
             @NotNull InteractionHand usedHand
     ) {
+        InteractionResultHolder<ItemStack> result;
         if (!player.isShiftKeyDown()) {
             player.startUsingItem(usedHand);
-            var usedData = Collectibles.getData(player);
+            Collectibles usedData = Collectibles.getData(player);
             if (usedData != null && usedData.isUsed(this)) {
                 player.useItemRemaining = Mth.ceil(this.useTicks * REPEAT_USE_DURATION_MULTIPLIER);
             }
-            return InteractionResultHolder.consume(player.getItemInHand(usedHand));
+            result = InteractionResultHolder.consume(player.getItemInHand(usedHand));
         } else {
-            return onSneakUse(level, player, usedHand);
+            result = onSneakUse(level, player, usedHand);
         }
+        return result;
     }
 
     /**
      * 蹲下使用时的特殊 hook，默认不执行任何收藏品流程。
      */
     @NotNull
-    InteractionResultHolder<ItemStack> onSneakUse(
+    protected InteractionResultHolder<ItemStack> onSneakUse(
             @NotNull Level level,
             @NotNull Player player,
             @NotNull InteractionHand hand
     ) {
-        return InteractionResultHolder.fail(player.getItemInHand(hand));
+        return InteractionResultHolder.pass(player.getItemInHand(hand));
     }
 
     @Override
-    public @NotNull ItemStack finishUsingItem(
+    public final @NotNull ItemStack finishUsingItem(
             @NotNull ItemStack stack,
             @NotNull Level level,
             @NotNull LivingEntity livingEntity
     ) {
+        ItemStack result = stack;
         if (livingEntity instanceof Player player && level instanceof ServerLevel) {
             // 冷却中可重复使用：每次使用重新触发完整激活流程，冷却由 Used 事件监听器统一重置
             if (canAlwaysUse || !isBanned()) {
                 activate(level, player, stack, this);
-                return consumeSelf(stack, player);
+                result = consumeSelf(stack, player);
             } else {
                 playFailure(level, player, stack);
             }
         }
-        return stack;
+        return result;
     }
 
     @Override
-    public int getUseDuration(@NotNull ItemStack stack) {
+    public final int getUseDuration(@NotNull ItemStack stack) {
         return this.useTicks;
     }
 
@@ -280,13 +249,13 @@ public final class CollectibleItem extends Item implements CollectibleLike {
     }
 
     void activate(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack, @NotNull Item item) {
-        var data = Collectibles.getData(player);
+        Collectibles data = Collectibles.getData(player);
         if (data != null) {
             data.markUsed(item);
         }
         CollectibleEvent.onUsed(player, item);
         playSuccess(level, player, stack);
-        effect.onEffectStarted(stack, level, player);
+        onEffectStarted(stack, level, player);
         if (level instanceof ServerLevel) {
             BabelNetwork.syncCollectibles(player);
         }
@@ -304,10 +273,10 @@ public final class CollectibleItem extends Item implements CollectibleLike {
      * 诅咒级收藏品：获得（进入背包）时自动激活一次。
      */
     @Override
-    public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slot, boolean selected) {
+    public final void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, level, entity, slot, selected);
         if (activation.autoUseOnGain() && entity instanceof Player player && entity.tickCount % 10 == 0) {
-            var data = Collectibles.getData(player);
+            Collectibles data = Collectibles.getData(player);
             Item item = stack.getItem();
             if (data != null && !data.isUsed(item) && !isBanned()) {
                 activate(level, player, stack, item);
@@ -316,6 +285,16 @@ public final class CollectibleItem extends Item implements CollectibleLike {
                 }
             }
         }
+    }
+
+    /**
+     * 收藏品激活时的效果，供子类重写，默认无效果。
+     */
+    public void onEffectStarted(
+            @NotNull ItemStack stack,
+            @NotNull Level level,
+            @NotNull Player player
+    ) {
     }
 
     @FunctionalInterface
@@ -327,22 +306,11 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         );
     }
 
-    public abstract static class CustomCollectibleItem extends Item implements CollectibleLike {
-        private final int useTicks;
-        private final boolean canAlwaysUse;
-        private final CollectibleTiers tier;
-        private final Levels levels;
-        private final CollectibleActivation activation;
+    public abstract static class CustomCollectibleItem extends CollectibleItem {
         private final List<AttributeBonus> attributeBonuses = new ArrayList<>();
 
         public CustomCollectibleItem(Properties properties, int useTicks, boolean canAlwaysUse, CollectibleTiers tier, Levels levels, CollectibleActivation activation) {
-            // 稀有度统一由等级映射，覆盖调用方在 Properties 中手动设置的原版稀有度
-            super(properties.rarity(rarityForTier(tier)));
-            this.useTicks = useTicks;
-            this.canAlwaysUse = canAlwaysUse;
-            this.tier = tier;
-            this.levels = levels;
-            this.activation = activation;
+            super(properties, useTicks, canAlwaysUse, tier, levels, activation);
         }
 
         /**
@@ -592,12 +560,12 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         public void onElementalHurt(ElementEvent.PostHurt event, Player player, int layer) {
         }
 
-        /** 持有者失去生命值或护盾（LifePointConsumeEvent 阶段）；type 为扣除的资源类型，amount 为扣除量，事件只读。 */
-        public void onLifePointLoss(LifePointConsumeEvent event, Player player, int layer) {
+        /** 目标受到元素损伤（ElementEvent.Hurt 阶段）；损伤来源不一定是持有者，目标是否为敌方由实现判定。 */
+        public void onElementalDamage(ElementEvent.Hurt event, Player player, LivingEntity target, int layer) {
         }
 
-        /** 持有者自身死亡（LivingDeathEvent 阶段）；在 LifePoint 扣减之后分发，cancel 事件可原地复活持有者。 */
-        public void onOwnerDeath(LivingDeathEvent event, Player player, int layer) {
+        /** 持有者失去生命值或护盾（LifePointConsumeEvent 阶段）；type 为扣除的资源类型，amount 为扣除量，事件只读。 */
+        public void onLifePointLoss(LifePointConsumeEvent event, Player player, int layer) {
         }
 
         /** 持有者接受治疗或生命回复（LivingHealEvent 阶段）；药水治疗与饱食自然回复都走 LivingEntity.heal，setAmount 可调整治疗量。 */
@@ -616,217 +584,6 @@ public final class CollectibleItem extends Item implements CollectibleLike {
         public void onExperienceDrop(LivingExperienceDropEvent event, Player player, int layer) {
         }
 
-        /**
-         * 诅咒级收藏品物品名染红（同原版负面附魔），其余沿用等级稀有度颜色。
-         */
-        @Override
-        final public @NotNull Component getName(@NotNull ItemStack stack) {
-            if (tier == CollectibleTiers.CURSED) {
-                return Component.translatable(this.getDescriptionId(stack)).withStyle(ChatFormatting.RED);
-            }
-            return super.getName(stack);
-        }
-
-        /**
-         * 所有收藏品通用逐行描述：键名按注册名生成，直到 lang 中不存在下一个 description_N 为止。
-         * 每行优先读取 description_N.<难度小写>，缺失时回退 description_N（EASY 默认文案）。
-         */
-        @Override
-        public void appendHoverText(@NotNull ItemStack stack, @NotNull Level level, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
-            super.appendHoverText(stack, level, tooltip, flag);
-            String descKey = this.getDescriptionId() + ".description";
-            // 描述难度变体键：expert 为顶格挡位，险境及以上并入 expert
-            String tierSuffix = "." + switch (NDifficulty.difficultyLevel(level).tier()) {
-                case EASY -> "easy";
-                case NORMAL -> "normal";
-                case HARD -> "hard";
-                case EXPERT, PERILOUS -> "expert";
-            };
-            for (int i = 0; ; i++) {
-                String key = descKey + "_" + i;
-                String tieredKey = key + tierSuffix;
-                MutableComponent tiered = Component.translatable(tieredKey);
-                MutableComponent line = tiered.getString().equals(tieredKey)
-                        ? Component.translatable(key)
-                        : tiered;
-                if (line.getString().equals(key)) {
-                    break;
-                }
-                if (i == 0) {
-                    tooltip.add(line.withStyle(ChatFormatting.AQUA));
-                } else {
-                    tooltip.add(line.withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
-                }
-            }
-        }
-
-        @Override
-        final public int minLevel() {
-            return levels.minLevel();
-        }
-
-        @Override
-        final public int maxLevel() {
-            return levels.maxLevel();
-        }
-
-        @Override
-        final public int defaultLevel() {
-            return levels.defaultLevel();
-        }
-
-        @Override
-        final public CollectibleTiers getTier() {
-            return tier;
-        }
-
-        // 稀有度仅由档位决定，禁止子类覆写破坏享元
-        @Override
-        public final Rarity getRarity(ItemStack stack) {
-            return rarityForTier(tier);
-        }
-
-        /**
-         * 诅咒级收藏品：获得（进入背包）时自动激活一次。
-         */
-        @Override
-        final public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slot, boolean selected) {
-            super.inventoryTick(stack, level, entity, slot, selected);
-            if (activation.autoUseOnGain() && entity instanceof Player player && entity.tickCount % 10 == 0) {
-                var data = Collectibles.getData(player);
-                Item item = stack.getItem();
-                if (data != null && !data.isUsed(item) && !isBanned()) {
-                    activate(level, player, stack, item);
-                    if (!player.getAbilities().instabuild) {
-                        stack.shrink(1);
-                    }
-                }
-            }
-        }
-
-        private void playSuccess(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack) {
-            double x = player.getX();
-            double y = player.getY();
-            double z = player.getZ();
-            if (level instanceof ServerLevel serverLevel) {
-                serverLevel.sendParticles(activation.particle(), x, y + activation.particleYOffset(), z,
-                        activation.paticleCount(), 1, 1, 1, activation.particleSpeed());
-            }
-            level.playSound(null, BlockPos.containing(x, y, z), activation.soundEvent(), SoundSource.NEUTRAL,
-                    activation.volume(), activation.pitch());
-            if (player instanceof ServerPlayer serverPlayer) {
-                BabelNetwork.syncCollectibleUse(serverPlayer, stack);
-            }
-        }
-
-        private void playFailure(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack) {
-            double x = player.getX();
-            double y = player.getY();
-            double z = player.getZ();
-            var sound = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("minecraft", "block.chest.locked"));
-            if (sound == null)
-                throw new RuntimeException("cannot found sound event: block.chest.locked");
-            level.playSound(
-                    null,
-                    BlockPos.containing(x, y, z),
-                    sound,
-                    SoundSource.NEUTRAL,
-                    activation.volume(),
-                    activation.pitch()
-            );
-        }
-
-        void activate(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack, @NotNull Item item) {
-            var data = Collectibles.getData(player);
-            if (data != null) {
-                data.markUsed(item);
-            }
-            CollectibleEvent.onUsed(player, item);
-            playSuccess(level, player, stack);
-            onEffectStarted(stack, level, player);
-            if (level instanceof ServerLevel) {
-                BabelNetwork.syncCollectibles(player);
-            }
-        }
-
-        /**
-         * 高稀有度收藏品被配置 ban_advanced_relics 禁用时，视为不可使用。
-         */
-        @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-        private boolean isBanned() {
-            return tier == CollectibleTiers.ADVANCED && BabelConfig.banAdvancedCollectibles;
-        }
-
-        private ItemStack consumeSelf(@NotNull ItemStack stack, Player player) {
-            ItemStack stackCopy = stack.copy();
-            if (!player.getAbilities().instabuild) {
-                stackCopy.shrink(1);
-            }
-            return stackCopy;
-        }
-
-        @Override
-        final public int getUseDuration(@NotNull ItemStack stack) {
-            return this.useTicks;
-        }
-
-        @Override
-        final public @NotNull InteractionResultHolder<ItemStack> use(
-                @NotNull Level level,
-                @NotNull Player player,
-                @NotNull InteractionHand usedHand
-        ) {
-            if (!player.isShiftKeyDown()) {
-                player.startUsingItem(usedHand);
-                var usedData = Collectibles.getData(player);
-                if (usedData != null && usedData.isUsed(this)) {
-                    player.useItemRemaining = Mth.ceil(this.useTicks * REPEAT_USE_DURATION_MULTIPLIER);
-                }
-                return InteractionResultHolder.consume(player.getItemInHand(usedHand));
-            } else {
-                return onSneakUse(level, player, usedHand);
-            }
-        }
-
-        /**
-         * 蹲下使用时的特殊操作，供子类重写,不执行任何收藏品流程。
-         */
-        @NotNull
-        protected InteractionResultHolder<ItemStack> onSneakUse(
-                @NotNull Level level,
-                @NotNull Player player,
-                @NotNull InteractionHand hand
-        ) {
-            return InteractionResultHolder.pass(player.getItemInHand(hand));
-        }
-
-        @Override
-        final public @NotNull ItemStack finishUsingItem(
-                @NotNull ItemStack stack,
-                @NotNull Level level,
-                @NotNull LivingEntity livingEntity
-        ) {
-            if (livingEntity instanceof Player player && level instanceof ServerLevel) {
-                // 冷却中可重复使用：每次使用重新触发完整激活流程，冷却由 Used 事件监听器统一重置
-                if (canAlwaysUse || !isBanned()) {
-                    activate(level, player, stack, this);
-                    return consumeSelf(stack, player);
-                } else {
-                    playFailure(level, player, stack);
-                }
-            }
-            return stack;
-        }
-
-        /**
-         * 收藏品激活时的效果，供子类重写，默认无效果。
-         */
-        public void onEffectStarted(
-                @NotNull ItemStack stack,
-                @NotNull Level level,
-                @NotNull Player player
-        ) {
-        }
     }
 
     public record Levels(int minLevel, int maxLevel, int defaultLevel) {

@@ -7,7 +7,7 @@ import com.susen36.babel.BabelConfig;
 import com.susen36.babel.api.event.CollectibleDropEvent;
 import com.susen36.babel.collectible.CollectibleLike;
 import com.susen36.babel.collectible.CollectibleTiers;
-import com.susen36.babel.init.BabelCollectible;
+import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.init.BabelEntityTypeTags;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.world.entity.Entity;
@@ -42,7 +42,7 @@ public class CollectibleLootModifier extends LootModifier {
 
     @Override
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        List<RegistryObject<Item>> pool = BabelCollectible.BABEL_COLLECTIBLES;
+        List<RegistryObject<Item>> pool = Collectibles.getCollectibleItems();
         String path = context.getQueriedLootTableId().getPath();
         if (path.startsWith("chests/")) {
             // chance 上限 0.99 防止配置为 1.0 时几何分布退化

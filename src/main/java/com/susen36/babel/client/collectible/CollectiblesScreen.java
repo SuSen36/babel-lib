@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CollectiblesScreen extends Screen {
     private static final int PANEL_WIDTH = 312;
@@ -58,7 +59,7 @@ public class CollectiblesScreen extends Screen {
     private void refreshEntries(Player player) {
         this.entries.clear();
         var used = Collectibles.getData(player);
-        for (var entry : Collectibles.REGISTRY.values()) {
+        for (var entry : Collectibles.getRegistry().values()) {
             if (used != null && used.isUsed(entry.get())) {
                 ItemStack stack = new ItemStack(entry.get());
                 stack.setCount(Math.max(1, Collectibles.getLayerData(player).getLayer(entry.get())));
@@ -118,7 +119,7 @@ public class CollectiblesScreen extends Screen {
             String descriptionId = this.entries.get(hovered).getItem().getDescriptionId();
             String name = Component.translatable(descriptionId).getString();
             Component desc = Component.translatable(descriptionId + ".description_0").withStyle(ChatFormatting.AQUA);
-            guiGraphics.renderTooltip(this.font, Component.literal(name + ": ").append(desc), mouseX, mouseY);
+            guiGraphics.renderTooltip(this.font, List.of(Component.literal(name + ": ").append(desc)), Optional.empty(), mouseX, mouseY);
         }
     }
 

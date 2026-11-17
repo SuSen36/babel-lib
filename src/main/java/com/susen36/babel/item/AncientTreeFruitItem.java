@@ -1,10 +1,6 @@
 package com.susen36.babel.item;
 
-import com.susen36.babel.collectible.CollectibleActivation;
-import com.susen36.babel.collectible.CollectibleItem;
-import com.susen36.babel.collectible.CollectibleLike;
-import com.susen36.babel.collectible.CollectibleTiers;
-import com.susen36.babel.init.BabelCollectible;
+import com.susen36.babel.collectible.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
@@ -35,7 +31,7 @@ public class AncientTreeFruitItem extends CollectibleItem.CustomCollectibleItem 
     public void onEffectStarted(ItemStack stack, Level level, Player player) {
         if (!player.level().isClientSide()) {
             List<RegistryObject<Item>> normalPool = new ArrayList<>();
-            for (RegistryObject<Item> holder : BabelCollectible.BABEL_COLLECTIBLES) {
+            for (RegistryObject<Item> holder : Collectibles.getCollectibleItems()) {
                 Item item = holder.get();
                 if (item instanceof CollectibleLike collectible && collectible.getTier() == CollectibleTiers.NORMAL) {
                     normalPool.add(holder);

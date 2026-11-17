@@ -30,7 +30,7 @@ public class CollectibleCommand {
                     .then(Commands.argument("targets", EntityArgument.players())
                             .then(Commands.argument("collectible", ResourceLocationArgument.id())
                                     .suggests((ctx, builder) ->
-                                            SharedSuggestionProvider.suggestResource(Collectibles.REGISTRY.keySet(), builder))
+                                            SharedSuggestionProvider.suggestResource(Collectibles.getRegistry().keySet(), builder))
                                     .executes(ctx -> give(ctx, 0))
                                     .then(Commands.argument("layer", IntegerArgumentType.integer(0))
                                             .executes(ctx -> give(ctx, IntegerArgumentType.getInteger(ctx, "layer")))))))
@@ -39,7 +39,7 @@ public class CollectibleCommand {
                             .executes(CollectibleCommand::clearCollectibles)
                             .then(Commands.argument("collectible", ResourceLocationArgument.id())
                                     .suggests((ctx, builder) ->
-                                            SharedSuggestionProvider.suggestResource(Collectibles.REGISTRY.keySet(), builder))
+                                            SharedSuggestionProvider.suggestResource(Collectibles.getRegistry().keySet(), builder))
                                     .executes(CollectibleCommand::clearCollectible))));
 
     public static LiteralArgumentBuilder<CommandSourceStack> get() {
@@ -48,7 +48,7 @@ public class CollectibleCommand {
 
     private static Item resolveCollectible(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         ResourceLocation id = ResourceLocationArgument.getId(ctx, "collectible");
-        var entry = Collectibles.REGISTRY.get(id);
+        var entry = Collectibles.getRegistry().get(id);
         if (entry != null && entry.get() != null) {
             return entry.get();
         }

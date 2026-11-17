@@ -102,6 +102,20 @@
     {
       "effects": [
         {
+          "effect": "babel:sleep",
+          "duration": 200,
+          "amplifier": 0
+        },
+        {
+          "effect": "minecraft:regeneration",
+          "duration": 200,
+          "amplifier": 1
+        }
+      ]
+    },
+    {
+      "effects": [
+        {
           "effect": "babel:physical_dodge",
           "duration": 200,
           "amplifier": 4

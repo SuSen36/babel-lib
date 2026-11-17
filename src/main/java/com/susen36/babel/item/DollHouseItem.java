@@ -4,6 +4,7 @@ import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -12,10 +13,11 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class GaulishSilverCoinItem extends CollectibleItem.CustomCollectibleItem {
+public class DollHouseItem extends CollectibleItem.CustomCollectibleItem {
 
-    public GaulishSilverCoinItem() {
-        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
+    public DollHouseItem() {
+        super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.NORMAL,
+                new CollectibleItem.Levels(0, 1, 0),
                 CollectibleActivation.builder()
                         .sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F)
                         .particle(ParticleTypes.HAPPY_VILLAGER, 72)
@@ -25,8 +27,8 @@ public class GaulishSilverCoinItem extends CollectibleItem.CustomCollectibleItem
 
     @Override
     public void onEffectStarted(ItemStack stack, Level level, Player player) {
-        if (!level.isClientSide()) {
-            ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.EMERALD, 6));
+        if (level instanceof ServerLevel) {
+            ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.EMERALD, 10));
         }
     }
 }

@@ -36,13 +36,13 @@ public class WeakArmorOverlay {
 		boolean least = amplifier > 9;
 		if (hasArmor && hasMagic) {
 			texture = new ResourceLocation(BabelMod.MODID,
-					"textures/gui/overlay/" + (least ? "least" : "less") + "_armor_and_weak_magic_resistance.png");
+					"textures/gui/overlay/" + (least ? "least" : "less") + "_armor_and_magic_resistance.png");
 		} else if (hasArmor) {
 			texture = new ResourceLocation(BabelMod.MODID,
 					"textures/gui/overlay/" + (least ? "least" : "less") + "_armor.png");
 		} else if (hasMagic) {
 			texture = new ResourceLocation(BabelMod.MODID,
-					"textures/gui/overlay/" + (least ? "least_" : "") + "weak_magic_resistance.png");
+					"textures/gui/overlay/" + (least ? "weakest" : "weak") + "_magic_resistance.png");
 		}
 		if (texture != null) {
 			int width = Minecraft.getInstance().getWindow().getGuiScaledWidth();

@@ -3,13 +3,15 @@ package com.susen36.babel.item;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
-import com.susen36.babel.init.BabelMobEffects;
+import com.susen36.babel.collectible.Collectibles;
+import com.susen36.babel.init.BabelCollectible;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -38,10 +40,18 @@ public class HandOfSwordItem extends CollectibleItem.CustomCollectibleItem {
         ItemStack mainHandItem = player.getMainHandItem();
         if ((mainHandItem.getItem() instanceof SwordItem || mainHandItem.is(MINECRAFT_SWORDS))
                 && !level.isClientSide()) {
-            if (!target.hasEffect(BabelMobEffects.LESS_ARMOR.get())) {
-                target.addEffect(new MobEffectInstance(BabelMobEffects.LESS_ARMOR.get(), 120, 1));
-            }
             player.heal((float) (player.getMaxHealth() * 0.075));
         }
+    }
+
+    public static boolean isArmorPenetrating(DamageSource source) {
+        boolean penetrating = false;
+        if (source.getEntity() instanceof Player player && source.is(DamageTypes.PLAYER_ATTACK)
+                && !player.level().isClientSide() && !Collectibles.isEffectSuppressed(player)) {
+            ItemStack mainHandItem = player.getMainHandItem();
+            penetrating = (mainHandItem.getItem() instanceof SwordItem || mainHandItem.is(MINECRAFT_SWORDS))
+                    && Collectibles.isUsed(player, BabelCollectible.HAND_OF_SWORD);
+        }
+        return penetrating;
     }
 }

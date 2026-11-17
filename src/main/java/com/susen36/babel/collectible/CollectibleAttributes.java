@@ -32,7 +32,7 @@ public final class CollectibleAttributes {
         if (!player.level().isClientSide) {
             var used = Collectibles.getData(player);
             boolean healthChanged = false;
-            for (RegistryObject<Item> entry : Collectibles.REGISTRY.values()) {
+            for (RegistryObject<Item> entry : Collectibles.getRegistry().values()) {
                 Item item = entry.get();
                 if (item instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     for (CollectibleItem.CustomCollectibleItem.AttributeBonus bonus : collectible.getAttributeBonuses()) {
@@ -77,7 +77,7 @@ public final class CollectibleAttributes {
             var used = Collectibles.getData(player);
             Set<UUID> expected = new HashSet<>();
             Set<LivingEntity> healthTargets = new HashSet<>();
-            for (RegistryObject<Item> entry : Collectibles.REGISTRY.values()) {
+            for (RegistryObject<Item> entry : Collectibles.getRegistry().values()) {
                 Item item = entry.get();
                 // 被总闸压制时按无生效收藏品处理：expected 保持为空，下方的 stale 清理会移除全部遗留范围修饰符
                 if (!Collectibles.isEffectSuppressed(player) && used != null && used.isUsed(item) && item instanceof CollectibleItem.CustomCollectibleItem collectible) {

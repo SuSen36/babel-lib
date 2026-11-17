@@ -1,6 +1,6 @@
 package com.susen36.babel.collectible;
 
-import com.google.common.collect.HashBiMap;
+import com.google.common.base.Suppliers;
 import com.mojang.logging.LogUtils;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.network.BabelNetwork;
@@ -23,15 +23,37 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 public class Collectibles implements INBTSerializable<ListTag> {
-    @NotNull
-    public static final HashBiMap<ResourceLocation, RegistryObject<Item>> REGISTRY = HashBiMap.create();
+    // 首次查询须在物品注册完成后；索引保留Builder声明顺序，共享池沿用Forge注册表顺序。
+    private static final Supplier<CollectibleDirectory> DIRECTORY = Suppliers.memoize(() -> {
+        Map<ResourceLocation, RegistryObject<Item>> registry = new LinkedHashMap<>();
+        List<RegistryObject<Item>> collectibleItems = new ArrayList<>();
+        for (Map.Entry<ResourceLocation, RegistryObject<Item>> entry : CollectibleBuilder.getDeclaredCollectibles().entrySet()) {
+            RegistryObject<Item> collectible = entry.getValue();
+            if (collectible.isPresent() && collectible.get() instanceof CollectibleLike) {
+                registry.put(entry.getKey(), collectible);
+            }
+        }
+        for (Item item : ForgeRegistries.ITEMS) {
+            if (item instanceof CollectibleLike) {
+                ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
+                if (id != null) {
+                    RegistryObject<Item> collectible = registry.computeIfAbsent(id,
+                            key -> RegistryObject.create(key, ForgeRegistries.ITEMS));
+                    collectibleItems.add(collectible);
+                }
+            }
+        }
+        return new CollectibleDirectory(Collections.unmodifiableMap(registry), List.copyOf(collectibleItems));
+    });
 
     private static final String ID = "id";
     private static final String USED = "used";
@@ -64,6 +86,18 @@ public class Collectibles implements INBTSerializable<ListTag> {
         modBus.addListener(CollectiblesEventsAdapter::onRegisterCapabilities);
         MinecraftForge.EVENT_BUS.addGenericListener(Entity.class, CollectiblesEventsAdapter::onAttachCapabilities);
         MinecraftForge.EVENT_BUS.addListener(CollectiblesEventsAdapter::onPlayerClone);
+    }
+
+    public static @NotNull Map<ResourceLocation, RegistryObject<Item>> getRegistry() {
+        return DIRECTORY.get().registry();
+    }
+
+    public static @NotNull List<RegistryObject<Item>> getCollectibleItems() {
+        return DIRECTORY.get().items();
+    }
+
+    private record CollectibleDirectory(Map<ResourceLocation, RegistryObject<Item>> registry,
+                                        List<RegistryObject<Item>> items) {
     }
 
     private static class CollectiblesEventsAdapter {
@@ -164,8 +198,6 @@ public class Collectibles implements INBTSerializable<ListTag> {
     public static void activateAndSync(@NotNull Player player, @NotNull Item item) {
         if (item instanceof CollectibleItem collectible) {
             collectible.activate(player.level(), player, new ItemStack(collectible), collectible);
-        } else if (item instanceof CollectibleItem.CustomCollectibleItem collectible) {
-            collectible.activate(player.level(), player, new ItemStack(collectible), collectible);
         }
     }
 
@@ -253,16 +285,18 @@ public class Collectibles implements INBTSerializable<ListTag> {
 
     private static @Nullable ResourceLocation getIdByItem(@NotNull Item item) {
         ResourceLocation key = BuiltInRegistries.ITEM.getKey(item);
-        RegistryObject<Item> entry = REGISTRY.get(key);
+        RegistryObject<Item> entry = getRegistry().get(key);
+        ResourceLocation id = null;
         if (entry == null) {
             LogUtils.getLogger().error("try to query {} in Collectibles, but not matched.", item);
-            return null;
+        } else {
+            id = key;
         }
-        return key;
+        return id;
     }
 
     private static @Nullable Item resolveItem(@NotNull ResourceLocation id) {
-        RegistryObject<Item> entry = REGISTRY.get(id);
+        RegistryObject<Item> entry = getRegistry().get(id);
         Item item = null;
         if (entry != null && entry.isPresent()) {
             item = entry.get();

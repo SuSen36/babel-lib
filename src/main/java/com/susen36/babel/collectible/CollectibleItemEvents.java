@@ -38,7 +38,7 @@ public class CollectibleItemEvents {
         Collectibles usedData = Collectibles.isEffectSuppressed(player) ? null : Collectibles.getData(player);
         if (usedData != null) {
             Collectibles.Layer layerData = Collectibles.getLayerData(player);
-            for (RegistryObject<Item> holder : Collectibles.REGISTRY.values()) {
+            for (RegistryObject<Item> holder : Collectibles.getRegistry().values()) {
                 if (usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     hook.invoke(collectible, player, layerData.getLayer(holder.get()));
                 }
@@ -78,7 +78,7 @@ public class CollectibleItemEvents {
             Collectibles usedData = Collectibles.getData(player);
             Collectibles.Layer layerData = Collectibles.getLayerData(player);
             Map<RangeKey, List<? extends LivingEntity>> rangedEntities = new HashMap<>();
-            for (RegistryObject<Item> holder : Collectibles.REGISTRY.values()) {
+            for (RegistryObject<Item> holder : Collectibles.getRegistry().values()) {
                 if (!Collectibles.isEffectSuppressed(player) && usedData != null && usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible) {
                     int layer = layerData.getLayer(holder.get());
                     for (CollectibleItem.CustomCollectibleItem.RangeBinding<?> binding : collectible.getRangeEffects()) {
@@ -138,6 +138,18 @@ public class CollectibleItemEvents {
         }
     }
 
+    /** 元素损伤量调整在结算前分发；逐玩家判定目标归属，支持对全部敌方生效的全局藏品。 */
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public static void onElementalHurtPre(ElementEvent.Hurt event) {
+        LivingEntity target = event.getEntity();
+        if (!target.level().isClientSide()) {
+            for (Player player : target.level().players()) {
+                forEachUsedCollectible(player, (collectible, owner, layer) ->
+                        collectible.onElementalDamage(event, owner, target, layer));
+            }
+        }
+    }
+
     /** 仅在损伤结算成功（未 failed）时分发；损伤爆发造成的 HP 伤害另走 LivingDamageEvent，不在此重复。 */
     @SubscribeEvent
     public static void onElementalHurtPost(ElementEvent.PostHurt event) {
@@ -161,15 +173,6 @@ public class CollectibleItemEvents {
         if (event.getEntity() instanceof Player player && event.getType() != LifePointConsumeEvent.Type.FAIL) {
             forEachUsedCollectible(player, (collectible, owner, layer) ->
                     collectible.onLifePointLoss(event, owner, layer));
-        }
-    }
-
-    // LOW 优先级保证在 LifePointEvents 的 HIGHEST 扣减之后分发，仅目标生命系统未拦截的真死会到达此处
-    @SubscribeEvent(priority = EventPriority.LOW)
-    public static void onOwnerDeath(LivingDeathEvent event) {
-        if (event.getEntity() instanceof Player player && !event.isCanceled()) {
-            forEachUsedCollectible(player, (collectible, owner, layer) ->
-                    collectible.onOwnerDeath(event, owner, layer));
         }
     }
 

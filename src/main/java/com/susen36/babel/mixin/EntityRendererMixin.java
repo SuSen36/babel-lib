@@ -3,7 +3,7 @@ package com.susen36.babel.mixin;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.susen36.babel.client.renderer.BarrierRenderer;
 import com.susen36.babel.client.renderer.FrozenIceRenderer;
-import com.susen36.babel.init.BabelMobEffects;
+import com.susen36.babel.effect.FrozenMobEffect;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -22,7 +22,7 @@ public abstract class EntityRendererMixin {
 
     @Inject(method = "render", at = @At("HEAD"))
     private void renderFrozenIce(Entity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight, CallbackInfo ci) {
-        if (entity instanceof LivingEntity living && !living.isSpectator() && living.hasEffect(BabelMobEffects.FROZEN.get())) {
+        if (entity instanceof LivingEntity living && !living.isSpectator() && FrozenMobEffect.isBabelFrozen(living)) {
             FrozenIceRenderer.render(living, poseStack, buffer, packedLight);
         }
     }

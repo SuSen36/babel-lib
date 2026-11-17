@@ -9,25 +9,25 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class HealthSyncMessage {
+public class LivesSyncMessage {
 
     public final int entityId;
     public final CompoundTag nbt;
 
-    public HealthSyncMessage(int entityId, CompoundTag nbt) {
+    public LivesSyncMessage(int entityId, CompoundTag nbt) {
         this.entityId = entityId;
         this.nbt = nbt;
     }
 
-    public static final BiConsumer<HealthSyncMessage, FriendlyByteBuf> ENCODER = (message, buffer) -> {
+    public static final BiConsumer<LivesSyncMessage, FriendlyByteBuf> ENCODER = (message, buffer) -> {
         buffer.writeInt(message.entityId);
         buffer.writeNbt(message.nbt);
     };
 
-    public static final Function<FriendlyByteBuf, HealthSyncMessage> DECODER = buffer ->
-            new HealthSyncMessage(buffer.readInt(), buffer.readNbt());
+    public static final Function<FriendlyByteBuf, LivesSyncMessage> DECODER = buffer ->
+            new LivesSyncMessage(buffer.readInt(), buffer.readNbt());
 
-    public static final BiConsumer<HealthSyncMessage, Supplier<NetworkEvent.Context>> HANDLER = (message, ctx) -> {
+    public static final BiConsumer<LivesSyncMessage, Supplier<NetworkEvent.Context>> HANDLER = (message, ctx) -> {
         ctx.get().enqueueWork(() -> ClientPacketHandler.handle(message));
         ctx.get().setPacketHandled(true);
     };

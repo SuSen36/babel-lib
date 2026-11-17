@@ -32,6 +32,10 @@ public class RobberyCapability implements ICapabilitySerializable<CompoundTag> {
         return currentTick < this.restrictedUntilTick;
     }
 
+    public long getRestrictedUntilTick() {
+        return this.restrictedUntilTick;
+    }
+
     public void startRestriction(long currentTick) {
         this.restrictedUntilTick = currentTick + BabelConfig.robberyRestrictionDurationTicks;
     }

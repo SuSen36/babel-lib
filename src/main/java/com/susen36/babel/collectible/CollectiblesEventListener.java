@@ -19,6 +19,9 @@ public class CollectiblesEventListener {
         BabelNetwork.syncCollectibles(event.getEntity());
         if (event.getEntity() instanceof ServerPlayer serverPlayer && serverPlayer.level() instanceof ServerLevel serverLevel)
             BabelNetwork.syncServerCurrentTick(serverPlayer, serverLevel.getServer().overworld().getGameTime());
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            BabelNetwork.syncRobberyRestriction(serverPlayer);
+        }
     }
 
     @SubscribeEvent
@@ -26,6 +29,7 @@ public class CollectiblesEventListener {
         if (event.getEntity() instanceof ServerPlayer player && player.level() instanceof ServerLevel serverLevel) {
             BabelNetwork.syncCollectibles(player);
             BabelNetwork.syncServerCurrentTick(player, serverLevel.getServer().overworld().getGameTime());
+            BabelNetwork.syncRobberyRestriction(player);
         }
     }
 
@@ -34,6 +38,7 @@ public class CollectiblesEventListener {
         if (event.getEntity() instanceof ServerPlayer player && player.level() instanceof ServerLevel serverLevel) {
             BabelNetwork.syncCollectibles(player);
             BabelNetwork.syncServerCurrentTick(player, serverLevel.getServer().overworld().getGameTime());
+            BabelNetwork.syncRobberyRestriction(player);
         }
     }
 

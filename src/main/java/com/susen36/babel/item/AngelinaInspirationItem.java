@@ -25,7 +25,7 @@ public class AngelinaInspirationItem extends CollectibleItem.CustomCollectibleIt
         addRangeAttributeModifier(Mob.class, Attributes.MOVEMENT_SPEED, -0.15, AttributeModifier.Operation.MULTIPLY_BASE, ENEMY_OF_PLAYER);
         addRangeEffect(Mob.class, (monster, player, layer) -> {
             monster.addEffect(new MobEffectInstance(
-                    BabelMobEffects.MASS_LOSS.get(), 60, 0, false, false));
+                    BabelMobEffects.MASS_LOSS.get(), 160, 0, false, false));
         }, ENEMY_OF_PLAYER);
     }
 }

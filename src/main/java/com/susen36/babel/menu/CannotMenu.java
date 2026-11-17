@@ -139,7 +139,7 @@ public class CannotMenu extends AbstractContainerMenu {
             Collectibles data = Collectibles.getData(player);
             List<Item> used = new ArrayList<>();
             List<Item> pool = new ArrayList<>();
-            for (RegistryObject<Item> entry : Collectibles.REGISTRY.values()) {
+            for (RegistryObject<Item> entry : Collectibles.getRegistry().values()) {
                 Item candidate = entry.get();
                 if (data != null && data.isUsed(candidate)) {
                     used.add(candidate);

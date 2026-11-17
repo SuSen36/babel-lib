@@ -8,7 +8,6 @@ import com.susen36.babel.init.BabelBlocks;
 import com.susen36.babel.util.LifePointUtils;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -43,10 +42,8 @@ public class KingsExtensionItem extends CollectibleItem.CustomCollectibleItem {
 	@Override
 	public void applyEffectTick(Player player, int layer) {
 		if (LifePointUtils.getLifePoint(player) <= 1 && !player.level().isClientSide()) {
-			int amplifier = Mth.clamp(Mth.ceil(player.getMaxHealth() / 20), 0, 24);
-			int currentAmplifier = player.hasEffect(MobEffects.REGENERATION) ? player.getEffect(MobEffects.REGENERATION).getAmplifier() : 0;
-			if (currentAmplifier < amplifier) {
-				player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 20, amplifier, false, false));
+			if (!player.hasEffect(MobEffects.REGENERATION)) {
+				player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, 0, false, false));
 			}
 		}
 	}

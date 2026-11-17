@@ -1,10 +1,12 @@
 package com.susen36.babel.init;
 
 import com.susen36.babel.BabelMod;
+import com.susen36.babel.collectible.Collectibles;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
@@ -18,7 +20,7 @@ public class BabelTabs {
                     .withTabsBefore(CreativeModeTabs.COMBAT)
                     .icon(() -> new ItemStack(BabelCollectible.KETTLE.get()))
                     .displayItems((parameters, output) -> {
-                        for (var item : BabelCollectible.BABEL_COLLECTIBLES) {
+                        for (RegistryObject<Item> item : Collectibles.getCollectibleItems()) {
                             output.accept(item.get());
                         }
                     }).build());

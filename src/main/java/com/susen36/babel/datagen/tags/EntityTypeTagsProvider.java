@@ -31,6 +31,7 @@ public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
     private static final TagKey<EntityType<?>> ORIGINIUM_CREATION = babelEntityTypeTag("originium_creation");
     private static final TagKey<EntityType<?>> COLLAPSAL = babelEntityTypeTag("collapsal");
     private static final TagKey<EntityType<?>> MACHINA = babelEntityTypeTag("machina");
+    private static final TagKey<EntityType<?>> APPARITION = babelEntityTypeTag("apparition");
     private static final TagKey<EntityType<?>> SARKAZ = babelEntityTypeTag("sarkaz");
 
     public EntityTypeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider,
@@ -61,6 +62,7 @@ public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
         tag(ORIGINIUM_CREATION);
         tag(COLLAPSAL);
         tag(MACHINA).add(entityTypeKey(EntityType.IRON_GOLEM));
+        tag(APPARITION).add(entityTypeKey(EntityType.WARDEN));
         tag(SARKAZ)
                 .add(entityTypeKey(EntityType.BLAZE), entityTypeKey(EntityType.GHAST),
                         entityTypeKey(EntityType.HOGLIN), entityTypeKey(EntityType.MAGMA_CUBE),

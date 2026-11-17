@@ -2,6 +2,7 @@ package com.susen36.babel.network;
 
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.collectible.Collectibles;
+import com.susen36.babel.entity.robbery.RobberyCapability;
 import com.susen36.babel.network.receive.*;
 import com.susen36.babel.network.record.NDifficultySyncPacket;
 import net.minecraft.nbt.CompoundTag;
@@ -35,10 +36,11 @@ public class BabelNetwork {
 
     public static void register() {
         CHANNEL.registerMessage(packetId++, EPSyncMessage.class, EPSyncMessage.ENCODER, EPSyncMessage.DECODER, EPSyncMessage.HANDLER, Optional.empty());
-        CHANNEL.registerMessage(packetId++, HealthSyncMessage.class, HealthSyncMessage.ENCODER, HealthSyncMessage.DECODER, HealthSyncMessage.HANDLER, Optional.empty());
+        CHANNEL.registerMessage(packetId++, LivesSyncMessage.class, LivesSyncMessage.ENCODER, LivesSyncMessage.DECODER, LivesSyncMessage.HANDLER, Optional.empty());
         CHANNEL.registerMessage(packetId++, CollectibleSyncMessage.class, CollectibleSyncMessage.ENCODER, CollectibleSyncMessage.DECODER, CollectibleSyncMessage.HANDLER, Optional.empty());
         CHANNEL.registerMessage(packetId++, CollectibleItemUseMessage.class, CollectibleItemUseMessage.ENCODER, CollectibleItemUseMessage.DECODER, CollectibleItemUseMessage.HANDLER, Optional.empty());
         CHANNEL.registerMessage(packetId++, CooldownSyncMessage.class, CooldownSyncMessage.ENCODER, CooldownSyncMessage.DECODER, CooldownSyncMessage.HANDLER, Optional.empty());
+        CHANNEL.registerMessage(packetId++, RobberyRestrictionSyncMessage.class, RobberyRestrictionSyncMessage.ENCODER, RobberyRestrictionSyncMessage.DECODER, RobberyRestrictionSyncMessage.HANDLER, Optional.empty());
         CHANNEL.registerMessage(packetId++, FireworkParticleMessage.class, FireworkParticleMessage.ENCODER, FireworkParticleMessage.DECODER, FireworkParticleMessage.HANDLER, Optional.empty());
         CHANNEL.messageBuilder(NDifficultySyncPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT).encoder(NDifficultySyncPacket::encode).decoder(NDifficultySyncPacket::decode).consumerMainThread(NDifficultySyncPacket::handle).add();
     }
@@ -63,6 +65,10 @@ public class BabelNetwork {
 
     public static void syncServerCurrentTick(ServerPlayer player, Long currentTick) {
         sendTo(new CooldownSyncMessage(null, 0L, currentTick), player);
+    }
+
+    public static void syncRobberyRestriction(ServerPlayer player) {
+        sendTo(new RobberyRestrictionSyncMessage(RobberyCapability.of(player).getRestrictedUntilTick()), player);
     }
 
     public static void sendFireworkParticles(Entity anchor, double x, double y, double z, CompoundTag fireworkNbt) {

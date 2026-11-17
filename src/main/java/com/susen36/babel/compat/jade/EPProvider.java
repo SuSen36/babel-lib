@@ -6,7 +6,6 @@ import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
 import com.susen36.babel.init.BabelAttributes;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import snownee.jade.api.EntityAccessor;
 import snownee.jade.api.IEntityComponentProvider;

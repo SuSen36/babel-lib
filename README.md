@@ -34,7 +34,7 @@ Babel 脱胎于「水月与深蓝之树」主题模组（Caerula Arbor），现�
 - **目标生命**（life point）：独立于原版血量的第二生命条，玩家受到致命伤害时先行扣除以阻挡死亡，全局上限可配（默认 32767）。
 - **护盾**（shield / `barrier` 属性）与目标生命并列显示，上限默认 99999。
 - 全套 HUD 覆盖层：目标生命、护盾、元素损伤、冻结、麻痹、沉睡、残血等。
-- 服务端权威计算 + 网络同步（`HealthSyncMessage` / `EPSyncMessage`），客户端只负责渲染。
+- 服务端权威计算 + 网络同步（`LivesSyncMessage` / `EPSyncMessage`），客户端只负责渲染。
 
 ### 战斗数值
 

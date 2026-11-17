@@ -1,11 +1,14 @@
 package com.susen36.babel.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.susen36.babel.api.event.LivingAddEffectEvent;
 import com.susen36.babel.effect.InvisibleMobEffect;
 import com.susen36.babel.init.BabelMobEffects;
 import com.susen36.babel.item.HandOfFlowingWaterItem;
+import com.susen36.babel.item.HandOfSwordItem;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -101,5 +104,19 @@ public abstract class LivingEntityMixin {
             float factor = (float) (InvisibleMobEffect.VISIBILITY_FACTOR / (1 << invisible.getAmplifier()));
             cir.setReturnValue(cir.getReturnValueD() * factor);
         }
+    }
+
+    @ModifyExpressionValue(
+            method = "getDamageAfterArmorAbsorb",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/damagesource/CombatRules;getDamageAfterAbsorb(FFF)F"
+            )
+    )
+    private float babel$handOfSwordArmorPenetration(float originalDamage, DamageSource source, float amount) {
+        if (HandOfSwordItem.isArmorPenetrating(source)) {
+            return amount - (amount - originalDamage) * 0.3F;
+        }
+        return originalDamage;
     }
 }

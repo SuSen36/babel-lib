@@ -28,6 +28,8 @@ public class EPElement extends Element {
     private static final ResourceLocation FIRE_BAR = rl("fire_bar");
     private static final ResourceLocation DARK_ICON = rl("dark_icon");
     private static final ResourceLocation DARK_BAR = rl("dark_bar");
+    private static final ResourceLocation ANGER_ICON = rl("anger_icon");
+    private static final ResourceLocation ANGER_BAR = rl("anger_bar");
 
     private static ResourceLocation rl(String name) {
         return new ResourceLocation(BabelMod.MODID, "textures/gui/ep/" + name + ".png");
@@ -49,6 +51,7 @@ public class EPElement extends Element {
             case CORROSION -> { this.icon = WATER_ICON; this.bar = WATER_BAR; }
             case BURN -> { this.icon = BURN_ICON; this.bar = FIRE_BAR; }
             case NECROSIS -> { this.icon = DARK_ICON; this.bar = DARK_BAR; }
+            case FRENZY -> { this.icon = ANGER_ICON; this.bar = ANGER_BAR; }
             default -> { this.icon = NERVOUS_ICON; this.bar = NERVOUS_BAR; }
         }
     }
@@ -61,13 +64,15 @@ public class EPElement extends Element {
 
     @Override
     public void render(GuiGraphics guiGraphics, float x, float y, float maxX, float maxY) {
+        Font font = Minecraft.getInstance().font;
+        int barWidth = 6 + font.width(this.text);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, OverlayRenderer.alpha);
         RenderSystem.setShaderTexture(0, this.icon);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        guiGraphics.blit(this.icon, (int) x, (int) y, 0, 0, 10, 10, 10, 10);
-        guiGraphics.blit(this.bar, (int) x + 11, (int) y + 8, 0, 2, 51, 2, 51, 4);
-        guiGraphics.blit(this.bar, (int) x + 12, (int) y + 8, 0, 0, (int) (50 * this.process), 2, 51, 4);
+        guiGraphics.blit(this.icon, (int) x, (int) y + 1, 0, 0, 10, 10, 10, 10);
+        guiGraphics.blit(this.bar, (int) x + 11, (int) y + 8, barWidth, 2, 0.0F, 2.0F, 51, 2, 51, 4);
+        guiGraphics.blit(this.bar, (int) x + 12, (int) y + 8, (int) ((barWidth - 2) * this.process), 2, 0.0F, 0.0F, 50, 2, 51, 4);
         DisplayHelper.INSTANCE.drawText(guiGraphics, this.text, x + 13F, y, IThemeHelper.get().getNormalColor());
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }

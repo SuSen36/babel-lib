@@ -9,6 +9,7 @@ import com.susen36.babel.entity.robbery.RobberyCapability;
 import com.susen36.babel.init.BabelCollectible;
 import com.susen36.babel.init.BabelItems;
 import com.susen36.babel.menu.CannotMenu;
+import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -16,6 +17,9 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
@@ -58,6 +62,7 @@ public class CannotEntity extends AbstractVillager {
     private static final float DAMAGE_CAP_FRACTION = 0.25F;
     private static final int SKILL_ANIM_LENGTH_TICKS = 40;
     private static final byte EVENT_SKILL = (byte)90;
+    private static final EntityDataAccessor<Boolean> DATA_ROBBERY_ACTIVE = SynchedEntityData.defineId(CannotEntity.class, EntityDataSerializers.BOOLEAN);
 
     public final AnimationState idleAnimationState = new AnimationState();
     public final AnimationState skillAnimationState = new AnimationState();
@@ -71,6 +76,20 @@ public class CannotEntity extends AbstractVillager {
 
     public CannotEntity(EntityType<? extends CannotEntity> type, Level level) {
         super(type, level);
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(DATA_ROBBERY_ACTIVE, false);
+    }
+
+    public boolean isRobberyActive() {
+        return this.entityData.get(DATA_ROBBERY_ACTIVE);
+    }
+
+    private void setRobberyActive(boolean active) {
+        this.entityData.set(DATA_ROBBERY_ACTIVE, active);
     }
 
     @Override
@@ -182,7 +201,7 @@ public class CannotEntity extends AbstractVillager {
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         InteractionResult result;
-        if (this.robbery.isActive() || (!this.level().isClientSide && RobberyCapability.of(player).isRestricted(this.level().getGameTime()))) {
+        if (this.isRobberyActive() || (!this.level().isClientSide && RobberyCapability.of(player).isRestricted(this.level().getGameTime()))) {
             result = InteractionResult.PASS;
         } else if (this.isAlive() && !this.isTrading() && !this.isBaby()) {
             if (hand == InteractionHand.MAIN_HAND) {
@@ -237,7 +256,7 @@ public class CannotEntity extends AbstractVillager {
     @Override
     public void remove(Entity.RemovalReason reason) {
         if (this.robbery.isActive() && this.level() instanceof ServerLevel serverLevel) {
-            this.robbery.stop(serverLevel);
+            this.robbery.stop(serverLevel, this);
         }
         super.remove(reason);
     }
@@ -245,19 +264,18 @@ public class CannotEntity extends AbstractVillager {
     public void vanish() {
         if (!this.level().isClientSide) {
             ServerLevel level = (ServerLevel) this.level();
-            this.robbery.stop(level);
+            this.robbery.stop(level, this);
+            List<MerchantOffer> available = new ArrayList<>();
             for (MerchantOffer offer : this.getOffers()) {
                 if (!offer.isOutOfStock()) {
-                    this.spawnAtLocation(offer.getResult().copy());
+                    available.add(offer);
                 }
             }
-            for (int i = 0; i < POOF_PARTICLE_COUNT; ++i) {
-                double dx = this.getRandom().nextGaussian() * 0.02D;
-                double dy = this.getRandom().nextGaussian() * 0.02D;
-                double dz = this.getRandom().nextGaussian() * 0.02D;
-                level.sendParticles(ParticleTypes.POOF, this.getRandomX(1.0D), this.getRandomY(), this.getRandomZ(1.0D), 1, dx, dy, dz, 0.0D);
+            int dropCount = Math.max(1, available.size() * 3 / 5);
+            for (int i = 0; i < dropCount; i++) {
+                this.spawnAtLocation(available.remove(this.getRandom().nextInt(available.size())).getResult().copy());
             }
-            this.playSound(SoundEvents.WANDERING_TRADER_DISAPPEARED, 1.0F, 1.0F);
+            this.playVanishEffects(level);
             this.discard();
         }
     }
@@ -269,15 +287,19 @@ public class CannotEntity extends AbstractVillager {
                     player.sendSystemMessage(Component.translatable("event.babel.robbery.left"));
                 }
             }
-            for (int i = 0; i < POOF_PARTICLE_COUNT; ++i) {
-                double dx = this.getRandom().nextGaussian() * 0.02D;
-                double dy = this.getRandom().nextGaussian() * 0.02D;
-                double dz = this.getRandom().nextGaussian() * 0.02D;
-                level.sendParticles(ParticleTypes.POOF, this.getRandomX(1.0D), this.getRandomY(), this.getRandomZ(1.0D), 1, dx, dy, dz, 0.0D);
-            }
-            this.playSound(SoundEvents.WANDERING_TRADER_DISAPPEARED, 1.0F, 1.0F);
+            this.playVanishEffects(level);
             this.discard();
         }
+    }
+
+    private void playVanishEffects(ServerLevel level) {
+        for (int i = 0; i < POOF_PARTICLE_COUNT; ++i) {
+            double dx = this.getRandom().nextGaussian() * 0.02D;
+            double dy = this.getRandom().nextGaussian() * 0.02D;
+            double dz = this.getRandom().nextGaussian() * 0.02D;
+            level.sendParticles(ParticleTypes.POOF, this.getRandomX(1.0D), this.getRandomY(), this.getRandomZ(1.0D), 1, dx, dy, dz, 0.0D);
+        }
+        this.playSound(SoundEvents.WANDERING_TRADER_DISAPPEARED, 1.0F, 1.0F);
     }
 
     @Override
@@ -285,14 +307,8 @@ public class CannotEntity extends AbstractVillager {
         boolean closing = this.getTradingPlayer() != null && player == null;
         super.setTradingPlayer(player);
         if (closing) {
-            this.stopTrading();
+            this.resetSpecialPrices();
         }
-    }
-
-    @Override
-    protected void stopTrading() {
-        super.stopTrading();
-        this.resetSpecialPrices();
     }
 
     private void resetSpecialPrices() {
@@ -321,7 +337,7 @@ public class CannotEntity extends AbstractVillager {
 
     @Override
     protected void updateTrades() {
-        List<RegistryObject<Item>> pool = new ArrayList<>(BabelCollectible.BABEL_COLLECTIBLES);
+        List<RegistryObject<Item>> pool = new ArrayList<>(Collectibles.getCollectibleItems());
         pool.removeIf(entry -> !(entry.get() instanceof CollectibleLike collectible) || collectible.getTier() == CollectibleTiers.CURSED);
 
         MerchantOffers offers = this.getOffers();
@@ -355,6 +371,7 @@ public class CannotEntity extends AbstractVillager {
             this.hasLostAndFound = tag.getBoolean("HasLostAndFound");
         }
         this.robbery.load(tag);
+        this.setRobberyActive(this.robbery.isActive());
         this.setInvulnerable(false);
         this.setAge(Math.max(0, this.getAge()));
     }
@@ -452,6 +469,7 @@ public class CannotEntity extends AbstractVillager {
                 this.config = config;
                 this.configId = configId;
                 this.active = true;
+                cannot.setRobberyActive(true);
                 this.wavesSpawned = 0;
                 this.waveSpawnCount = 0;
                 this.waveCooldownTicks = config.getWaveIntervalTicks();
@@ -468,8 +486,11 @@ public class CannotEntity extends AbstractVillager {
                     }
                 }
                 RobberyCapability.of(player).startRestriction(level.getGameTime());
-                if (player instanceof ServerPlayer serverPlayer && serverPlayer.containerMenu instanceof CannotMenu) {
-                    serverPlayer.closeContainer();
+                if (player instanceof ServerPlayer serverPlayer) {
+                    BabelNetwork.syncRobberyRestriction(serverPlayer);
+                    if (serverPlayer.containerMenu instanceof CannotMenu) {
+                        serverPlayer.closeContainer();
+                    }
                 }
                 player.sendSystemMessage(Component.translatable("event.babel.robbery.started"));
             }
@@ -479,7 +500,7 @@ public class CannotEntity extends AbstractVillager {
             if (this.active) {
                 this.ticksActive++;
                 if (level.getDifficulty() == Difficulty.PEACEFUL || this.ticksActive >= RAID_TIMEOUT_TICKS) {
-                    this.stop(level);
+                    this.stop(level, cannot);
                 } else if (this.config != null) {
                     Robbery config = this.config;
                     this.spawnedMobs.removeIf(uuid -> this.removeFromRaid(level, cannot, uuid));
@@ -621,8 +642,6 @@ public class CannotEntity extends AbstractVillager {
 
         private void updateBossbar(ServerLevel level, Robbery config) {
             if (this.wavesSpawned >= config.getWaveCount() && this.spawnedMobs.isEmpty()) {
-                this.bossEvent.setProgress(0.0F);
-                this.bossEvent.setName(config.getBossBarName());
                 this.bossEvent.removeAllPlayers();
             } else {
                 if (this.waveCooldownTicks > 0) {
@@ -670,9 +689,10 @@ public class CannotEntity extends AbstractVillager {
             return entry;
         }
 
-        public void stop(ServerLevel level) {
+        public void stop(ServerLevel level, CannotEntity cannot) {
             if (this.active) {
                 this.active = false;
+                cannot.setRobberyActive(false);
                 this.bossEvent.removeAllPlayers();
                 this.bossEvent.setProgress(0.0F);
                 for (UUID uuid : this.spawnedMobs) {
