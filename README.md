@@ -14,7 +14,7 @@
 
 Babel 脱胎于「水月与深蓝之树」主题模组（Caerula Arbor），现定位为**公共库**：将明日方舟的战斗机制与肉鸽藏品在 Minecraft 中实现，供同系列内容模组复用。
 
-它同时也是一个能直接游玩的模组：142 件收藏品、十余种状态效果、坎诺特商人与其劫掠战、源石锭货币、`/ep` 与 `/lifepoint` 调试指令。
+它同时也是一个能直接游玩的模组：拥有百余件收藏品、十余种状态效果、坎诺特商人与其劫掠战、源石锭货币、`/ep` 与 `/lifepoint` 调试指令。
 
 - **给玩家**：安装即获得方舟式战斗体验与收藏品玩法。
 - **给开发者**：`com.susen36.babel.api` 提供可挂接的事件与注册入口，属性、Capability、网络同步、HUD、Jade 显示均已就绪。
@@ -74,6 +74,7 @@ Babel 脱胎于「水月与深蓝之树」主题模组（Caerula Arbor），现�
 - 每件收藏品可有**层数**（`Levels(min, max, default)`）、**冷却**、**持续时间**（默认 576000 tick ≈ 8 小时 / 24 游戏日）。
 - 获取途径：战利品表注入（默认 30% 概率）、怪物 / Boss 掉落（Boss 必掉高级藏品）、`/collectible give`。
 - 自带收藏品界面（默认 `C` 键），可查看已持有藏品、层数、冷却；坎诺特的「失与得」界面可用已有藏品交换随机藏品。
+- 某些藏品带有特殊功能，详情见`docs/collectibles-effect/`
 - 注册 API 见下文[收藏品注册](#收藏品注册)。
 
 ### 状态效果
@@ -297,22 +298,25 @@ dependencies {
 babel-lib/
 ├─ src/main/java/com/susen36/babel/
 │  ├─ api/            对外事件（订阅方唯一应直接依赖的包）
-│  ├─ collectible/    收藏品框架：注册、层级、冷却、界面数据
-│  ├─ elemental/      元素损伤实现与 EPManager
-│  ├─ capability/     EP / Health 两类 Capability 与注册
-│  ├─ difficulty/     N 难度、档位与倍率工具
-│  ├─ item/           142 件收藏品实现
 │  ├─ block/          水壶、王座基座、金杯、血族床等方块
-│  ├─ entity/         坎诺特与劫掠机制
+│  ├─ capability/     EP / Health 两类 Capability 与注册
+│  ├─ client/         HUD、界面、渲染、粒子、模型
+│  ├─ collectible/    收藏品框架：注册、层级、冷却、界面数据
+│  ├─ command/        命令实现
+│  ├─ compat/jade/    Jade 插件
+│  ├─ datagen/        数据生成器
+│  ├─ difficulty/     N 难度、档位与倍率工具
 │  ├─ effect/         状态效果
+│  ├─ elemental/      元素损伤实现与 EPManager
+│  ├─ entity/         坎诺特与劫掠机制
 │  ├─ event/          内部事件监听与玩法逻辑
 │  ├─ init/           DeferredRegister 集中注册
+│  ├─ item/           收藏品实现
+│  ├─ loot/           为藏品与源石锭添加战利品掉落
+│  ├─ menu/           菜单界面
 │  ├─ mixin/          17 个 Mixin（含 2 个客户端）
-│  ├─ client/         HUD、界面、渲染、粒子、模型
-│  ├─ command/        /collectible、/ep、/lifepoint
 │  ├─ network/        同步与交互数据包
-│  ├─ compat/jade/    Jade 插件
-│  └─ datagen/        数据生成器
+│  └─ util/           工具函数单元（使用冷却，判断，元素伤害，目标生命值）
 ├─ src/main/resources/
 │  ├─ assets/babel/   模型、贴图、语言（`zh_cn` / `en_us` 为基准）、粒子、音效
 │  └─ data/babel/     伤害类型、战利品表、劫掠配置、标签
