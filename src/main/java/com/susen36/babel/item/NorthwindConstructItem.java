@@ -37,13 +37,13 @@ public class NorthwindConstructItem extends CollectibleItem.CustomCollectibleIte
                 SCANNED_TICKS.put(enemy, enemy.tickCount), (entity, player) -> !ALLIED_WITH_PLAYER.test(entity, player));
     }
 
-    /** 扫描每 20 tick 一次，按一个周期内的命中判定。 */
+    // 范围扫描每 20 tick 一次，按一个周期内的命中判定。
     public static boolean isInRange(LivingEntity entity) {
         Integer scanned = SCANNED_TICKS.get(entity);
         return scanned != null && entity.tickCount - scanned <= TICKS_PER_SECOND;
     }
 
-    /** 每只敌人仅触发一次，触发标记持久化在实体数据中。 */
+    // 每只敌人仅触发一次，触发标记持久化在实体数据中。
     public static void onMobAttack(LivingEntity attacker) {
         CompoundTag data = attacker.getPersistentData();
         if (attacker.getType().is(BabelEntityTypeTags.MACHINA) || attacker.getType().is(BabelEntityTypeTags.ORIGINIUM_CREATION)) {

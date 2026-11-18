@@ -9,7 +9,7 @@ import net.minecraftforge.eventbus.api.Cancelable;
 /**
  * 目标生命系统在玩家死亡时扣除护盾/目标生命的事件回调。
  * <p>
- * babel 负责核心扣除与阻挡死亡逻辑,依赖模组通过该事件处理模组专属效果。
+ * babel 负责核心扣除与阻挡死亡逻辑，依赖模组通过该事件处理模组专属效果。
  */
 public class LifePointConsumeEvent extends LivingEvent {
 

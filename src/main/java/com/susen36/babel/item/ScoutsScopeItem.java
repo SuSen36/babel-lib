@@ -10,7 +10,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 
 public class ScoutsScopeItem extends CollectibleItem.CustomCollectibleItem {
-    /** 增幅到 +100% 封顶的距离。 */
+    // 增幅随距离线性增长，32 格处到 +100% 封顶。
     private static final float MAX_RANGE = 32.0F;
 
     public ScoutsScopeItem() {

@@ -31,6 +31,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 
+/**
+ * 玩家级收藏品状态：已使用、层数与冷却，持久化为 NBT 列表。
+ * <p>
+ * 服务端权威；写入统一使用带 {@code Sync} 后缀的静态方法，由它们负责向客户端同步。
+ */
 public class Collectibles implements INBTSerializable<ListTag> {
     // 首次查询须在物品注册完成后；索引保留Builder声明顺序，共享池沿用Forge注册表顺序。
     private static final Supplier<CollectibleDirectory> DIRECTORY = Suppliers.memoize(() -> {
@@ -142,6 +147,9 @@ public class Collectibles implements INBTSerializable<ListTag> {
         return player.isSpectator();
     }
 
+    /**
+     * @return 玩家藏品数据；Capability 缺失时返回 null
+     */
     @Nullable
     public static Collectibles getData(@NotNull Player player) {
         CollectibleCapability cap = CollectibleCapability.of(player);
@@ -185,6 +193,9 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
     }
 
+    /**
+     * @param delta 层数增量，可为负；仅服务端写入，完成后立即同步客户端
+     */
     public static void addLayerAndSync(@NotNull Player player, @NotNull Item item, int delta) {
         if (!player.level().isClientSide) {
             getLayerData(player).addLayer(item, delta);

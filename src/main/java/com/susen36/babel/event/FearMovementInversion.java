@@ -8,7 +8,7 @@ import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-/** 玩家恐惧时反转移动输入，与生物恐惧取反逃逸方向的行为对应。 */
+// 玩家恐惧时反转移动输入，与生物恐惧取反逃逸方向的行为对应。
 @Mod.EventBusSubscriber(modid = BabelMod.MODID, value = Dist.CLIENT)
 public class FearMovementInversion {
 

@@ -9,6 +9,10 @@ import net.minecraftforge.eventbus.api.Cancelable;
 
 import javax.annotation.Nullable;
 
+/**
+ * 坎诺特「失与得」兑换事件：{@link Pre} 在结算前发布，可取消或通过 {@link Pre#setGained(Item)} 替换获得的藏品；
+ * {@link Post} 在兑换完成后发布，只读。
+ */
 public class LostAndFoundEvent extends PlayerEvent {
     @Nullable
     private final CannotEntity trader;

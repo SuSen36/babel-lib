@@ -15,11 +15,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * {@code babel:applies_difficulty} 默认纳入末影龙与 {@code forge:bosses}；
- * {@code babel:elite} 默认纳入原版精锐敌怪；{@code babel:sarkaz} 默认纳入原版下界敌怪；
- * {@code babel:bypasses_difficulty} 保持为空，交由依赖模组自行添加。
- */
+// babel:applies_difficulty 默认纳入末影龙与 forge:bosses；
+// babel:elite 默认纳入原版精锐敌怪；babel:sarkaz 默认纳入原版下界敌怪；
+// babel:bypasses_difficulty 保持为空，交由依赖模组自行添加。
 public class EntityTypeTagsProvider extends TagsProvider<EntityType<?>> {
 
     private static final TagKey<EntityType<?>> APPLIES_DIFFICULTY = babelEntityTypeTag("applies_difficulty");

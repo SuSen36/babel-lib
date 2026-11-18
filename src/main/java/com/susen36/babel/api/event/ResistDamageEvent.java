@@ -5,6 +5,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
 
+/**
+ * 防御与法术抗性参与减伤前的可修改事件，订阅方通过 {@link #setAttrValue(double)} 改写本次生效的属性值。
+ * <p>
+ * {@link Defense} 对应物理防御，{@link MagicResistance} 对应法术抗性；只影响本次结算，不修改实体属性本身。
+ */
 public class ResistDamageEvent extends LivingEvent {
     private final DamageSource source;
     private final float amount;

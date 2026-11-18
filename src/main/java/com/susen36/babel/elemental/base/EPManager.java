@@ -20,6 +20,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+// 元素损伤公共入口：提供施加 / 恢复 / 查询损伤，以及读取攻击与防御配置的工具方法。
+// 结算在服务端进行；方法对空实体与 empty 类型做了短路，调用方无需重复判空。
 public class EPManager {
     private static final Map<LivingEntity, Double> ELEMENTAL_DEFENSE_BASE_MODIFIERS = new WeakHashMap<>();
 
@@ -99,6 +101,7 @@ public class EPManager {
         return new ElementalDefenseConfig(type, baseModifier, totalModifier);
     }
 
+    // 施加元素损伤，返回是否实际施加；目标为空、类型为 empty、数值非正或缺少 EP Capability 时返回 false
     public static boolean hurtElemental(LivingEntity target, AbstractEPCapability.EPType type, int amount) {
         boolean hurt = false;
         if (target != null && !type.isEmpty() && amount > 0) {
@@ -108,10 +111,12 @@ public class EPManager {
         return hurt;
     }
 
+    // 带攻击者的施加，事件订阅方可通过 ElementEvent#getSource() 取到来源
     public static boolean hurtElemental(LivingEntity target, AbstractEPCapability.EPType type, @Nullable LivingEntity attacker, int amount) {
         return hurtElemental(target, type, attacker, amount, ElementEvent.HurtType.ENTITY);
     }
 
+    // 指定 ElementEvent.HurtType 的施加，用于区分伤害、方块、药水等来源
     public static boolean hurtElemental(LivingEntity target, AbstractEPCapability.EPType type, @Nullable LivingEntity attacker, int amount, ElementEvent.HurtType hurtType) {
         boolean hurt = false;
         if (target != null && !type.isEmpty() && amount > 0) {
@@ -133,6 +138,7 @@ public class EPManager {
         }
     }
 
+    // 把指定类型的损伤恢复到上限（上限取自元素损伤上限属性）
     public static void healToFull(LivingEntity entity, AbstractEPCapability.EPType type) {
         if (entity != null && !type.isEmpty()) {
             EPCapability ep = getEP(entity);
@@ -144,6 +150,7 @@ public class EPManager {
         }
     }
 
+    // 返回距离爆条的剩余进度比例，范围 0–1，用于 HUD 进度显示
     public static float getRemainProgress(LivingEntity entity, AbstractEPCapability.EPType type) {
         float progress = 1.0F;
         if (entity != null && !type.isEmpty()) {
@@ -201,6 +208,7 @@ public class EPManager {
         return immune;
     }
 
+    // 设置免疫持续 tick 数，到期自动解除
     public static void setImmune(LivingEntity entity, AbstractEPCapability.EPType type, int ticks) {
         if (entity != null && !type.isEmpty() && ticks >= 0) {
             EPCapability ep = getEP(entity);
@@ -213,6 +221,7 @@ public class EPManager {
         }
     }
 
+    // 对全部损伤类型施加临时免疫
     public static void setAllImmune(LivingEntity entity, int ticks) {
         if (entity != null && ticks >= 0) {
             EPCapability ep = getEP(entity);
@@ -229,6 +238,7 @@ public class EPManager {
         }
     }
 
+    // 永久免疫单一损伤类型
     public static void setPermanentImmunity(LivingEntity entity, AbstractEPCapability.EPType type) {
         if (entity != null && !type.isEmpty()) {
             EPCapability ep = getEP(entity);

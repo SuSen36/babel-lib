@@ -125,6 +125,9 @@ public class BabelCollectible {
     public static RegistryObject<Item> TIMEWORN_POETRY_STRIPS;
     public static RegistryObject<Item> RAINBOW_JAR;
     public static RegistryObject<Item> LITTLE_GRAN_FARO;
+    public static RegistryObject<Item> MEMORIES_THE_SHARD;
+    public static RegistryObject<Item> RING_OF_THORNS;
+    public static RegistryObject<Item> PUNGENT_COFFEE_BEANS;
     public static RegistryObject<Item> ORIRON_ROUND_SHIELD;
     public static RegistryObject<Item> FRISTON_P;
     public static RegistryObject<Item> STRING_PUPPET;
@@ -180,6 +183,7 @@ public class BabelCollectible {
     public static RegistryObject<Item> BLUE_SILK_SCARF;
     public static RegistryObject<Item> GLORIOUS_KAZIMIERZ;
     public static RegistryObject<Item> THE_RETURN;
+    public static RegistryObject<Item> YANESE_DICTIONARY;
 
     public static void register(IEventBus bus) {
         REGISTRY = CollectibleBuilder.create(BabelMod.MODID, bus);
@@ -279,6 +283,9 @@ public class BabelCollectible {
         OLD_FAN = REGISTRY.registerCollectible("old_fan", OldFanItem::new);
         RAINBOW_JAR = REGISTRY.registerCollectible("rainbow_jar", RainbowJarItem::new);
         LITTLE_GRAN_FARO = REGISTRY.registerCollectible("little_gran_faro", LittleGranFaroItem::new);
+        MEMORIES_THE_SHARD = REGISTRY.registerCollectible("memories_the_shard", MemoriesTheShardItem::new);
+        RING_OF_THORNS = REGISTRY.registerCollectible("ring_of_thorns", RingOfThornsItem::new);
+        PUNGENT_COFFEE_BEANS = REGISTRY.registerCollectible("pungent_coffee_beans", PungentCoffeeBeansItem::new);
         ORIRON_ROUND_SHIELD = REGISTRY.registerCollectible("oriron_round_shield", OrironRoundShieldItem::new);
         FRISTON_P = REGISTRY.registerCollectible("friston_p", FristonPItem::new);
         STRING_PUPPET = REGISTRY.registerCollectible("string_puppet", StringPuppetItem::new);
@@ -336,6 +343,7 @@ public class BabelCollectible {
         BLUE_SILK_SCARF = REGISTRY.registerCollectible("blue_silk_scarf", BlueSilkScarfItem::new);
         GLORIOUS_KAZIMIERZ = REGISTRY.registerCollectible("glorious_kazimierz", GloriousKazimierzItem::new);
         THE_RETURN = REGISTRY.registerCollectible("the_return", TheReturnItem::new);
+        YANESE_DICTIONARY = REGISTRY.registerCollectible("yanese_dictionary", YaneseDictionaryItem::new);
 
         GOLD_EXPEDITION = REGISTRY.registerCollectible("gold_expedition", 25, false, CollectibleTiers.ADVANCED, new Levels(0, 1, 0),
                 CollectibleActivation.builder().sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F).particle(ParticleTypes.WAX_OFF, 72).showOverlay(true).build(),

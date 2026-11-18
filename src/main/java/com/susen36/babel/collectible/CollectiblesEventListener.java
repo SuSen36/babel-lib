@@ -10,6 +10,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * 收藏品登录同步监听：玩家登录、重生或切换维度后同步其藏品数据，并在服务端每 tick 广播当前游戏刻。
+ */
 @Mod.EventBusSubscriber(modid = BabelMod.MODID)
 public class CollectiblesEventListener {
 

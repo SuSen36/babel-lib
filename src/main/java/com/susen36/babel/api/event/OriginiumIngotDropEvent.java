@@ -10,7 +10,7 @@ import net.minecraftforge.eventbus.api.Event;
  * 实体战利品结算掉落源石锭时触发，用于让其他模组调整掉落倍率。
  * <p>
  * 倍率作用于基础掉落数量 1，小数部分按概率进位：倍率 1.5 表示必定掉落 1 个、另有 50% 概率额外掉落 1 个。
- * 将倍率设为 0 可阻止本次掉落。
+ * 将倍率设为 0 可阻止本次掉落。boss 的固定掉落不经过本事件。
  */
 public class OriginiumIngotDropEvent extends Event {
 

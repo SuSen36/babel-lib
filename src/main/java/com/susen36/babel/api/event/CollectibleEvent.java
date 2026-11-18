@@ -13,7 +13,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
  * <p>
  * 三个子事件：
  * <ul>
- *   <li>{@link Used}        - 玩家使用（获得）收集品，由 {@code CollectibleItem.finishUsingItem} 触发</li>
+ *   <li>{@link Used}        - 玩家使用（获得）收集品，由 {@code CollectibleItem.finishUsingItem} 或 {@code Collectibles.activateAndSync} 触发</li>
  *   <li>{@link Removed}     - 玩家移除收集品，由库外部调用 {@link #onRemoved} 触发</li>
  *   <li>{@link LayerChanged}- 收集品层级变更，由库外部调用 {@link #onLayerChanged} 触发</li>
  * </ul>

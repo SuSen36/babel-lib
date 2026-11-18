@@ -32,7 +32,7 @@ public class TherapyTapeItem extends CollectibleItem.CustomCollectibleItem {
                 SCANNED_TICKS.put(enemy, enemy.tickCount), (entity, player) -> entity instanceof Enemy && entity.isAlive());
     }
 
-    /** 扫描每 20 tick 一次，按一个周期内的命中判定。 */
+    // 范围扫描每 20 tick 一次，按一个周期内的命中判定。
     public static boolean isInRange(LivingEntity entity) {
         Integer scanned = SCANNED_TICKS.get(entity);
         return scanned != null && entity.tickCount - scanned <= TICKS_PER_SECOND;

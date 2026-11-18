@@ -14,6 +14,8 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nullable;
 
+// 目标生命与护盾的存储与同步：上限取自 MAX_LIFE_POINT 属性并受全局上限配置限制。
+// 修改数值后需调用 sync 才会同步到客户端。
 public class HealthCapability implements INBTSerializable<CompoundTag> {
 
     public static final ResourceLocation ID = new ResourceLocation(BabelMod.MODID, "health_cap");
@@ -40,6 +42,7 @@ public class HealthCapability implements INBTSerializable<CompoundTag> {
         return lives;
     }
 
+    // 设置当前值，夹取到 [1, getMaxLives()]
     public void setLives(double value) {
         double clamped = Math.max(1, Math.min(value, getMaxLives()));
         if (this.lives != clamped) {
@@ -49,6 +52,7 @@ public class HealthCapability implements INBTSerializable<CompoundTag> {
 
     // ========== Max Lives ==========
 
+    // 返回目标生命上限，取自 MAX_LIFE_POINT 属性并受全局上限配置限制；属性缺失时返回初始值
     public double getMaxLives() {
         AttributeInstance instance = getAttributeInstance();
         if (instance != null) {
@@ -57,6 +61,7 @@ public class HealthCapability implements INBTSerializable<CompoundTag> {
         return BabelConfig.lifePointInit;
     }
 
+    // 设置上限值，写入属性基础值前夹取到 [1, 全局上限]
     public void setMaxLives(double value) {
         AttributeInstance instance = getAttributeInstance();
         if (instance != null) {
@@ -75,6 +80,7 @@ public class HealthCapability implements INBTSerializable<CompoundTag> {
         return shield;
     }
 
+    // 设置护盾值，夹取到 [0, 全局护盾上限]
     public void setShield(double value) {
         double clamped = Math.max(0, Math.min(value, BabelConfig.shieldLimit));
         if (this.shield != clamped) {
@@ -84,6 +90,7 @@ public class HealthCapability implements INBTSerializable<CompoundTag> {
 
     // ========== Sync ==========
 
+    // 向追踪该实体的客户端与自身发送同步包，仅服务端调用有效
     public void sync() {
         if (entity != null && !entity.level().isClientSide) {
             BabelNetwork.sendToTrackingAndSelf(entity, new LivesSyncMessage(entity.getId(), serializeNBT()));

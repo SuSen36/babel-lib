@@ -69,7 +69,9 @@ public class CannotScreen extends AbstractContainerScreen<CannotMenu> {
     private void postButtonClick() {
         this.menu.setSelectionHint(this.shopItem);
         this.menu.tryMoveItems(this.shopItem);
-        this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, this.shopItem);
+        if (this.minecraft != null &&this.minecraft.gameMode != null){
+            this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, this.shopItem);
+        }
     }
 
     @Override

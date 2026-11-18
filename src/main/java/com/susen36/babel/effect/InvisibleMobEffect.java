@@ -11,9 +11,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 
 import java.util.UUID;
 
-/**
- * 倍数作用于 {@code LivingEntity#getVisibilityPercent}，与之叠加而非覆盖，因此仍保留原版隐身、潜行、同类头颅的额外折减。
- */
+// 倍数作用于 LivingEntity#getVisibilityPercent，与之叠加而非覆盖，因此仍保留原版隐身、潜行、同类头颅的额外折减。
 public class InvisibleMobEffect extends MobEffect {
 
     public static final double VISIBILITY_FACTOR = 0.4D;

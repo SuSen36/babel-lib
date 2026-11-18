@@ -77,9 +77,18 @@ function ConvertFrom-WikiTemplate {
 
 function Clean-WikiText([string]$s) {
     if ([string]::IsNullOrWhiteSpace($s)) { return '' }
-    $s = [regex]::Replace($s, '\{\{r\+\|([^|}]+)\|([^}]+)\}\}', '$2')          # {{r+|tip|show}} -> show
-    $s = [regex]::Replace($s, '\{\{color\|[^|}]+\|([^}]+)\}\}', '$1')          # {{color|c|t}} -> t
-    $s = [regex]::Replace($s, '\{\{mdi\|[^}]*\}\}', '')                        # 图标
+    # 由内向外展开模板：每轮只匹配不含嵌套花括号的最内层
+    for ($pass = 0; $pass -lt 5; $pass++) {
+        $before = $s
+        $s = [regex]::Replace($s, '\{\{color\|[^{}|]+\|([^{}]+)\}\}', '$1')                 # {{color|c|t}} -> t
+        $s = [regex]::Replace($s, '\{\{r\+\|([^{}|]+)\|([^{}]+)\}\}', '$2')                 # {{r+|tip|show}} -> show
+        $s = [regex]::Replace($s, '\{\{模糊\|([^{}|]*)\}\}', '$1')                           # {{模糊|t}} -> t
+        $s = [regex]::Replace($s, '\{\{修正\|([^{}|]*)\|[^{}]*\}\}', '$1')                   # {{修正|新|原文=旧|...}} -> 新
+        $s = [regex]::Replace($s, '\{\{变动数值lite\|[^{}|]*\|[^{}|]*\|([^{}|]+)\}\}', '$1') # {{变动数值lite|up|c|t}} -> t
+        $s = [regex]::Replace($s, '\{\{变动数值lite\|[^{}]*\|([^{}|]+)\}\}', '$1')            # 参数不足时取最后一个
+        if ($s -eq $before) { break }
+    }
+    $s = [regex]::Replace($s, '\{\{mdi\|[^{}]*\}\}', '')                       # 图标
     $s = [regex]::Replace($s, '\{\{[^|}]*\}\}', '')                            # 其余无参模板
     $s = [regex]::Replace($s, '\[\[[^\]|]+\|([^\]]+)\]\]', '$1')               # [[a|b]] -> b
     $s = [regex]::Replace($s, '\[\[([^\]]+)\]\]', '$1')                        # [[a]] -> a

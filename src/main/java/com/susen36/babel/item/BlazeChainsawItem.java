@@ -10,7 +10,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 
 public class BlazeChainsawItem extends CollectibleItem.CustomCollectibleItem {
-    /** 加成衰减到 +0% 的距离。 */
+    // 加成随距离线性衰减，16 格处衰减到 +0%。
     private static final float MAX_RANGE = 16.0F;
 
     public BlazeChainsawItem() {

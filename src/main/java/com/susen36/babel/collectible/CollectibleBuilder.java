@@ -17,6 +17,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * 收藏品注册构建器：为指定 modid 创建物品注册表，并在构造时发布 {@link CollectibleRegisterEvent} 供外部注入藏品。
+ * <p>
+ * {@code registerCollectible} 的重载覆盖从「只给激活效果」到「指定耗时、可重复使用、稀有度、层数与激活动画」的注册需求。
+ */
 public class CollectibleBuilder {
     private static final Map<ResourceLocation, RegistryObject<Item>> DECLARED_COLLECTIBLES = new LinkedHashMap<>();
 

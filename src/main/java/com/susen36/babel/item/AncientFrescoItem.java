@@ -49,7 +49,7 @@ public class AncientFrescoItem extends CollectibleItem.CustomCollectibleItem {
         }, ENEMY_OF_PLAYER);
     }
 
-    /** 敌人的浮空或失重状态自然结束时惩罚一次，主动移除不经过此方法。 */
+    // 敌人的浮空或失重效果自然到期时惩罚一次，主动移除不经过此方法。
     public static void punishOnExpire(LivingEntity entity, MobEffect effect) {
         if (effect == MobEffects.LEVITATION || effect == BabelMobEffects.MASS_LOSS.get()) {
             TRIGGER_TICKS.remove(entity);

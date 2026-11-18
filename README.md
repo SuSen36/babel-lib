@@ -112,7 +112,7 @@ gradlew.bat build
 ./gradlew build
 ```
 
-产物：`build/libs/babel-1.2.6.jar`。
+产物：`build/libs/babellib-1.20.1-forge-1.2.6.jar`。
 
 常用任务：
 
@@ -188,6 +188,8 @@ gradlew.bat build
 列表类配置支持 `*` 通配整个命名空间，例如 `tacz:*`、`babel:oceanized_*`。
 
 ## 开发者 API
+
+完整的依赖引入、事件时机与扩展流程见 [`docs/developer-guide.md`](docs/developer-guide.md)。
 
 对外接口集中在 `api`（事件）、`collectible`（收藏品框架）、`elemental`（EPManager 等）、`capability` 与 `difficulty`；`client`、`mixin`、`datagen`、`init` 属内部实现，升级时可能变动。
 

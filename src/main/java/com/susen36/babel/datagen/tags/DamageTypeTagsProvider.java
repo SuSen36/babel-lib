@@ -14,10 +14,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * {@code #babel:element_break} 归拢元素损伤五类爆发伤害，作为其父级通用属性（如绕抗性）的挂载点；
- * sanity 绕效果、burn 算魔法等子类型专属特性在原版/forge tag 中单独追加，不通过父级 tag 扩散。
- */
+// #babel:element_break 归拢元素损伤五类爆发伤害，作为其父级通用属性（如绕抗性）的挂载点；
+// sanity 绕效果、burn 算魔法等子类型专属特性在原版/forge tag 中单独追加，不通过父级 tag 扩散。
 public class DamageTypeTagsProvider extends TagsProvider<DamageType> {
 
     private static final TagKey<DamageType> ELEMENT_BREAK = babelDamageTypeTag("element_break");

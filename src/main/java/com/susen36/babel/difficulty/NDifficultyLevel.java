@@ -22,12 +22,12 @@ public final class NDifficultyLevel {
         return value <= 0 ? EASY : new NDifficultyLevel(value);
     }
 
-    /** 获取当前难度的阶段分类（容易、普通、困难、专家、险境）。 */
+    // 获取当前难度的阶段分类（容易、普通、困难、专家、险境）
     public NDifficultyTier tier() {
         return this.tier;
     }
 
-    /** 难度等级值[0, 18]。 */
+    // 难度等级值[0, 18]
     public int value() {
         return Mth.clamp(this.value, 0, 18);
     }

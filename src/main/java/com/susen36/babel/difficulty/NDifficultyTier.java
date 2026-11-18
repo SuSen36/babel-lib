@@ -1,18 +1,16 @@
 package com.susen36.babel.difficulty;
 
-/**
- * 探索难度阶段划分。
- */
+// 探索难度阶段划分。
 public enum NDifficultyTier {
-    /** [0, 2]：简单。 */
+    // [0, 2]：简单
     EASY(0, 2),
-    /** [3, 5]：普通。 */
+    // [3, 5]：普通
     NORMAL(3, 5),
-    /** [6, 8]：困难。 */
+    // [6, 8]：困难
     HARD(6, 8),
-    /** [9, 11]：专家。 */
+    // [9, 11]：专家
     EXPERT(9, 11),
-    /** [12, 18]：险境。 */
+    // [12, 18]：险境
     PERILOUS(12, 18);
 
     private final int min;
@@ -31,7 +29,7 @@ public enum NDifficultyTier {
         return this.max;
     }
 
-    /** 根据具体数值获取对应的阶段，默认兜底为 EASY。 */
+    // 根据具体数值获取对应的阶段，默认兜底为 EASY
     public static NDifficultyTier fromValue(int value) {
         NDifficultyTier result = EASY;
         for (NDifficultyTier tier : values()) {

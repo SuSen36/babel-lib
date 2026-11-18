@@ -12,6 +12,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.IItemDecorator;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * 物品栏渲染装饰：为处于冷却的收藏品叠加白色进度遮罩，仅客户端生效。
+ */
 public class CollectiblesDecorator implements IItemDecorator {
     private static final int SLOT_SIZE = 16;
     private static final int COOLDOWN_OVERLAY_COLOR = 0x80FFFFFF;

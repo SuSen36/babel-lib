@@ -17,6 +17,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 收藏品属性修饰符对账器：按玩家当前生效的藏品与层数补齐、更新或移除属性修饰符，
+ * 并维护范围光环修饰符的生命周期。
+ */
 public final class CollectibleAttributes {
 
     // 范围修饰符对账记录：玩家 UUID -> (修饰符 ID -> 上轮命中实体)；修饰符均为 transient 不入档，卸载/死亡由存档特性兜底

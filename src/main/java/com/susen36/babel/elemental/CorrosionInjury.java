@@ -1,12 +1,13 @@
 package com.susen36.babel.elemental;
 
+import com.susen36.babel.effect.LessArmorMobEffect;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
 import com.susen36.babel.init.BabelDamageTypes;
-import com.susen36.babel.effect.LessArmorMobEffect;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 
+// 侵蚀损伤的爆条与减益实现。
 public class CorrosionInjury extends AbstractEPCapability {
 
     public CorrosionInjury(LivingEntity livingEntity) {

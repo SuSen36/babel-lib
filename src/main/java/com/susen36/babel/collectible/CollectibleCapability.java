@@ -15,6 +15,11 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * 收藏品 Capability 提供者：挂载 {@link Collectibles} 数据并负责 NBT 持久化。
+ * <p>
+ * 调用方应通过 {@code Collectibles} 的静态方法读写，不要直接持有该类型。
+ */
 public class CollectibleCapability implements ICapabilitySerializable<CompoundTag> {
     public static final Capability<CollectibleCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
     private static final ResourceLocation KEY = new ResourceLocation(BabelMod.MODID, "collectible_cap");

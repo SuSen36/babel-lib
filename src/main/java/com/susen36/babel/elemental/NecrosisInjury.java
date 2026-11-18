@@ -8,6 +8,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 
+// 凋亡损伤的爆条与减益实现。
 public class NecrosisInjury extends AbstractEPCapability {
 
     public NecrosisInjury(LivingEntity livingEntity) {

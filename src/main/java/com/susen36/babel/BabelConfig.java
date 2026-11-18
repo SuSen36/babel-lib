@@ -87,7 +87,7 @@ public class BabelConfig {
 
     public static final ForgeConfigSpec.LongValue ROBBERY_RESTRICTION_DURATION_TICKS = BUILDER
             .comment("触发坎诺特劫掠后的限制时长，期间坎诺特不再理睬该玩家")
-            .defineInRange("robbery_restriction_duration_ticks", 108000L, 0L, Long.MAX_VALUE);
+            .defineInRange("robbery_restriction_duration_ticks", 252000L, 0L, Long.MAX_VALUE);
 
     static final ForgeConfigSpec SPEC = BUILDER.build();
     public static boolean epBarStyle;

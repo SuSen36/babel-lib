@@ -22,7 +22,7 @@ public class RockHornItem extends CollectibleItem.CustomCollectibleItem {
     private static final double ALLY_RANGE = 8.0D;
     private static final int MAX_ALLIES = 10;
 
-    /** 以扫描所在的 server tick 为键，同一周期内的回调累计计数，进入下一周期自动重置。 */
+    // 以扫描所在的 tick 为键，同一周期内的回调累计计数，新周期的回调从头累计。
     private record Scan(int tick, int count) {
     }
 

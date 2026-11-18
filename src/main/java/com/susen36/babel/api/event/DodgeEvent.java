@@ -5,6 +5,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
 
+/**
+ * 伤害被物理或法术闪避完全规避时发布，只读，用于播放特效或统计。
+ */
 public class DodgeEvent extends LivingEvent {
     private final DamageSource source;
 

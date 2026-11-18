@@ -36,20 +36,17 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-/**
- * 难度（探索等级）通用实体应用逻辑。
- * <p>
- * 仅复制 N18 相关通用部分：实体生成时按 {@link NDifficulty#multiplier} 提升
- * 生命、攻击、盔甲值与盔甲韧性，并保持当前血量百分比。不包含任何海嗣专属依赖。
- */
+// 难度（探索等级）通用实体应用逻辑。
+// 仅复制 N18 相关通用部分：实体加入世界时按 NDifficulty#multiplier 提升
+// 生命、攻击、盔甲值与盔甲韧性，并保持当前血量百分比。不包含任何海嗣专属依赖。
 @Mod.EventBusSubscriber(modid = BabelMod.MODID)
 public class NDifficultyEvent {
 
-    /** 强制应用标签：加入该标签的实体即使不属于默认敌对目标也会应用难度倍率。 */
+    // 强制应用标签：加入该标签的实体即使不属于默认敌对目标也会应用难度倍率
     public static final TagKey<EntityType<?>> APPLIES_DIFFICULTY = TagKey.create(
             Registries.ENTITY_TYPE, new ResourceLocation(BabelMod.MODID, "applies_difficulty"));
 
-    /** 绕过标签：加入该标签的实体即使属于默认敌对目标也不会应用难度倍率。 */
+    // 绕过标签：加入该标签的实体即使属于默认敌对目标也不会应用难度倍率
     public static final TagKey<EntityType<?>> BYPASSES_DIFFICULTY = TagKey.create(
             Registries.ENTITY_TYPE, new ResourceLocation(BabelMod.MODID, "bypasses_difficulty"));
 
@@ -133,7 +130,7 @@ public class NDifficultyEvent {
         }
     }
 
-    /** 每20tick更新一次 */
+    // 每 20 tick 检查一次难度值，数值变化时向全体客户端同步
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
@@ -148,7 +145,7 @@ public class NDifficultyEvent {
         }
     }
 
-    /**服务器关闭时设置为初始值*/
+    // 服务器关闭时将 lastSent 重置为初始值
     @SubscribeEvent
     public static void onServerStopped(ServerStoppedEvent event) {
         lastSent = Integer.MIN_VALUE;
@@ -165,7 +162,7 @@ public class NDifficultyEvent {
 
     @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = BabelMod.MODID)
     public static class ClientEvents {
-        /**客户端玩家登出时清除{@code 同步NDifficultyValue}*/
+        //客户端玩家登出时清除同步难度值
         @SubscribeEvent
         public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
             NDifficulty.clearSynced();

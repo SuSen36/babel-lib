@@ -14,9 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * 挂在 {@link EntityRenderer#render} 上，可同时覆盖原版活体渲染器与 GeckoLib 等第三方渲染器。
- */
+// 注入基类 EntityRenderer.render，原版活体渲染器经 LivingEntityRenderer.render 尾部的 super.render 调用到此处，
+// GeckoLib 等第三方渲染器同样经由该基类方法被覆盖。
 @Mixin(EntityRenderer.class)
 public abstract class EntityRendererMixin {
 

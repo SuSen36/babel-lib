@@ -29,7 +29,7 @@ import java.util.List;
 
 public class SpeechDraftItem extends CollectibleItem.CustomCollectibleItem {
 
-    /** 召唤梯度：3、4、5 级各一名村民。 */
+    // 召唤梯度：3、4、5 级各一名村民。
     private static final int[] SUMMON_LEVELS = {3, 4, 5};
 
     public SpeechDraftItem() {

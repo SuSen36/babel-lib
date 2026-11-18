@@ -15,11 +15,11 @@ import java.util.WeakHashMap;
 
 public class BlackTulipItem extends CollectibleItem.CustomCollectibleItem {
 
-    /** 充能时长 30 秒，加成随经过 tick 线性增长。 */
+    // 充能时长 30 秒，加成随经过 tick 线性增长。
     private static final int CHARGE_TICKS = 600;
     private static final double MAX_CRIT_BONUS = 0.6D;
 
-    /** 以 Player 实例弱引用计时，不写入 NBT：重登或重启后充能清零。 */
+    // 以 Player 实例弱引用计时，不写入 NBT：重登或重启后充能清零。
     private static final Map<Player, Integer> CHARGE_STARTS = new WeakHashMap<>();
 
     public BlackTulipItem() {

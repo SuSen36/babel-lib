@@ -13,6 +13,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+// 实体进入世界与玩家登录、重生、切换维度时向客户端推送 EP、目标生命与藏品数据，保证新加载内容显示一致。
 @Mod.EventBusSubscriber(modid = BabelMod.MODID)
 public class BabelCapabilityEvents {
 

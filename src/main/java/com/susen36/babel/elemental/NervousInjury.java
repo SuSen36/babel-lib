@@ -10,6 +10,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 
+// 神经损伤的爆条与减益实现。
 public class NervousInjury extends AbstractEPCapability {
     private static final float SANITY_BREAK_BASE_DAMAGE = 12.0F;
 

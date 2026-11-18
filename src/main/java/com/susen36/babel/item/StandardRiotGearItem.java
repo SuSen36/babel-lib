@@ -10,7 +10,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 
 public class StandardRiotGearItem extends CollectibleItem.CustomCollectibleItem {
-    /** 附加的法术伤害会再次触发 onDealDamage，用重入标记让它在第一层停住，不影响任何伤害类型的加成。 */
+    // 附加的法术伤害会再次触发 onDealDamage，用重入标记让它在第一层停住，附加伤害本身不获得任何加成。
     private static final ThreadLocal<LivingEntity> EXTRA_DAMAGE_TARGET = new ThreadLocal<>();
 
     public StandardRiotGearItem() {

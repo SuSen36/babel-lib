@@ -168,6 +168,14 @@ public class CollectibleItemEvents {
     }
 
     @SubscribeEvent
+    public static void onMobEffectApplicable(MobEffectEvent.Applicable event) {
+        if (event.getEntity() instanceof Player player) {
+            forEachUsedCollectible(player, (collectible, owner, layer) ->
+                    collectible.onOwnerEffectApplicable(event, owner, layer));
+        }
+    }
+
+    @SubscribeEvent
     public static void onLifePointLoss(LifePointConsumeEvent event) {
         // FAIL 类型代表真实死亡而非失去资源，不进入收藏品计件钩子
         if (event.getEntity() instanceof Player player && event.getType() != LifePointConsumeEvent.Type.FAIL) {

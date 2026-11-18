@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+// 灼燃损伤的爆条与减益：爆条时削减法术抗性、点燃目标并结算火焰或元素伤害。
 public class BurnInjury extends AbstractEPCapability {
     private static final String MAGIC_RESISTANCE_NAME = BabelMod.MODID + ":burn_magic_resistance";
     private static final UUID MAGIC_RESISTANCE_ID = UUID.nameUUIDFromBytes(MAGIC_RESISTANCE_NAME.getBytes(StandardCharsets.UTF_8));

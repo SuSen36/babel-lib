@@ -20,6 +20,8 @@ import net.minecraftforge.fml.common.Mod;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+// Capability 注册与访问入口：为所有 LivingEntity 挂载 EP 与目标生命，为玩家额外挂载劫掠状态。
+// getEP / getHealth 可能返回 null，调用前需判空。
 @Mod.EventBusSubscriber(modid = BabelMod.MODID)
 public class BabelCapability {
 

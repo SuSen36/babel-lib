@@ -9,6 +9,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 
 import java.util.UUID;
 
+// 狂躁损伤的爆条与减益实现。
 public class FrenzyInjury extends AbstractEPCapability {
     private static final AttributeModifier ATTACK_SPEED_BONUS = new AttributeModifier(UUID.fromString("7d4e9a2b-3f6c-4b8e-9d1a-5c2e8f0b3a17"), "babel:frenzy_attack_speed", 0.5, AttributeModifier.Operation.MULTIPLY_TOTAL);
 

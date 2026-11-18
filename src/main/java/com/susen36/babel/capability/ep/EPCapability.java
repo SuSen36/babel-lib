@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+// 单实体的元素损伤容器：按类型持有五份损伤状态，负责自然回复、破条计时与客户端同步。
 public class EPCapability implements INBTSerializable<CompoundTag> {
     private final LivingEntity entity;
     private final Map<AbstractEPCapability.EPType, AbstractEPCapability> EP_TYPES = new HashMap<>();

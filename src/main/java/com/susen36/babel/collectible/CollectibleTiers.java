@@ -2,13 +2,13 @@ package com.susen36.babel.collectible;
 
 /**
  * 收藏品的稀有度等级，与原版物品稀有度一一对应并由基类自动映射：
- * CURSED/NORMAL → COMMON，RARE → RARE，ADVANCED → EPIC。默认等级为 {@link #NORMAL}。
+ * CURSED → UNCOMMON（物品名染红），NORMAL → COMMON，RARE → RARE，ADVANCED → EPIC。默认等级为 {@link #NORMAL}。
  * <p>
- * 配置 ban_advanced_relics 禁用 {@link #ADVANCED}（高稀有度）级藏品。
+ * 配置 ban_advanced_collectibles 禁用 {@link #ADVANCED}（高稀有度）级藏品。
  */
 public enum CollectibleTiers {
     /**
-     * 诅咒：携带负面效果的诅咒类藏品，物品名染红（原版稀有度 COMMON）。
+     * 诅咒：携带负面效果的诅咒类藏品，物品名染红（原版稀有度 UNCOMMON）。
      */
     CURSED,
     /**
@@ -20,7 +20,7 @@ public enum CollectibleTiers {
      */
     RARE,
     /**
-     * 高稀有度：被配置 ban_advanced_relics 禁用的藏品（原版稀有度 EPIC）。
+     * 高稀有度：被配置 ban_advanced_collectibles 禁用的藏品（原版稀有度 EPIC）。
      */
     ADVANCED
 }

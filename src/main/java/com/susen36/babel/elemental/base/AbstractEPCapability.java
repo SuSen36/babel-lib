@@ -17,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Locale;
 import java.util.function.Function;
 
+// 单类元素损伤的抽象实现：维护当前剩余值、上限、爆条与免疫状态及 NBT 序列化，
+// 子类分别实现玩家与非玩家两条爆条结算。EPType 定义五类损伤与空占位类型。
 public abstract class AbstractEPCapability implements INBTSerializable<CompoundTag> {
 
     public enum EPType {

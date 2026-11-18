@@ -5,14 +5,11 @@ import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.init.BabelAttributes;
+import com.susen36.babel.init.BabelEntityTypeTags;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -21,9 +18,6 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 public class SurvivorContractItem extends CollectibleItem.CustomCollectibleItem {
-
-    private static final TagKey<EntityType<?>> FORGE_BOSSES = TagKey.create(
-            Registries.ENTITY_TYPE, new ResourceLocation("forge:bosses"));
 
     public SurvivorContractItem() {
         super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
@@ -43,7 +37,7 @@ public class SurvivorContractItem extends CollectibleItem.CustomCollectibleItem 
         if (layer >= 0 && layer < 32
                 && victim instanceof LivingEntity living
                 && ENEMY_OF_PLAYER.test(living, player)
-                && (Math.random() < 0.35 || victim.getType().is(FORGE_BOSSES))) {
+                && (Math.random() < 0.2 || victim.getType().is(BabelEntityTypeTags.FORGE_BOSSES))) {
             if (player != null) {
                 Collectibles.addLayerAndSync(player, this, 1);
             }

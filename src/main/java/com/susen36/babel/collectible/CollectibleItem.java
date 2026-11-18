@@ -42,6 +42,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiPredicate;
 
+/**
+ * 收藏品物品基类：实现 {@link CollectibleLike}，携带使用耗时、可重复使用标记、稀有度、层数与激活动画。
+ * <p>
+ * 具体效果由激活回调提供；需要属性加成或事件钩子时改用内嵌的 {@code CustomCollectibleItem}。
+ */
 public class CollectibleItem extends Item implements CollectibleLike {
     private final int useTicks;
     private final boolean canAlwaysUse;
@@ -150,7 +155,7 @@ public class CollectibleItem extends Item implements CollectibleLike {
     }
 
     /**
-     * 高稀有度收藏品被配置 ban_advanced_relics 禁用时，视为不可使用。
+     * 高稀有度收藏品被配置 ban_advanced_collectibles 禁用时，视为不可使用。
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean isBanned() {
@@ -270,7 +275,7 @@ public class CollectibleItem extends Item implements CollectibleLike {
     }
 
     /**
-     * 诅咒级收藏品：获得（进入背包）时自动激活一次。
+     * 开启 autoUseOnGain 的收藏品（诅咒级默认开启）：进入背包且尚未激活时自动激活一次并消耗物品（创造模式不消耗）。
      */
     @Override
     public final void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slot, boolean selected) {
@@ -314,7 +319,7 @@ public class CollectibleItem extends Item implements CollectibleLike {
         }
 
         /**
-         * 属性倍率来源：每 10 tick 对账时按返回倍率乘算属性值；未激活的收藏品统一按 0 处理，此回调不会被调用。
+         * 属性倍率来源：每 10 tick 对账时以返回值为层数，加成量 = perStack × 层数；未激活的收藏品统一按 0 处理，此回调不会被调用。
          */
         @FunctionalInterface
         public interface AttributeStacks {
@@ -534,7 +539,7 @@ public class CollectibleItem extends Item implements CollectibleLike {
             return List.copyOf(this.rangeAttributeBonuses);
         }
 
-        /** LivingHurtEvent 阶段回调；事件可能已取消、直接伤害来源可能是持有者本人，需要时由实现自行判定。 */
+        /** LivingHurtEvent 阶段回调（LOWEST 优先级）；伤害量可能已被其他处理器调整，被取消的事件不会分发到此，需要时由实现自行判定。 */
         public void onAttackHit(LivingHurtEvent event, Player player, LivingEntity target, int layer) {
         }
 
@@ -564,12 +569,16 @@ public class CollectibleItem extends Item implements CollectibleLike {
         public void onElementalDamage(ElementEvent.Hurt event, Player player, LivingEntity target, int layer) {
         }
 
-        /** 持有者失去生命值或护盾（LifePointConsumeEvent 阶段）；type 为扣除的资源类型，amount 为扣除量，事件只读。 */
+        /** 持有者失去目标生命或护盾（LifePointConsumeEvent.Post 阶段）；type 为扣除的资源类型，amount 为扣除量，事件只读。 */
         public void onLifePointLoss(LifePointConsumeEvent event, Player player, int layer) {
         }
 
         /** 持有者接受治疗或生命回复（LivingHealEvent 阶段）；药水治疗与饱食自然回复都走 LivingEntity.heal，setAmount 可调整治疗量。 */
         public void onOwnerHeal(LivingHealEvent event, Player player, int layer) {
+        }
+
+        /** 持有者即将被应用药水效果（MobEffectEvent.Applicable 阶段）；result 置为 DENY 即在入口拒绝效果，效果不进入 activeEffects，与凋灵骷髅免疫凋零同语义。 */
+        public void onOwnerEffectApplicable(MobEffectEvent.Applicable event, Player player, int layer) {
         }
 
         public void onPlayerKill(LivingDeathEvent event, Player player, Entity victim, int layer) {
