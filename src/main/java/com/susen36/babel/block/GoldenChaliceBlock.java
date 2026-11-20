@@ -42,7 +42,7 @@ public class GoldenChaliceBlock extends Block implements SimpleWaterloggedBlock,
     public static final IntegerProperty BLOCKSTATE = IntegerProperty.create("blockstate", 0, 2);
 
     public GoldenChaliceBlock() {
-        super(BlockBehaviour.Properties.of().sound(SoundType.METAL).strength(8f, 1200f).noOcclusion().isRedstoneConductor((bs, br, bp) -> false));
+        super(BlockBehaviour.Properties.of().sound(SoundType.METAL).strength(1f, 10f).noOcclusion().isRedstoneConductor((bs, br, bp) -> false));
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(WATERLOGGED, false)

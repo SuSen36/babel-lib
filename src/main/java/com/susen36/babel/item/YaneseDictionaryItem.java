@@ -41,12 +41,12 @@ public class YaneseDictionaryItem extends CollectibleItem.CustomCollectibleItem 
                 BUFF_STATES.remove(player);
             } else {
                 BuffState state = BUFF_STATES.get(player);
-                boolean reapplied = state == null
-                        || absorption.getAmplifier() != state.amplifier()
-                        || absorption.getDuration() > state.lastDuration();
+                boolean reapplied = false;
                 float granted;
                 boolean restored;
-                if (reapplied) {
+                if (state == null
+                        || absorption.getAmplifier() != state.amplifier()
+                        || absorption.getDuration() > state.lastDuration() ) {
                     granted = player.getAbsorptionAmount();
                     restored = false;
                 } else {

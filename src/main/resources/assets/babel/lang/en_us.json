@@ -259,7 +259,7 @@
   "item.babel.hand_of_sword.description_0": "Sword attacks ignore 70% of the target's armor and toughness, and restore 7.5% of the player's health",
   "item.babel.hand_of_sword.description_1": "Mountains shatter, stones devoured.",
   "item.babel.hand_of_engrave": "Hand of Branding",
-  "item.babel.hand_of_engrave.description_0": "Everytime when player kill with a trident or axe, he gets 1% addition of attack and max health, only functions with a trident or axe",
+  "item.babel.hand_of_engrave.description_0": "When players kill enemies using a trident or an axe, their attack power, max HP, defense, and armor toughness increase by 1%, and magic resistance by 0.25 (stackable up to 99 times)",
   "item.babel.hand_of_engrave.description_1": "Victory is the best supply.",
   "item.babel.hand_of_snatcher": "Hand of Snatcher",
   "item.babel.hand_of_snatcher.description_0": "10% chance to gain an emerald for each enemy killed, movement speed +10% while having Hero of the Village",

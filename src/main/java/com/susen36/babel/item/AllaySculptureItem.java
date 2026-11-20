@@ -18,8 +18,8 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 
-public class AlleySculptureItem extends CollectibleItem.CustomCollectibleItem {
-	public AlleySculptureItem() {
+public class AllaySculptureItem extends CollectibleItem.CustomCollectibleItem {
+	public AllaySculptureItem() {
 		super(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.NORMAL, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
 						.sound(SoundEvents.ALLAY_AMBIENT_WITH_ITEM, 3.5F, 1F)

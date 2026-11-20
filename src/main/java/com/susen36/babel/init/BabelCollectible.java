@@ -242,7 +242,7 @@ public class BabelCollectible {
         SOLO_MUSIC_BOX = REGISTRY.registerCollectible("solo_music_box", SoloMusicBoxItem::new);
         TOPONYM_ORIGINS = REGISTRY.registerCollectible("toponym_origins", ToponymOriginsItem::new);
         YEARNING = REGISTRY.registerCollectible("yearning", UnripeYearningItem::new);
-        ALLAY_SCULPTURE = REGISTRY.registerCollectible("allay_sculpture", AlleySculptureItem::new);
+        ALLAY_SCULPTURE = REGISTRY.registerCollectible("allay_sculpture", AllaySculptureItem::new);
         CHURCH_ALMS_VOUCHER = REGISTRY.registerCollectible("church_alms_voucher", ChurchAlmsVoucherItem::new);
         WORN_GROUP_PHOTO = REGISTRY.registerCollectible("worn_group_photo", WornGroupPhotoItem::new);
         ABYSSAL_WYRDMASK = REGISTRY.registerCollectible("abyssal_wyrdmask", AbyssalWyrdmaskItem::new);

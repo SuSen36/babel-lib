@@ -148,6 +148,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
     }
 
     /**
+     * 获取玩家收藏品数据
      * @return 玩家藏品数据；Capability 缺失时返回 null
      */
     @Nullable
@@ -194,6 +195,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
     }
 
     /**
+     * 层数增加与同步
      * @param delta 层数增量，可为负；仅服务端写入，完成后立即同步客户端
      */
     public static void addLayerAndSync(@NotNull Player player, @NotNull Item item, int delta) {
