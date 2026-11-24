@@ -23,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
+//Hand of Branding
 public class HandOfEngraveItem extends CollectibleItem.CustomCollectibleItem {
 
     private static final TagKey<Item> FORGE_TRIDENTS = ItemTags.create(new ResourceLocation("forge:tools/tridents"));

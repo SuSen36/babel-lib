@@ -18,6 +18,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
+//Hand of Purification
 public class HandOfSwipeItem extends CollectibleItem.CustomCollectibleItem {
 
     public HandOfSwipeItem() {

@@ -19,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 
+//Hand of Choker
 public class HandOfStrangleItem extends CollectibleItem.CustomCollectibleItem {
 
     public HandOfStrangleItem() {

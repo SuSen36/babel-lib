@@ -19,6 +19,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 
+//Hand of Spikes
 public class HandOfThornsItem extends CollectibleItem.CustomCollectibleItem {
 
     private static final TagKey<DamageType> IGNORES_THORN_REBOUND = TagKey.create(
@@ -48,7 +49,7 @@ public class HandOfThornsItem extends CollectibleItem.CustomCollectibleItem {
                 if (level instanceof ServerLevel serverLevel) {
                     serverLevel.sendParticles(ParticleTypes.SMOKE, sourceEntity.getX(), sourceEntity.getY(), sourceEntity.getZ(), 72, 0.85, 1, 0.85, 0.2);
                 }
-                sourceEntity.hurt(level.damageSources().thorns(player), player.getArmorValue());
+                sourceEntity.hurt(level.damageSources().thorns(player), player.getArmorValue()/2f);
             }
         }
     }

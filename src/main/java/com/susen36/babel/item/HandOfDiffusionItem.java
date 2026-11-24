@@ -9,7 +9,11 @@ import com.susen36.babel.init.BabelCollectible;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -38,7 +42,9 @@ public class HandOfDiffusionItem extends CollectibleItem.CustomCollectibleItem {
         if (player != null && event.getEntity() != player
                 && Collectibles.isUsed(player, BabelCollectible.HAND_OF_DIFFUSION)
                 && STRUCK_ENTITIES.computeIfAbsent(event.getLightning(), bolt -> new HashSet<>()).add(event.getEntity().getUUID())) {
-            player.getFoodData().eat(1, 0.0F);
+            if(event.getEntity() instanceof Enemy || (event.getEntity() instanceof Mob mob && mob.getTarget() == player)) {
+                player.getFoodData().eat(1, 0.0F);
+            }
         }
     }
 }

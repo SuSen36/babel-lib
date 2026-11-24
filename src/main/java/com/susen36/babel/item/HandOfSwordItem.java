@@ -20,6 +20,7 @@ import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 
+//Hand of Rending
 public class HandOfSwordItem extends CollectibleItem.CustomCollectibleItem {
 
     private static final TagKey<Item> MINECRAFT_SWORDS = ItemTags.create(new ResourceLocation("minecraft:swords"));

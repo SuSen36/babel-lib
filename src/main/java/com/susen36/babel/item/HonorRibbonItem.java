@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+//Ribbon of Honor
 public class HonorRibbonItem extends CollectibleItem.CustomCollectibleItem {
 
     private static final int BUFF_DURATION_TICKS = 280;

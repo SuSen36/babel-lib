@@ -1,9 +1,10 @@
 package com.susen36.babel.item;
 
-import com.susen36.babel.block.KingPedestalBlockEntity;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
+import com.susen36.babel.collectible.Collectibles;
+import com.susen36.babel.init.BabelAttributes;
 import com.susen36.babel.init.BabelBlocks;
 import com.susen36.babel.util.BlockUtils;
 import com.susen36.babel.util.LifePointUtils;
@@ -11,18 +12,15 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 
 //Visage of Crowned Fates
 public class RoyalFateItem extends CollectibleItem.CustomCollectibleItem {
+	protected int lifePointsFix;
 	public RoyalFateItem() {
 		super(new Item.Properties().stacksTo(1).fireResistant(), 25, false, CollectibleTiers.RARE, new CollectibleItem.Levels(0, 1, 0),
 				CollectibleActivation.builder()
@@ -30,14 +28,27 @@ public class RoyalFateItem extends CollectibleItem.CustomCollectibleItem {
 						.particle(ParticleTypes.END_ROD, 72)
 						.showOverlay(true)
 						.build());
+		addConditionalAttributeModifier(BabelAttributes.MAX_LIFE_POINT.get(), -1, AttributeModifier.Operation.ADDITION, (player, self) -> {return lifePointsFix;});
 	}
 
 	@Override
 	public void onEffectStarted(ItemStack stack, Level level, Player player) {
 		int maxLives = LifePointUtils.getMaxLifePoint(player);
-		LifePointUtils.addShieldPoint(player, maxLives);
+		Collectibles data = Collectibles.getData(player);
+		if (data != null) {
+			int is = 0 ;
+			for (Item relic : data.getUsed()) {
+				if(relic.asItem() == this) {
+					is++;
+				}
+			}
+			if (is == 0) {
+				lifePointsFix = 0 ;
+			}
+		}
+		lifePointsFix = lifePointsFix+maxLives-1;
+		LifePointUtils.addShieldPoint(player, maxLives-1);
 		LifePointUtils.addShieldPoint(player,  3);
-		LifePointUtils.setMaxLifePoint(player, 1);
 		LifePointUtils.setLifePoint(player, 1);
 	}
 

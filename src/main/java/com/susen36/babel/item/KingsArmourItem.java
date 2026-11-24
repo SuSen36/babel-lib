@@ -1,6 +1,5 @@
 package com.susen36.babel.item;
 
-import com.susen36.babel.block.KingPedestalBlockEntity;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
@@ -15,12 +14,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 
@@ -40,7 +34,7 @@ public class KingsArmourItem extends CollectibleItem.CustomCollectibleItem {
 		if (storedLives > 1) {
 			LifePointUtils.setLifePoint(player, 1);
 		}
-		double shieldAfterLifeTransfer = LifePointUtils.getShieldPoint(player) + storedLives;
+		double shieldAfterLifeTransfer = LifePointUtils.getShieldPoint(player) + storedLives - 1 ;
 		LifePointUtils.setShieldPoint(player, (int) (shieldAfterLifeTransfer + 3));
 	}
 

@@ -19,6 +19,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+//Hand of Superspeed
 public class HandOfSpeedItem extends CollectibleItem.CustomCollectibleItem {
 
     public HandOfSpeedItem() {

@@ -1,5 +1,6 @@
 package com.susen36.babel.block;
 
+import com.susen36.babel.init.BabelCollectible;
 import com.susen36.babel.init.BabelSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -30,6 +31,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -47,6 +49,14 @@ public class GoldenChaliceBlock extends Block implements SimpleWaterloggedBlock,
                 .setValue(FACING, Direction.NORTH)
                 .setValue(WATERLOGGED, false)
                 .setValue(BLOCKSTATE, 0));
+    }
+
+    /**
+     * 对创造模式中键获取物品的修改
+     */
+    @Override
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+        return new ItemStack(BabelCollectible.GOLDEN_CHALICE.get());
     }
 
     @Override

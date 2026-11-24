@@ -4,6 +4,7 @@ import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.init.BabelAttributes;
+import com.susen36.babel.util.LifePointUtils;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -21,11 +22,11 @@ public class PungentCoffeeBeansItem extends CollectibleItem.CustomCollectibleIte
                 CollectibleActivation.builder()
                         .showOverlay(true)
                         .build());
-        addAttributeModifier(BabelAttributes.BARRIER.get(), 1.0, AttributeModifier.Operation.ADDITION);
     }
 
     @Override
     public void onEffectStarted(@NotNull ItemStack stack, @NotNull Level level, @NotNull Player player) {
+        LifePointUtils.addShieldPoint(player,  1);
         if (!player.level().isClientSide()) {
             player.giveExperienceLevels(EXPERIENCE_LEVELS);
         }

@@ -1,4 +1,5 @@
 {
+  "replace": false,
   "values": [
     "babel:king_crown",
     "babel:king_armor",
@@ -7,7 +8,6 @@
     "babel:king_crystal",
     "babel:king_staff",
     "babel:king_fellowship",
-    "babel:king_buckler",
-    "babel:relic_crown"
+    "babel:king_buckler"
   ]
 }
