@@ -1,6 +1,6 @@
 package com.susen36.babel.api.entity;
 
-import com.susen36.babel.elemental.base.AbstractEPCapability;
+import com.susen36.babel.api.elemental.ElementType;
 import net.minecraft.world.entity.Entity;
 
 /**
@@ -8,7 +8,7 @@ import net.minecraft.world.entity.Entity;
  * EPManager 读取其损伤类型、累积速率与单次损伤值并合并计算。
  */
 public interface ElementalAttacker {
-    AbstractEPCapability.EPType getElementalType();
+    ElementType getElementalType();
 
     double getElementalRate();
 

@@ -52,18 +52,15 @@ public class BlockUtils {
             return InteractionResultHolder.pass(itemstack);
         }
 
-        //放置检查
         if (!level.setBlock(pos, blockState, 3)) {
             return InteractionResultHolder.pass(itemstack);
         }
         //与原版 BlockItem 一致，触发床等双格方块的另一半放置。
         blockState.getBlock().setPlacedBy(level, pos, blockState, player, itemstack);
 
-        //检查放置
         if (level.getBlockEntity(pos) instanceof KingPedestalBlockEntity pedestal) {
             pedestal.setItem(itemstack.copy());
         }
-        //消耗物品
         if (!player.getAbilities().instabuild) {
             itemstack.shrink(1);
         }

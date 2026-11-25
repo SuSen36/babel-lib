@@ -1,6 +1,7 @@
 package com.susen36.babel.network.receive;
 
 import com.susen36.babel.network.ClientPacketHandler;
+import com.susen36.babel.network.ClientboundHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -23,8 +24,6 @@ public class RobberyRestrictionSyncMessage {
     public static final Function<FriendlyByteBuf, RobberyRestrictionSyncMessage> DECODER = buffer ->
             new RobberyRestrictionSyncMessage(buffer.readLong());
 
-    public static final BiConsumer<RobberyRestrictionSyncMessage, Supplier<NetworkEvent.Context>> HANDLER = (message, ctx) -> {
-        ctx.get().enqueueWork(() -> ClientPacketHandler.handle(message));
-        ctx.get().setPacketHandled(true);
-    };
+    public static final BiConsumer<RobberyRestrictionSyncMessage, Supplier<NetworkEvent.Context>> HANDLER =
+            ClientboundHandler.create(() -> ClientPacketHandler::handle);
 }

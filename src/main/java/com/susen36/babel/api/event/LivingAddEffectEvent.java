@@ -2,7 +2,6 @@ package com.susen36.babel.api.event;
 
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
 
 /**
@@ -33,11 +32,5 @@ public class LivingAddEffectEvent extends LivingEvent {
             this.effect = new MobEffectInstance(effect.getEffect(), (int) (effect.getDuration() * multiplier),
                     effect.getAmplifier(), effect.isAmbient(), effect.isVisible(), effect.showIcon());
         }
-    }
-
-    public static MobEffectInstance onAddEffect(LivingEntity entity, MobEffectInstance effect) {
-        LivingAddEffectEvent event = new LivingAddEffectEvent(entity, effect);
-        MinecraftForge.EVENT_BUS.post(event);
-        return event.getEffect();
     }
 }

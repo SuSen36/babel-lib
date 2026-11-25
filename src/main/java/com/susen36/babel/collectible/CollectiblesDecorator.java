@@ -23,15 +23,16 @@ public class CollectiblesDecorator implements IItemDecorator {
     public boolean render(@NotNull GuiGraphics guiGraphics, @NotNull Font font, @NotNull ItemStack stack, int x, int y) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (player != null) {
-            var cd = Collectibles.getCooldownData(player);
+        Collectibles data = player == null ? null : Collectibles.getData(player);
+        if (data != null) {
+            Collectibles.Cooldown cd = data.cooldown;
             Item item = stack.getItem();
             long maxTicks = cd.getCooldownDuration(item);
             if (maxTicks > 0) {
-                long lastTicks = cd.getCooldownEndTick(item) - CooldownUtils.getServerCurrentTick();
-                if (lastTicks > 0) {
+                long remainingTicks = cd.getRemainingTicks(item, CooldownUtils.getServerCurrentTick());
+                if (remainingTicks > 0) {
                     float progress = Mth.clamp(
-                            ((float) lastTicks + mc.getFrameTime()) / (float) maxTicks,
+                            ((float) remainingTicks + mc.getFrameTime()) / (float) maxTicks,
                             0.0F, 1.0F);
                     int height = Math.round(SLOT_SIZE * progress);
                     int topY = y + (SLOT_SIZE - height);

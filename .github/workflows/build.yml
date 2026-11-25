@@ -8,6 +8,9 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v6
 
+      - name: check Babel API boundary
+        run: python3 tools/check_api_boundary.py
+
       - name: setup jdk
         uses: actions/setup-java@v5
         with:

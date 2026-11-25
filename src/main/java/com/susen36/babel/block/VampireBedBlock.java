@@ -27,7 +27,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.material.PushReaction;
-import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -64,20 +63,13 @@ public class VampireBedBlock extends BedBlock {
     }
 
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
-        ItemStack stack = BabelCollectible.VAMPIRES_BED.get().asItem().getDefaultInstance();
-        stack.setCount(1);
-        return List.of(stack);
-    }
-
-    @Override
     public VoxelShape getVisualShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return Shapes.empty();
     }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        //原版 FACING 为脚→头，模型按头→脚制作，取反后才能与模型旋转和碰撞箱对齐。
+        // 模型默认对应 facing=south（脚在北、头在南），碰撞箱分支按模型局部方向书写，因此取反匹配。
         Direction facing = state.getValue(FACING).getOpposite();
         if (state.getValue(PART) == BedPart.HEAD) {
             return switch (facing) {

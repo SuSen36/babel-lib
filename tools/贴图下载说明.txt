@@ -1,0 +1,54 @@
+用途
+download_textures.py 用于按清单批量下载贴图，校验 PNG 签名与最小字节数，支持断点跳过。可被多个模组复用：清单来源、URL 模板、过滤规则、输出目录、并发与重试全部由参数控制，不绑定任何单一仓库。
+
+清单格式
+- GitHub tree API 的 JSON：读取 tree 数组中每个 blob 的 path 文件名，忽略子目录
+- 纯文本 txt：每行一个文件名或一个完整 URL，空行与 # 开头的行忽略
+- 传完整 URL 时直接下载该 URL，文件名取 URL 末段；其余文件名用 URL 模板拼装
+
+运行方式
+在项目根目录打开终端后执行，manifest 与 --out 均为必填：
+
+python tools/download_textures.py <清单文件> --out <输出目录>
+
+下载原 fexli 收藏品素材（默认模板已内置两个可用代理）：
+
+python tools/download_textures.py C:\path\to\tree.json --out C:\path\to\images --include relic
+
+其他模组用自己的仓库或镜像时，用 --url-template 覆盖默认模板：
+
+python tools/download_textures.py C:\path\to\list.txt --out C:\path\to\images --url-template "https://your.host/path/{name}"
+
+参数
+- manifest：清单文件，位置参数，必填
+- --out：输出目录，必填，不存在会自动创建
+- --url-template：含 {name} 占位符的下载 URL 模板，可重复指定多个用于轮换重试；不传则用内置的 fexli 收藏品代理模板
+- --include：只下载文件名含该子串的项，可重复，任一命中即保留
+- --exclude：跳过文件名含该子串的项，可重复
+- --ext：后缀过滤，默认 .png；传 * 表示不过滤
+- --min-size：有效文件最小字节数，默认 500
+- --workers：并发线程数，默认 10
+- --retries：重试次数，默认 3；多个模板时按序轮换
+- --timeout：单次请求超时秒数，默认 30
+- --dry-run：只列出待下载项，不实际下载
+
+依赖
+- 仅 Python 3 标准库，无需安装第三方包
+
+下载与校验规则
+- 使用标准库 urllib 下载，启用 HTTPS 证书校验，不使用忽略证书的开关
+- 先写入 <文件名>.part 临时文件，校验 PNG 签名（前 4 字节）与字节数后再原子替换到目标
+- 目标文件已是有效 PNG 时直接跳过，重复运行安全
+- 单次下载失败会清理 .part 并按 --retries 重试，多模板时逐个轮换
+- 仍失败的文件写入输出目录下 _failed.txt，每行「文件名<Tab>失败原因」
+
+运行结果
+- 先输出清单命中条数
+- 结束输出 NEW（新下载）、SKIP（已存在跳过）、FAIL（失败）计数
+- 每新下载 50 张输出一次进度
+
+注意事项
+- 默认 URL 模板仅用于兼容原 fexli 收藏品素材；其他来源必须用 --url-template 指定自己的地址，{name} 会被替换为文件名
+- GitHub raw 直连在部分网络环境下会被中断，模板使用代理时需自行确认代理可用性与可信度
+- 本工具只负责下载与文件校验，不涉及素材授权；第三方游戏素材进入项目或分发前请自行确认授权
+- --dry-run 先跑一次可确认清单解析与过滤结果是否符合预期

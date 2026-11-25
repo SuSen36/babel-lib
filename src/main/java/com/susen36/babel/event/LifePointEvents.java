@@ -24,37 +24,54 @@ public class LifePointEvents {
     public static void onPlayerDeath(LivingDeathEvent event) {
         if (event.getEntity() instanceof Player player && !player.level().isClientSide() && !event.isCanceled()
                 && !event.getSource().is(DamageTypes.GENERIC_KILL)
-                && player.level().getGameRules().getBoolean(BabelGameRules.TARGET_LIFE_FUNCTION)
-                && !LifePointConsumeEvent.firePre(player, event.getSource())) {
+                && player.level().getGameRules().getBoolean(BabelGameRules.TARGET_LIFE_FUNCTION)) {
             HealthCapability health = BabelCapability.getHealth(player);
-            LifePointConsumeEvent.Type type = null;
-
-            if (health != null) {
-                if (health.getShield() > 0) {
-                    type = LifePointConsumeEvent.Type.SHIELD;
-                    health.setShield(health.getShield() - 1);
-                } else if (health.getLives() > 1) {
-                    type = LifePointConsumeEvent.Type.LIVES;
-                    health.setLives(health.getLives() - 1);
-                }
-
-                if (type != null) {
-                    event.setCanceled(true);
-                    player.setHealth(player.getMaxHealth());
-                    double x = player.getX();
-                    double y = player.getY();
-                    double z = player.getZ();
-                    player.level().playSound(null, x, y, z, BabelSounds.TARGET_DAMAGED.get(), SoundSource.PLAYERS, 0.33F, 1.0F);
-                    if (player.level() instanceof ServerLevel serverLevel) {
-                        serverLevel.sendParticles(type == LifePointConsumeEvent.Type.SHIELD ? BabelParticles.SHIELDLOSS.get() : BabelParticles.LIFELOSS.get(), x, y + 0.95, z, 72, 0.75, 0.55, 0.75, 0.2);
-                    }
-                    health.sync();
-                    LifePointConsumeEvent.firePost(player, event.getSource(), type, 1F);
-                } else if (LifePointConsumeEvent.firePost(player, event.getSource(), LifePointConsumeEvent.Type.FAIL, 0F)) {
-                    event.setCanceled(true);
-                }
+            LifePointConsumeEvent.Type proposed = LifePointConsumeEvent.Type.FAIL;
+            if (health != null && health.getShield() > 0) {
+                proposed = LifePointConsumeEvent.Type.SHIELD;
+            } else if (health != null && health.getLives() > 1) {
+                proposed = LifePointConsumeEvent.Type.LIVES;
+            }
+            LifePointConsumeEvent.Pre pre = BabelEventFactory.beforeLifePointConsume(player, event.getSource(), proposed);
+            if (health != null && !pre.isCanceled()) {
+                resolveDeath(event, player, health, pre);
             }
         }
+    }
+
+    private static void resolveDeath(LivingDeathEvent event, Player player, HealthCapability health, LifePointConsumeEvent.Pre pre) {
+        LifePointConsumeEvent.Type result = LifePointConsumeEvent.Type.FAIL;
+        double spent = 0;
+        if (pre.getType() == LifePointConsumeEvent.Type.SHIELD && health.getShield() > 0) {
+            double before = health.getShield();
+            health.setShield(before - pre.getAmount());
+            spent = before - health.getShield();
+        } else if (pre.getType() == LifePointConsumeEvent.Type.LIVES && health.getLives() > 1) {
+            double before = health.getLives();
+            health.setLives(before - pre.getAmount());
+            spent = before - health.getLives();
+        }
+
+        LifePointConsumeEvent.Revival revival = pre.getRevival();
+        if (spent > 0) {
+            result = pre.getType();
+            event.setCanceled(true);
+            player.setHealth(player.getMaxHealth());
+            double x = player.getX();
+            double y = player.getY();
+            double z = player.getZ();
+            player.level().playSound(null, x, y, z, BabelSounds.TARGET_DAMAGED.get(), SoundSource.PLAYERS, 0.33F, 1.0F);
+            if (player.level() instanceof ServerLevel serverLevel) {
+                serverLevel.sendParticles(result == LifePointConsumeEvent.Type.SHIELD ? BabelParticles.SHIELDLOSS.get() : BabelParticles.LIFELOSS.get(), x, y + 0.95, z, 72, 0.75, 0.55, 0.75, 0.2);
+            }
+            health.sync();
+        } else if (revival != null) {
+            result = LifePointConsumeEvent.Type.REVIVED;
+            event.setCanceled(true);
+            player.setHealth(revival.health());
+            revival.onRevived().run();
+        }
+        BabelEventFactory.afterLifePointConsume(player, event.getSource(), result, (float) spent);
     }
 
     @SubscribeEvent

@@ -2,6 +2,7 @@ package com.susen36.babel.item;
 
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.api.event.LifePointConsumeEvent;
+import com.susen36.babel.capability.health.HealthCapability;
 import com.susen36.babel.collectible.CollectibleActivation;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
@@ -50,12 +51,13 @@ public class EndOfTimesItem extends CollectibleItem.CustomCollectibleItem {
 
     @Override
     public void onLifePointLoss(LifePointConsumeEvent event, Player player, int layer) {
-        int lostLives = getLostLives(player);
-        int lostShields = getLostShields(player);
+        CompoundTag counter = getLossCounter(player);
+        double lostLives = counter.getDouble(LIVES_LOST_TAG);
+        double lostShields = counter.getDouble(SHIELD_LOST_TAG);
         if (event.getType() == LifePointConsumeEvent.Type.LIVES) {
-            lostLives++;
+            lostLives += event.getAmount();
         } else {
-            lostShields++;
+            lostShields += event.getAmount();
         }
         saveLossCounter(player, lostLives, lostShields);
     }
@@ -73,10 +75,10 @@ public class EndOfTimesItem extends CollectibleItem.CustomCollectibleItem {
                 .getCompound(BabelMod.MODID).getCompound(LOSS_COUNTER_TAG);
     }
 
-    private static void saveLossCounter(Player player, int lostLives, int lostShields) {
+    private static void saveLossCounter(Player player, double lostLives, double lostShields) {
         CompoundTag counter = new CompoundTag();
-        counter.putInt(LIVES_LOST_TAG, lostLives);
-        counter.putInt(SHIELD_LOST_TAG, lostShields);
+        counter.putDouble(LIVES_LOST_TAG, lostLives);
+        counter.putDouble(SHIELD_LOST_TAG, lostShields);
         CompoundTag persisted = player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
         CompoundTag mod = persisted.getCompound(BabelMod.MODID);
         mod.put(LOSS_COUNTER_TAG, counter);
@@ -85,16 +87,26 @@ public class EndOfTimesItem extends CollectibleItem.CustomCollectibleItem {
     }
 
     public static void revive(Player player) {
-        int lostLives = getLostLives(player);
-        int lostShields = getLostShields(player);
-        // 与图鉴文案对齐：累计损失超过阈值时按真实损失数量回复生命与护盾，未超过则固定补 10 点护盾
-        if (lostLives + lostShields > RESTORE_ALL_LOSS_THRESHOLD) {
-            LifePointUtils.addLifePoint(player, lostLives);
-            LifePointUtils.addShieldPoint(player, lostShields);
-        } else {
-            LifePointUtils.addShieldPoint(player, RESTORE_ALL_LOSS_THRESHOLD);
-        }
         player.setHealth(player.getMaxHealth());
+        onRevived(player);
+    }
+
+    /** 仅在复活已获准、玩家生命值已恢复后执行藏品效果。 */
+    public static void onRevived(Player player) {
+        CompoundTag counter = getLossCounter(player);
+        double lostLives = counter.getDouble(LIVES_LOST_TAG);
+        double lostShields = counter.getDouble(SHIELD_LOST_TAG);
+        // 与图鉴文案对齐：累计损失超过阈值时按真实损失数量回复生命与护盾，未超过则固定补 10 点护盾
+        HealthCapability health = LifePointUtils.get(player);
+        if (lostLives + lostShields > RESTORE_ALL_LOSS_THRESHOLD) {
+            if (lostLives > 0) {
+                health.setLives(health.getLives() + lostLives);
+            }
+            health.setShield(health.getShield() + lostShields);
+        } else {
+            health.setShield(health.getShield() + RESTORE_ALL_LOSS_THRESHOLD);
+        }
+        health.sync();
         saveLossCounter(player, 0, 0);
         double x = player.getX();
         double y = player.getY();

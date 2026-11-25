@@ -24,7 +24,7 @@ import java.util.Arrays;
 
 public class EPCommand {
 
-    private static final DynamicCommandExceptionType ERROR_UNKNOWN_EP_TYPE = new DynamicCommandExceptionType(obj -> Component.literal("Unknown elemental injury type: " + obj));
+    private static final DynamicCommandExceptionType ERROR_UNKNOWN_EP_TYPE = new DynamicCommandExceptionType(obj -> Component.translatable("command.ep.unknown_type", obj));
 
     private static final LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal("ep").then(
             Commands.argument("entities", EntityArgument.entities())
@@ -68,20 +68,14 @@ public class EPCommand {
         }
         if (executedCount == 1 && singleCandidate != null) {
             final LivingEntity finalSingleCandidate = singleCandidate;
-            argument.getSource().sendSuccess(() -> Component.literal(Component.translatable("command.ep.hurt.single").getString()
-                            .replace("{name}", finalSingleCandidate.getDisplayName().getString())
-                            .replace("{amount}", "" + amount)
-                            .replace("{type}", type.description().getString())),
-                    true);
+            argument.getSource().sendSuccess(() -> Component.translatable("command.ep.hurt.single",
+                    finalSingleCandidate.getDisplayName(), amount, type.description()), true);
         } else if (executedCount > 0) {
             final int finalExecutedCount = executedCount;
-            argument.getSource().sendSuccess(() -> Component.literal(Component.translatable("command.ep.hurt.mult").getString()
-                            .replace("{num}", "" + finalExecutedCount)
-                            .replace("{amount}", "" + amount)
-                            .replace("{type}", type.description().getString())),
-                    true);
+            argument.getSource().sendSuccess(() -> Component.translatable("command.ep.hurt.mult",
+                    finalExecutedCount, amount, type.description()), true);
         } else {
-            argument.getSource().sendFailure(Component.literal(Component.translatable("command.ep.not_found").getString()));
+            argument.getSource().sendFailure(Component.translatable("command.ep.not_found"));
         }
         return executedCount;
     }
@@ -96,28 +90,25 @@ public class EPCommand {
             if (entity instanceof LivingEntity living) {
                 EPCapability ep = BabelCapability.getEP(living);
                 if (ep != null) {
+                    int before = ep.getValue(type);
                     ep.heal(type, amount);
+                    if (ep.getValue(type) != before) {
+                        singleCandidate = living;
+                        executedCount++;
+                    }
                 }
-                if (executedCount == 0) singleCandidate = living;
-                executedCount++;
             }
         }
         if (executedCount == 1 && singleCandidate != null) {
             final LivingEntity finalSingleCandidate = singleCandidate;
-            argument.getSource().sendSuccess(() -> Component.literal(Component.translatable("command.ep.heal.single").getString()
-                            .replace("{name}", finalSingleCandidate.getDisplayName().getString())
-                            .replace("{amount}", "" + amount)
-                            .replace("{type}", type.description().getString())),
-                    true);
+            argument.getSource().sendSuccess(() -> Component.translatable("command.ep.heal.single",
+                    finalSingleCandidate.getDisplayName(), amount, type.description()), true);
         } else if (executedCount > 0) {
             final int finalExecutedCount = executedCount;
-            argument.getSource().sendSuccess(() -> Component.literal(Component.translatable("command.ep.heal.mult").getString()
-                            .replace("{num}", "" + finalExecutedCount)
-                            .replace("{amount}", "" + amount)
-                            .replace("{type}", type.description().getString())),
-                    true);
+            argument.getSource().sendSuccess(() -> Component.translatable("command.ep.heal.mult",
+                    finalExecutedCount, amount, type.description()), true);
         } else {
-            argument.getSource().sendFailure(Component.literal(Component.translatable("command.ep.not_found").getString()));
+            argument.getSource().sendFailure(Component.translatable("command.ep.not_found"));
         }
         return executedCount;
     }
@@ -125,27 +116,27 @@ public class EPCommand {
     private static int sendEPValue(CommandContext<CommandSourceStack> argument) throws CommandSyntaxException {
         AbstractEPCapability.EPType type = resolveType(argument);
         Entity[] entities = EntityArgument.getEntities(argument, "entities").toArray(new Entity[0]);
+        long total = 0;
         for (Entity entity : entities) {
             if (entity instanceof LivingEntity living) {
                 EPCapability ep = BabelCapability.getEP(living);
                 if (ep != null) {
+                    int value = ep.getValue(type);
+                    if (value < 0) {
+                        continue;
+                    }
+                    total += value;
+                    Component feedback = Component.translatable("command.ep.check", living.getDisplayName(), type.description(),
+                            value, (int) BabelAttributes.getMaxElementalValue(living));
                     if (entity instanceof Player player && !player.level().isClientSide()) {
-                        player.displayClientMessage(Component.literal(Component.translatable("command.ep.check").getString()
-                                        .replace("{name}", player.getDisplayName().getString())
-                                        .replace("{type}", type.description().getString())
-                                        .replace("{num}", "" + ep.getValue(type))
-                                        .replace("{max}", "" + (int) BabelAttributes.getMaxElementalValue(living))),
-                                false);
+                        player.displayClientMessage(feedback, false);
                     } else {
-                        argument.getSource().sendSystemMessage(Component.literal(Component.translatable("command.ep.check").getString()
-                                .replace("{name}", living.getDisplayName().getString())
-                                .replace("{type}", type.description().getString())
-                                .replace("{num}", "" + ep.getValue(type))
-                                .replace("{max}", "" + (int) BabelAttributes.getMaxElementalValue(living))));
+                        argument.getSource().sendSystemMessage(feedback);
                     }
                 }
             }
         }
-        return 0;
+        // Multi-target queries sum valid values; Brigadier results are signed ints.
+        return (int) Math.min(total, Integer.MAX_VALUE);
     }
 }

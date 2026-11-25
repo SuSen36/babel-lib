@@ -5,7 +5,7 @@
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-62B47A.svg)](#环境要求)
 [![Forge](https://img.shields.io/badge/Forge-47.1.47%2B-orange.svg)](#环境要求)
 [![Java](https://img.shields.io/badge/Java-17-blue.svg)](#环境要求)
-[![Version](https://img.shields.io/badge/version-1.2.6-lightgrey.svg)](gradle.properties)
+[![Version](https://img.shields.io/badge/version-1.2.53-lightgrey.svg)](gradle.properties)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ---
@@ -19,13 +19,15 @@ Babel 脱胎于「水月与深蓝之树」主题模组（Caerula Arbor），现�
 - **给玩家**：安装即获得方舟式战斗体验与收藏品玩法。
 - **给开发者**：`com.susen36.babel.api` 提供可挂接的事件与注册入口，属性、Capability、网络同步、HUD、Jade 显示均已就绪。
 
+重构进度与待决方案见[设计缺陷 TODO](TODO.md)；受影响的下游模组请查阅[迁移指南](docs/api-migration-1.5.0.md)。游戏外插件读取默认小图的路径见[图标读取约定](docs/logo-resources.md)。
+
 ## 特性
 
 ### 元素损伤（EP）
 
 - 五类损伤：**神经**（`nervous`）、**侵蚀**（`corrosion`）、**灼燃**（`burn`）、**凋亡**（`necrosis`）、**狂躁**（`frenzy`），另有 `empty` 占位类型。
 - 每种损伤独立累积、独立上限（`elemental_max_value` 属性），受 `elemental_resistance`、`elemental_modifier` 与实体自身的损伤倍率影响。
-- 攒满即「爆条」：触发对应负面效果（如麻痹、破甲、虚弱等）并结算元素伤害（专属伤害类型），可致死。
+- 攒满即「爆条」：触发对应负面效果（如麻痹、破甲、虚弱等）并结算元素伤害（统一使用 `babel:element_break`），可致死。
 - HUD 支持两种样式：图标条（类似饥饿值）或圆环，由配置项切换，位置可微调。
 - 对其他模组的开放接口：`EPManager#hurtElemental` / `healElemental` / `getValue` / `getRemainProgress`，以及可取消的 `ElementEvent.Hurt`。
 
@@ -72,7 +74,7 @@ Babel 脱胎于「水月与深蓝之树」主题模组（Caerula Arbor），现�
 
 - 百余件收藏品，分四级：`NORMAL`、`RARE`、`ADVANCED`（可被配置禁用）、`CURSED`（诅咒，自动激活且名字染红）。
 - 每件收藏品可有**层数**（`Levels(min, max, default)`）、**冷却**、**持续时间**（默认 864000 tick ≈ 12 小时 / 36 游戏日）。
-- 获取途径：战利品表注入（默认 30% 概率）、怪物 / Boss 掉落（Boss 必掉高级藏品）、`/collectible give`。
+- 获取途径：箱子战利品（默认独立判定 3 次，每次 30%）、怪物 / Boss 掉落（Boss 必掉高级藏品）、`/collectible give`。
 - 自带收藏品界面（默认 `C` 键），可查看已持有藏品、层数、冷却；坎诺特的「失与得」界面可用已有藏品交换随机藏品。
 - 某些藏品带有特殊功能，详情见`docs/collectibles-effect/`
 - 注册 API 见下文[收藏品注册](#收藏品注册)。
@@ -112,7 +114,7 @@ gradlew.bat build
 ./gradlew build
 ```
 
-产物：`build/libs/babellib-1.20.1-forge-1.2.6.jar`。
+产物：`build/libs/babellib-1.20.1-forge-1.2.53.jar`。
 
 常用任务：
 
@@ -120,10 +122,13 @@ gradlew.bat build
 |---|---|
 | `gradlew build` | 编译 + 打包（含 `reobfJar` 重混淆） |
 | `gradlew runClient` | 启动开发客户端 |
+| `gradlew runClient -PdevCompatRuntime=true` | 开发联调：额外加载 JEI 与 Jade；默认不加载 |
 | `gradlew runServer` | 启动开发服务端 |
 | `gradlew runData` | 运行数据生成器，输出到 `src/generated/resources` |
 | `gradlew publishToMavenLocal` | 发布到本地 Maven 仓库，供其他模组依赖 |
 
+> Jade 插件仍需解析编译期 Jade 依赖，关闭联调开关不等于可离线首次构建。
+>
 > 首次构建需要联网下载 Forge、Mappings 与依赖，耗时较长。若 IDE 缺库，先 `gradlew --refresh-dependencies`。
 
 **编译期检查**：项目启用 ErrorProne + NullAway，NullAway 违规按 **ERROR** 处理，会直接中断构建。`build.gradle` 中已关闭一批框架必然触发的误报（`ReferenceEquality`、`UnusedMethod`、`FutureReturnValueIgnored` 等），新增代码请勿依赖这些开关兜底。
@@ -143,9 +148,11 @@ gradlew.bat build
 | `/ep <entities> <type> hurt <amount>` | 2    | 施加元素损伤，`type` 为 `nervous` / `corrosion` / `burn` / `necrosis` / `frenzy` |
 | `/ep <entities> <type> heal <amount>` | 2    | 恢复元素损伤 |
 | `/ep <entities> <type> check` | 0    | 查询当前元素损伤数值 |
-| `/lifepoint <players> life_point <0–255>` | 2    | 设置目标生命 |
-| `/lifepoint <players> max_life_point <1–255>` | 2    | 设置目标生命上限 |
-| `/lifepoint <players> shield <0–999>` | 2    | 设置护盾 |
+| `/lifepoint <players> life_point <非负数>` | 2    | 设置目标生命 |
+| `/lifepoint <players> max_life_point <至少1>` | 2    | 设置目标生命上限 |
+| `/lifepoint <players> shield <非负数>` | 2    | 设置护盾 |
+
+`/lifepoint` 按执行时的 `life_point_global_limit` 或 `player_shield_global_limit` 校验，超出全局上限整条命令不写入。小数沿用向下取整；当前生命还受玩家自身上限限制，`life_point 0` 不改值。返回实际改变的玩家数。
 
 `<collectible>` 使用物品 ID，例如 `babel:omnikey`、`babel:hand_of_strangle`。
 
@@ -177,7 +184,7 @@ gradlew.bat build
 | `collectible_loot_chance` | `0.3` | 战利品表额外注入收藏品的概率 |
 | `collectible_duration_ticks` | `864000` | 收藏品生效时长（tick） |
 | `ban_advanced_collectibles` | `false` | 禁用 `ADVANCED` 级收藏品（无法激活） |
-| `hand_strangle_recognizable` | `CrossbowMod2:item.woodenCrossbow` | 额外可触发「扼喉之手」的物品 |
+| `hand_strangle_recognizable` | `[]`（仍识别弩类和弩标签） | 额外可触发「扼喉之手」的物品 |
 | `hand_firework_recognizable` | `twilightforest:triple_bow` | 额外可触发「烟花之手」的物品 |
 | `hand_engrave_recognizable` | `iceandfire:tide_trident` | 额外可触发「刻勋之手」的物品 |
 | `royal_alliance_treaty_recognizable` | `cataclysm:ignis` 等 | 额外可触发「王庭盟约」的生物 |
@@ -185,11 +192,11 @@ gradlew.bat build
 | `cold_to_frozen` | `true` | 两段式寒冷：先标记寒冷，再次冻结伤害转为冰冻效果 |
 | `robbery_restriction_duration_ticks` | `108000` | 劫掠后坎诺特无视该玩家的时长 |
 
-列表类配置支持 `*` 通配整个命名空间，例如 `tacz:*`、`babel:oceanized_*`。
+上述四个识别列表支持完整注册 ID（如 `twilightforest:triple_bow`）、整个命名空间（`tacz:*`）、同一命名空间内的路径前缀（`babel:oceanized_*`），以及匹配全部的 `*`。`[]` 表示不添加额外匹配，不会关闭藏品原有的类型或标签判断。
 
 ## 开发者 API
 
-完整的依赖引入、事件时机与扩展流程见 [`docs/developer-guide.md`](docs/developer-guide.md)。
+当前开发版本为 `1.2.53`，重构目标为 `1.5.0`。本次已修改事件 API；从 `1.2.6` 升级的模组若使用了受影响的签名，需重新编译，详见[重构迁移指南](docs/api-migration-1.5.0.md)。完整的依赖引入、事件时机与扩展流程见 [`docs/developer-guide.md`](docs/developer-guide.md)。
 
 对外接口集中在 `api`（事件）、`collectible`（收藏品框架）、`elemental`（EPManager 等）、`capability` 与 `difficulty`；`client`、`mixin`、`datagen`、`init` 属内部实现，升级时可能变动。
 
@@ -200,48 +207,35 @@ gradlew.bat build
 | `ElementEvent.Hurt` | 元素损伤结算前 | 可取消；可改 `amount` |
 | `ElementEvent.PostHurt` | 元素损伤结算后 | 只读 |
 | `ElementEvent.Heal` | 元素损伤恢复前 | 可取消；可改 `amount` |
-| `ElementEvent.Burst` | 元素损伤「爆条」时 | 只读 |
+| `ElementEvent.Burst` | 元素损伤「爆条」时 | 可改伤害倍率，不可取消 |
 | `ResistDamageEvent.Defense` / `.MagicResistance` | 防御 / 法抗参与减伤时 | 可改有效属性值 |
 | `DodgeEvent` | 触发物理或法术闪避时 | 只读 |
-| `LifePointConsumeEvent` | 玩家受致命伤、扣除护盾与目标生命时 | 可供依赖模组挂钩自身机制 |
+| `LifePointConsumeEvent` | 玩家受致命伤、判定是否扣除护盾或目标生命 | `Pre` 可取消、改扣费或登记备用复活；`Post` 只读 |
 | `LivingAddEffectEvent` | 实体获得药水效果时 | 可整体替换效果实例（如延长时长） |
 | `CollectibleEvent.Used` / `.Removed` / `.LayerChanged` | 收藏品使用 / 移除 / 层级变化 | 只读 |
 | `CollectibleDropEvent` | 实体死亡结算收藏品掉落 | 可改掉落概率（设 0 阻止） |
-| `CollectibleRegisterEvent` | 收藏品注册表就绪后 | 注入收藏品 |
 | `OriginiumIngotDropEvent` | 结算源石锭掉落 | 可改倍率（设 0 阻止） |
 | `LostAndFoundEvent` | 拾遗界面兑换时 | 可取消 |
 
 ### 收藏品注册
 
+在模组构造函数中调用一次 `MyCollectibles.register(自己的模组 ID 常量, modBus)`。这里只安装回调，不创建物品；Forge 分发 `NewRegistryEvent` 时才会执行声明。
+
 ```java
 public final class MyCollectibles {
+    public static RegistryObject<Item> SAMPLE_RELIC;
 
-    // 建议在 mod 构造阶段初始化（内部会向 mod 事件总线投递 CollectibleRegisterEvent）
-    private static final CollectibleBuilder BUILDER =
-            CollectibleBuilder.create("mymod", FMLJavaModLoadingContext.get().getModEventBus());
-
-    public static final RegistryObject<Item> SAMPLE_RELIC = BUILDER.registerCollectible(
-            "sample_relic",                       // 注册名 → mymod:sample_relic
-            25,                                   // 使用耗时（tick）
-            false,                                // 是否可无限次重复使用
-            CollectibleTiers.RARE,                // 稀有度
-            new CollectibleItem.Levels(0, 3, 1),  // 层数 min / max / 默认
-            CollectibleActivation.standard(),     // 激活音效、粒子与是否自动使用
-            (stack, level, player) -> {           // 激活效果
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 1200, 0));
-            });
+    public static void register(String modId, IEventBus modBus) {
+        CollectibleRegistration.register(modId, modBus, registrar -> {
+            CollectibleSpec spec = new CollectibleSpec(25, false, CollectibleSpec.Tier.RARE, 0, 3, 1, null);
+            SAMPLE_RELIC = registrar.registerCollectible("sample_relic", spec, (stack, level, player) ->
+                    player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 1200, 0)));
+        });
+    }
 }
 ```
 
-只想从外部注入、不想替换注册表时，监听事件即可：
-
-```java
-@SubscribeEvent
-public static void onCollectibleRegister(CollectibleRegisterEvent event) {
-    event.builder().registerCollectible("other_relic",
-            (stack, level, player) -> player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 600, 1)));
-}
-```
+`CollectibleRegistration` 和 `CollectibleSpec` 位于 `com.susen36.babel.api.collectible`。注册名属于传入的模组命名空间；回调中只保存句柄，等物品注册完成后再调用 `get()` 或查询运行时目录。
 
 运行时读写（`Collectibles` 是玩家级 Capability，服务端权威）：
 
@@ -278,7 +272,7 @@ if (health != null) {
 
 ```groovy
 dependencies {
-    implementation fg.deobf("com.susen36.babel:babel-lib:1.2.6")
+    implementation fg.deobf("com.susen36.babel:babel-lib:1.2.53")
 }
 ```
 
@@ -316,7 +310,7 @@ babel-lib/
 │  ├─ item/           收藏品实现
 │  ├─ loot/           为藏品与源石锭添加战利品掉落
 │  ├─ menu/           菜单界面
-│  ├─ mixin/          17 个 Mixin（含 2 个客户端）
+│  ├─ mixin/          16 个 Mixin（含 2 个客户端）
 │  ├─ network/        同步与交互数据包
 │  └─ util/           工具函数单元（使用冷却，判断，元素伤害，目标生命值）
 ├─ src/main/resources/

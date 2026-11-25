@@ -37,10 +37,9 @@ public class CollectibleItemEvents {
     private static void forEachUsedCollectible(Player player, UsedCollectibleHook hook) {
         Collectibles usedData = Collectibles.isEffectSuppressed(player) ? null : Collectibles.getData(player);
         if (usedData != null) {
-            Collectibles.Layer layerData = Collectibles.getLayerData(player);
             for (RegistryObject<Item> holder : Collectibles.getRegistry().values()) {
                 if (usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible) {
-                    hook.invoke(collectible, player, layerData.getLayer(holder.get()));
+                    hook.invoke(collectible, player, usedData.layer.getLayer(holder.get()));
                 }
             }
         }
@@ -76,11 +75,10 @@ public class CollectibleItemEvents {
     private static void applyRangeEffects(Player player) {
         if (!player.level().isClientSide()) {
             Collectibles usedData = Collectibles.getData(player);
-            Collectibles.Layer layerData = Collectibles.getLayerData(player);
             Map<RangeKey, List<? extends LivingEntity>> rangedEntities = new HashMap<>();
             for (RegistryObject<Item> holder : Collectibles.getRegistry().values()) {
                 if (!Collectibles.isEffectSuppressed(player) && usedData != null && usedData.isUsed(holder.get()) && holder.get() instanceof CollectibleItem.CustomCollectibleItem collectible) {
-                    int layer = layerData.getLayer(holder.get());
+                    int layer = usedData.layer.getLayer(holder.get());
                     for (CollectibleItem.CustomCollectibleItem.RangeBinding<?> binding : collectible.getRangeEffects()) {
                         dispatchRange(binding, rangedEntities, player, layer);
                     }
@@ -176,9 +174,9 @@ public class CollectibleItemEvents {
     }
 
     @SubscribeEvent
-    public static void onLifePointLoss(LifePointConsumeEvent event) {
-        // FAIL 类型代表真实死亡而非失去资源，不进入收藏品计件钩子
-        if (event.getEntity() instanceof Player player && event.getType() != LifePointConsumeEvent.Type.FAIL) {
+    public static void onLifePointLoss(LifePointConsumeEvent.Post event) {
+        if (event.getEntity() instanceof Player player && (event.getType() == LifePointConsumeEvent.Type.SHIELD
+                || event.getType() == LifePointConsumeEvent.Type.LIVES)) {
             forEachUsedCollectible(player, (collectible, owner, layer) ->
                     collectible.onLifePointLoss(event, owner, layer));
         }

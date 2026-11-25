@@ -35,13 +35,13 @@ public class BabelNetwork {
     }
 
     public static void register() {
-        CHANNEL.registerMessage(packetId++, EPSyncMessage.class, EPSyncMessage.ENCODER, EPSyncMessage.DECODER, EPSyncMessage.HANDLER, Optional.empty());
-        CHANNEL.registerMessage(packetId++, LivesSyncMessage.class, LivesSyncMessage.ENCODER, LivesSyncMessage.DECODER, LivesSyncMessage.HANDLER, Optional.empty());
-        CHANNEL.registerMessage(packetId++, CollectibleSyncMessage.class, CollectibleSyncMessage.ENCODER, CollectibleSyncMessage.DECODER, CollectibleSyncMessage.HANDLER, Optional.empty());
-        CHANNEL.registerMessage(packetId++, CollectibleItemUseMessage.class, CollectibleItemUseMessage.ENCODER, CollectibleItemUseMessage.DECODER, CollectibleItemUseMessage.HANDLER, Optional.empty());
-        CHANNEL.registerMessage(packetId++, CooldownSyncMessage.class, CooldownSyncMessage.ENCODER, CooldownSyncMessage.DECODER, CooldownSyncMessage.HANDLER, Optional.empty());
-        CHANNEL.registerMessage(packetId++, RobberyRestrictionSyncMessage.class, RobberyRestrictionSyncMessage.ENCODER, RobberyRestrictionSyncMessage.DECODER, RobberyRestrictionSyncMessage.HANDLER, Optional.empty());
-        CHANNEL.registerMessage(packetId++, FireworkParticleMessage.class, FireworkParticleMessage.ENCODER, FireworkParticleMessage.DECODER, FireworkParticleMessage.HANDLER, Optional.empty());
+        CHANNEL.registerMessage(packetId++, EPSyncMessage.class, EPSyncMessage.ENCODER, EPSyncMessage.DECODER, EPSyncMessage.HANDLER, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        CHANNEL.registerMessage(packetId++, LivesSyncMessage.class, LivesSyncMessage.ENCODER, LivesSyncMessage.DECODER, LivesSyncMessage.HANDLER, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        CHANNEL.registerMessage(packetId++, CollectibleSyncMessage.class, CollectibleSyncMessage.ENCODER, CollectibleSyncMessage.DECODER, CollectibleSyncMessage.HANDLER, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        CHANNEL.registerMessage(packetId++, CollectibleItemUseMessage.class, CollectibleItemUseMessage.ENCODER, CollectibleItemUseMessage.DECODER, CollectibleItemUseMessage.HANDLER, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        CHANNEL.registerMessage(packetId++, CooldownSyncMessage.class, CooldownSyncMessage.ENCODER, CooldownSyncMessage.DECODER, CooldownSyncMessage.HANDLER, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        CHANNEL.registerMessage(packetId++, RobberyRestrictionSyncMessage.class, RobberyRestrictionSyncMessage.ENCODER, RobberyRestrictionSyncMessage.DECODER, RobberyRestrictionSyncMessage.HANDLER, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        CHANNEL.registerMessage(packetId++, FireworkParticleMessage.class, FireworkParticleMessage.ENCODER, FireworkParticleMessage.DECODER, FireworkParticleMessage.HANDLER, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
         CHANNEL.messageBuilder(NDifficultySyncPacket.class, packetId++, NetworkDirection.PLAY_TO_CLIENT).encoder(NDifficultySyncPacket::encode).decoder(NDifficultySyncPacket::decode).consumerMainThread(NDifficultySyncPacket::handle).add();
     }
 

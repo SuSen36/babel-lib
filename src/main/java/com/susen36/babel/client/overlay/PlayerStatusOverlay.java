@@ -48,10 +48,10 @@ public class PlayerStatusOverlay {
         if (player != null && !player.isSpectator() && health != null) {
             Font font = Minecraft.getInstance().font;
             double capabilityShield = health.getShield();
-            int lifeOffsetX = (int) Math.round(BabelConfig.lifeXOffset);
-            int lifeOffsetY = (int) Math.round(BabelConfig.lifeYOffset) - 16;
-            int shieldOffsetX = lifeOffsetX + (int) Math.round(BabelConfig.shieldXOffset);
-            int shieldOffsetY = lifeOffsetY + (int) Math.round(BabelConfig.shieldYOffset);
+            int lifeOffsetX = (int) Math.round(BabelConfig.LIFE_X_OFFSET.get());
+            int lifeOffsetY = (int) Math.round(BabelConfig.LIFE_Y_OFFSET.get()) - 16;
+            int shieldOffsetX = lifeOffsetX + (int) Math.round(BabelConfig.SHIELD_X_OFFSET.get());
+            int shieldOffsetY = lifeOffsetY + (int) Math.round(BabelConfig.SHIELD_Y_OFFSET.get());
 
             guiGraphics.blit(LIFE_POINT, 6 + lifeOffsetX, height - 24 + lifeOffsetY, 0, 0, 24, 16, 24, 16);
 

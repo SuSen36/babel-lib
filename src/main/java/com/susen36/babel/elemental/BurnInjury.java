@@ -3,9 +3,6 @@ package com.susen36.babel.elemental;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
 import com.susen36.babel.init.BabelAttributes;
-import com.susen36.babel.init.BabelDamageTypes;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -25,16 +22,14 @@ public class BurnInjury extends AbstractEPCapability {
     @Override
     public void doPlayerBurst() {
         addMagicResistancePenalty();
-        DamageSource source = BabelDamageTypes.source(livingEntity.level(), DamageTypes.ON_FIRE);
         livingEntity.setSecondsOnFire(3);
-        livingEntity.hurt(source, 11.0F);
+        applyBurstDamage(11.0F);
     }
 
     @Override
     public void doNonPlayerBurst() {
         addMagicResistancePenalty();
-        DamageSource source = BabelDamageTypes.source(livingEntity.level(), BabelDamageTypes.ELEMENT_BREAK);
-        livingEntity.hurt(source, 36.0F);
+        applyBurstDamage(36.0F);
     }
 
     @Override

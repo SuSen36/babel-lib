@@ -1,8 +1,8 @@
 package com.susen36.babel.mixin;
 
 import com.susen36.babel.BabelConfig;
+import com.susen36.babel.api.elemental.ElementType;
 import com.susen36.babel.api.entity.ElementalAttacker;
-import com.susen36.babel.elemental.base.AbstractEPCapability;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.projectile.WitherSkull;
@@ -14,8 +14,8 @@ public abstract class WitherBossMixin implements ElementalAttacker {
 
     @Unique
     @Override
-    public AbstractEPCapability.EPType getElementalType() {
-        return AbstractEPCapability.EPType.NECROSIS;
+    public ElementType getElementalType() {
+        return ElementType.NECROSIS;
     }
 
     @Unique
@@ -33,7 +33,7 @@ public abstract class WitherBossMixin implements ElementalAttacker {
     @Unique
     @Override
     public double getElementalInjuryDamage(Entity directEntity) {
-        return BabelConfig.witherElementalDamage
+        return BabelConfig.WITHER_ELEMENTAL_DAMAGE.get()
                 && directEntity instanceof WitherSkull skull && skull.isDangerous() ? 10.0D : 5.0D;
     }
 }

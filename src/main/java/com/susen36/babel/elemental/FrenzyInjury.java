@@ -1,11 +1,14 @@
 package com.susen36.babel.elemental;
 
 import com.susen36.babel.elemental.base.AbstractEPCapability;
-import com.susen36.babel.init.BabelDamageTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -47,7 +50,7 @@ public class FrenzyInjury extends AbstractEPCapability {
         if (reviveTick <= 0) {
             removeAttackSpeedBonus();
         } else if (livingEntity.tickCount % 20 == 0) {
-            livingEntity.hurt(BabelDamageTypes.source(livingEntity.level(), BabelDamageTypes.FRENZY_BREAK), frenzyStacks * 0.5F);
+            applyBurstDamage(frenzyStacks * 0.5F);
         }
     }
 
@@ -56,7 +59,7 @@ public class FrenzyInjury extends AbstractEPCapability {
         if (reviveTick <= 0) {
             removeAttackSpeedBonus();
         } else if (livingEntity.tickCount % 20 == 0) {
-            livingEntity.hurt(BabelDamageTypes.source(livingEntity.level(), BabelDamageTypes.FRENZY_BREAK), frenzyStacks * 0.75F);
+            applyBurstDamage(frenzyStacks * 0.75F);
         }
     }
 
@@ -64,6 +67,24 @@ public class FrenzyInjury extends AbstractEPCapability {
         AttributeInstance attackSpeed = livingEntity.getAttribute(Attributes.ATTACK_SPEED);
         if (attackSpeed != null) {
             attackSpeed.removeModifier(ATTACK_SPEED_BONUS.getId());
+        }
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        CompoundTag tag = super.serializeNBT();
+        if (underBurst()) {
+            tag.putInt("frenzyStacks", frenzyStacks);
+        }
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag tag) {
+        super.deserializeNBT(tag);
+        if (underBurst() && tag.contains("frenzyStacks", Tag.TAG_INT)) {
+            maxFrenzyStacks = livingEntity instanceof Player ? 10 : 8;
+            frenzyStacks = Mth.clamp(tag.getInt("frenzyStacks"), 1, maxFrenzyStacks);
         }
     }
 

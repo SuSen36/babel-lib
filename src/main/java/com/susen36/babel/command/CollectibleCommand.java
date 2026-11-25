@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.commands.CommandSourceStack;
@@ -20,10 +21,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class CollectibleCommand {
 
-    private static final DynamicCommandExceptionType ERROR_UNKNOWN_COLLECTIBLE = new DynamicCommandExceptionType(obj -> Component.literal("Unknown collectible: " + obj));
+    private static final DynamicCommandExceptionType ERROR_UNKNOWN_COLLECTIBLE = new DynamicCommandExceptionType(obj -> Component.translatable("command.collectible.unknown", obj.toString()));
 
     private static final LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal("collectible")
             .then(Commands.literal("give").requires(s -> s.hasPermission(2))
@@ -58,53 +60,72 @@ public class CollectibleCommand {
     private static int give(CommandContext<CommandSourceStack> ctx, int layer) throws CommandSyntaxException {
         Item item = resolveCollectible(ctx);
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "targets");
+        List<ServerPlayer> written = new ArrayList<>();
         for (ServerPlayer player : targets) {
-            if (layer > 0) {
-                Collectibles.addLayerAndSync(player, item, layer);
+            Collectibles data = Collectibles.getData(player);
+            if (data != null && item instanceof CollectibleItem) {
+                if (layer > 0) {
+                    Collectibles.addLayerAndSync(player, item, layer);
+                }
+                if (Collectibles.getData(player) == data) {
+                    boolean activated = Collectibles.activateAndSync(player, item);
+                    if (activated) {
+                        written.add(player);
+                    }
+                }
             }
-            Collectibles.activateAndSync(player, item);
         }
-        sendFeedback(ctx, "command.collectible.give", targets, item);
-        return targets.size();
+        sendFeedback(ctx, "command.collectible.give", written, item);
+        return written.size();
     }
 
     private static int clearCollectible(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         Item item = resolveCollectible(ctx);
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "targets");
+        List<ServerPlayer> written = new ArrayList<>();
         for (ServerPlayer player : targets) {
-            Collectibles.removeAndSync(player, item);
+            Collectibles data = Collectibles.getData(player);
+            if (data != null) {
+                boolean removed = Collectibles.removeAndSync(player, item);
+                if (removed && Collectibles.getData(player) == data) {
+                    written.add(player);
+                }
+            }
         }
-        sendFeedback(ctx, "command.collectible.remove", targets, item);
-        return targets.size();
+        sendFeedback(ctx, "command.collectible.remove", written, item);
+        return written.size();
     }
 
     private static int clearCollectibles(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "targets");
+        List<ServerPlayer> written = new ArrayList<>();
         for (ServerPlayer player : targets) {
             Collectibles data = Collectibles.getData(player);
             if (data != null) {
                 for (Item item : new ArrayList<>(data.getUsed())) {
+                    if (Collectibles.getData(player) != data) {
+                        break;
+                    }
                     data.remove(item);
                 }
-                BabelNetwork.syncCollectibles(player);
+                if (Collectibles.getData(player) == data) {
+                    BabelNetwork.syncCollectibles(player);
+                    written.add(player);
+                }
             }
         }
-        sendFeedback(ctx, "command.collectible.clear", targets, null);
-        return targets.size();
+        sendFeedback(ctx, "command.collectible.clear", written, null);
+        return written.size();
     }
 
     private static void sendFeedback(CommandContext<CommandSourceStack> ctx, String key, Collection<ServerPlayer> targets, @Nullable Item item) {
-        String collectible = item == null ? "" : Component.translatable(item.getDescriptionId()).getString();
-        String info;
-        if (targets.size() == 1) {
-            info = Component.translatable(key + ".single").getString()
-                    .replace("<player>", targets.iterator().next().getGameProfile().getName())
-                    .replace("<collectible>", collectible);
-        } else {
-            info = Component.translatable(key + ".mult").getString()
-                    .replace("<num>", String.valueOf(targets.size()))
-                    .replace("<collectible>", collectible);
+        if (!targets.isEmpty()) {
+            boolean single = targets.size() == 1;
+            String feedbackKey = key + (single ? ".single" : ".mult");
+            Object target = single ? targets.iterator().next().getDisplayName() : targets.size();
+            Component feedback = item == null ? Component.translatable(feedbackKey, target)
+                    : Component.translatable(feedbackKey, target, item.getDescription());
+            ctx.getSource().sendSuccess(() -> feedback, true);
         }
-        ctx.getSource().sendSuccess(() -> Component.literal(info), true);
     }
 }

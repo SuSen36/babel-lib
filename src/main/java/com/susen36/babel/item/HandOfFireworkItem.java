@@ -58,7 +58,7 @@ public class HandOfFireworkItem extends CollectibleItem.CustomCollectibleItem {
 
     private static boolean isFireworkWeapon(ItemStack stack, String registryName) {
         return stack.is(Tags.Items.TOOLS_BOWS) || stack.getItem() instanceof BowItem
-                || matchesConfigured(BabelConfig.handFireworkRecognizable, registryName);
+                || matchesConfigured(BabelConfig.HAND_FIREWORK_RECOGNIZABLE.get(), registryName);
     }
 
     private static void detonateFirework(Level level, LivingEntity target, Player player, double amount) {

@@ -1,8 +1,8 @@
 package com.susen36.babel.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.susen36.babel.api.event.LivingAddEffectEvent;
 import com.susen36.babel.effect.InvisibleMobEffect;
+import com.susen36.babel.event.BabelEventFactory;
 import com.susen36.babel.init.BabelMobEffects;
 import com.susen36.babel.item.HandOfFlowingWaterItem;
 import com.susen36.babel.item.HandOfSwordItem;
@@ -100,7 +100,7 @@ public abstract class LivingEntityMixin {
 
     @ModifyVariable(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"), argsOnly = true)
     private MobEffectInstance onAddEffect(MobEffectInstance effect) {
-        return LivingAddEffectEvent.onAddEffect((LivingEntity) (Object) this, effect);
+        return BabelEventFactory.onAddEffect((LivingEntity) (Object) this, effect);
     }
 
     @Inject(method = "getVisibilityPercent", at = @At("RETURN"), cancellable = true)

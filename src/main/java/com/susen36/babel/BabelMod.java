@@ -1,7 +1,9 @@
 package com.susen36.babel;
 
 import com.mojang.logging.LogUtils;
+import com.susen36.babel.api.collectible.CollectibleRegistration;
 import com.susen36.babel.capability.BabelCapability;
+import com.susen36.babel.collectible.CollectibleBuilder;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.init.*;
 import com.susen36.babel.network.BabelNetwork;
@@ -16,13 +18,12 @@ import org.slf4j.Logger;
 @Mod(BabelMod.MODID)
 public class BabelMod {
 
-    public static final String MODID = "babel";
+    // 实现层统一使用 MODID；引用 API 常量，避免注册 API 反向依赖模组主类。
+    public static final String MODID = CollectibleRegistration.BABEL_MOD_ID;
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public BabelMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        modEventBus.addListener(BabelConfig::onLoad);
-        modEventBus.addListener(BabelConfig::onReloading);
         modEventBus.addListener(this::commonSetup);
         BabelBlocks.REGISTRY.register(modEventBus);
         BabelBlockEntities.REGISTRY.register(modEventBus);
@@ -34,12 +35,15 @@ public class BabelMod {
         BabelPotions.REGISTRY.register(modEventBus);
         BabelParticles.REGISTRY.register(modEventBus);
         BabelSounds.REGISTRY.register(modEventBus);
+        BabelLootModifiers.REGISTRY.register(modEventBus);
         BabelTabs.REGISTRY.register(modEventBus);
         Collectibles.register(modEventBus);
         BabelCapability.register(modEventBus);
-        BabelCollectible.register(modEventBus);
+        CollectibleBuilder.installExtensionPoint();
+        CollectibleRegistration.register(MODID, modEventBus, BabelCollectible::register);
         BabelGameRules.init();
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BabelConfig.SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BabelConfig.COMMON_SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, BabelConfig.CLIENT_SPEC);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

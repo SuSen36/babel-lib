@@ -1,8 +1,8 @@
 package com.susen36.babel.init;
 
-import com.susen36.babel.BabelMod;
+import com.susen36.babel.api.collectible.CollectibleRegistrar;
+import com.susen36.babel.api.collectible.CollectibleSpec;
 import com.susen36.babel.collectible.CollectibleActivation;
-import com.susen36.babel.collectible.CollectibleBuilder;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleItem.Levels;
 import com.susen36.babel.collectible.CollectibleTiers;
@@ -15,13 +15,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.RegistryObject;
 
 public class BabelCollectible {
-    public static CollectibleBuilder REGISTRY;
-
     public static RegistryObject<Item> ORIGINIUM_IRIS_FLOWER;
     public static RegistryObject<Item> OMNIKEY;
     public static RegistryObject<Item> GOLD_EXPEDITION;
@@ -185,193 +182,191 @@ public class BabelCollectible {
     public static RegistryObject<Item> THE_RETURN;
     public static RegistryObject<Item> YANESE_DICTIONARY;
 
-    public static void register(IEventBus bus) {
-        REGISTRY = CollectibleBuilder.create(BabelMod.MODID, bus);
-        ORIGINIUM_IRIS_FLOWER = REGISTRY.registerCollectible("originium_iris_flower", OriginiumIrisFlowerItem::new);
-        OMNIKEY = REGISTRY.registerCollectible("omnikey", OmniKeyItem::new);
-        DURIN_OVERGROUND = REGISTRY.registerCollectible("durin_overground", DurinOvergroundItem::new);
-        KETTLE = REGISTRY.registerCollectible("kettle", KettleItem::new);
-        VAMPIRES_BED = REGISTRY.registerCollectible("vampires_bed", VampireBedItem::new);
-        PITTS_ASSORTED_FRUITS = REGISTRY.registerCollectible("pitts_assorted_fruits", PittsAssortedFruitsItem::new);
-        HAND_OF_BUCKLER = REGISTRY.registerCollectible("hand_of_buckler", HandOfBucklerItem::new);
-        HAND_OF_THORNS = REGISTRY.registerCollectible("hand_of_thorns", HandOfThornsItem::new);
-        HAND_OF_STRANGLE = REGISTRY.registerCollectible("hand_of_strangle", HandOfStrangleItem::new);
-        HAND_OF_SPEED = REGISTRY.registerCollectible("hand_of_speed", HandOfSpeedItem::new);
-        HAND_OF_FIREWORK = REGISTRY.registerCollectible("hand_of_firework", HandOfFireworkItem::new);
-        HAND_OF_SWIPE = REGISTRY.registerCollectible("hand_of_swipe", HandOfSwipeItem::new);
-        HAND_OF_SWORD = REGISTRY.registerCollectible("hand_of_sword", HandOfSwordItem::new);
-        HAND_OF_ENGRAVE = REGISTRY.registerCollectible("hand_of_engrave", HandOfEngraveItem::new);
-        HAND_OF_SNATCHER = REGISTRY.registerCollectible("hand_of_snatcher", HandOfSnatcherItem::new);
-        HAND_OF_DIFFUSION = REGISTRY.registerCollectible("hand_of_diffusion", HandOfDiffusionItem::new);
-        HAND_OF_FLOWING_WATER = REGISTRY.registerCollectible("hand_of_flowing_water", HandOfFlowingWaterItem::new);
-        HAND_OF_PULVERIZATION = REGISTRY.registerCollectible("hand_of_pulverization", HandOfPulverizationItem::new);
-        HAND_OF_PROTRACTION = REGISTRY.registerCollectible("hand_of_protraction", HandOfProtractionItem::new);
-        CHITINOUS_RIPPER = REGISTRY.registerCollectible("chitinous_ripper", ChitinousRipperItem::new);
-        FEARLESS_BLADE = REGISTRY.registerCollectible("fearless_blade", FearlessBladeItem::new);
-        DEVOTION = REGISTRY.registerCollectible("devotion", DevotionItem::new);
-        WHITE_FLOWER_CROWN = REGISTRY.registerCollectible("white_flower_crown", WhiteFlowerCrownItem::new);
-        PRESENCE_NECKLACE = REGISTRY.registerCollectible("presence_necklace", PresenceNecklaceItem::new);
-        REVOLVER_CYLINDER = REGISTRY.registerCollectible("revolver_cylinder", RevolverCylinderItem::new);
-        LEITHANIAN_HONOR_MEDAL = REGISTRY.registerCollectible("leithanian_honor_medal", LeithanianHonorMedalItem::new);
-        CONVAL_EXPERIENCE_CARD = REGISTRY.registerCollectible("conval_experience_card", ConvalExperienceCardItem::new);
-        RUSTED_IRON_HAMMER = REGISTRY.registerCollectible("rusted_iron_hammer", RustedIronHammerItem::new);
-        CONVAL_PRIME_MEMBERSHIP = REGISTRY.registerCollectible("conval_prime_membership", ConvalPrimeMembershipItem::new);
-        SILVER_FORKS = REGISTRY.registerCollectible("silver_forks", SilverForksItem::new);
-        FIRST_AID_KIT = REGISTRY.registerCollectible("first_aid_kit", FirstAidKitItem::new);
-        THE_SILENCE = REGISTRY.registerCollectible("the_silence", TheSilenceItem::new);
-        VIEUX_VANGUARDS_BLADE = REGISTRY.registerCollectible("vieux_vanguards_blade", VieuxVanguardsBladeItem::new);
-        FOWLBEAST_LIVER_PATE = REGISTRY.registerCollectible("fowlbeast_liver_pate", FowlbeastLiverPateItem::new);
-        VANILLA_SODA = REGISTRY.registerCollectible("vanilla_soda", VanillaSodaItem::new);
-        ACTOR_PERFUME = REGISTRY.registerCollectible("actor_perfume", ActorPerfumeItem::new);
-        DREAMING_ESSENCE = REGISTRY.registerCollectible("dreaming_essence", DreamingEssenceItem::new);
-        CARRIAGE_WHIP = REGISTRY.registerCollectible("carriage_whip", CarriageWhipItem::new);
-        CHILDREN_PUPPET = REGISTRY.registerCollectible("children_puppet", ChildrenPuppetItem::new);
-        SECOND_REFORM_ACT = REGISTRY.registerCollectible("second_reform_act", SecondReformActItem::new);
-        ROYAL_RAPIER = REGISTRY.registerCollectible("royal_rapier", RoyalRapierItem::new);
-        AVENGER = REGISTRY.registerCollectible("avenger", AvengerItem::new);
-        UNKNOWN_INSTRUMENT = REGISTRY.registerCollectible("unknown_instrument", UnknownInstrumentItem::new);
-        SARKAZ_KING_BED = REGISTRY.registerCollectible("sarkaz_king_bed", SarkazKingBedItem::new);
-        SARKAZ_KING_BANNER = REGISTRY.registerCollectible("sarkaz_king_banner", ArchfiendsBannerItem::new);
-        SARKAZ_KING_ARTIFACT = REGISTRY.registerCollectible("sarkaz_king_artifact", ArchfiendsArtifactItem::new);
-        ROYAL_ALLIANCE_TREATY = REGISTRY.registerCollectible("royal_alliance_treaty", RoyalAllianceTreatyItem::new);
-        SEAGRASS_SALAD = REGISTRY.registerCollectible("seagrass_salad", SeagrassSaladItem::new);
-        ACAHUALLAN_BOWL = REGISTRY.registerCollectible("acahuallan_bowl", AcahuallanBowlItem::new);
-        BANSHEE_KISS = REGISTRY.registerCollectible("banshees_kiss", BansheeKissItem::new);
-        PROOF_OF_LONGEVITY = REGISTRY.registerCollectible("proof_of_longevity", ProofOfLongevityItem::new);
-        HEMOST = REGISTRY.registerCollectible("hemost", SmellyHemostaticItem::new);
-        SOLO_MUSIC_BOX = REGISTRY.registerCollectible("solo_music_box", SoloMusicBoxItem::new);
-        TOPONYM_ORIGINS = REGISTRY.registerCollectible("toponym_origins", ToponymOriginsItem::new);
-        YEARNING = REGISTRY.registerCollectible("yearning", UnripeYearningItem::new);
-        ALLAY_SCULPTURE = REGISTRY.registerCollectible("allay_sculpture", AllaySculptureItem::new);
-        CHURCH_ALMS_VOUCHER = REGISTRY.registerCollectible("church_alms_voucher", ChurchAlmsVoucherItem::new);
-        WORN_GROUP_PHOTO = REGISTRY.registerCollectible("worn_group_photo", WornGroupPhotoItem::new);
-        ABYSSAL_WYRDMASK = REGISTRY.registerCollectible("abyssal_wyrdmask", AbyssalWyrdmaskItem::new);
-        KING_ARMOR = REGISTRY.registerCollectible("king_armor", KingsArmourItem::new);
-        KING_SPEAR = REGISTRY.registerCollectible("king_spear", KingsSpearItem::new);
-        KING_EXTENSION = REGISTRY.registerCollectible("king_extension", KingsExtensionItem::new);
-        KING_CRYSTAL = REGISTRY.registerCollectible("king_crystal", KingsCrystalItem::new);
-        KING_CROWN = REGISTRY.registerCollectible("king_crown", KingCrownItem::new);
-        KING_STAFF = REGISTRY.registerCollectible("king_staff", KingsStaffItem::new);
-        KING_FELLOWSHIP = REGISTRY.registerCollectible("king_fellowship", KingsFellowshipItem::new);
-        KING_BUCKLER = REGISTRY.registerCollectible("king_buckler", KingsBucklerItem::new);
-        SURVIVOR_CONTRACT = REGISTRY.registerCollectible("survivor_contract", SurvivorContractItem::new);
-        ROYAL_FATE = REGISTRY.registerCollectible("royal_fate", RoyalFateItem::new);
-        CANNED_CHERRY = REGISTRY.registerCollectible("canned_cherry", CannedCherryItem::new);
-        GOLDEN_CHALICE = REGISTRY.registerCollectible("golden_chalice", GoldenChaliceItem::new);
-        BLACK_TULIP = REGISTRY.registerCollectible("black_tulip", BlackTulipItem::new);
-        COFFEE_CANDY = REGISTRY.registerCollectible("coffee_candy", CoffeeCandyItem::new);
-        ORANGE_STORM = REGISTRY.registerCollectible("orange_storm", OrangeStormItem::new);
-        ODD_FLUTE = REGISTRY.registerCollectible("odd_flute", OddFluteItem::new);
-        FEATURED_CANNED_MEAT = REGISTRY.registerCollectible("featured_canned_meat", MeatCanItem::new);
-        RESCISSION = REGISTRY.registerCollectible("rescission", RescissionItem::new);
-        SHEET_MUSIC = REGISTRY.registerCollectible("sheet_music", SheetMusicItem::new);
-        OLD_STEAM_ARMOR = REGISTRY.registerCollectible("old_steam_armor", OldSteamArmorItem::new);
-        BRILLIANT_LAMENT = REGISTRY.registerCollectible("brilliant_lament", BrilliantLamentItem::new);
-        LIVE_ROSE = REGISTRY.registerCollectible("live_rose", LiveRoseItem::new);
-        KNIGHTS_CODE = REGISTRY.registerCollectible("knights_code", KnightsCodeItem::new);
-        DARKNIGHT_WHISPERER = REGISTRY.registerCollectible("darknight_whisperer", DarknightWhispererItem::new);
-        TOPOGRAPHICAL_MAP = REGISTRY.registerCollectible("topographical_map", TopographicalMapItem::new);
-        GODMOTHERS_TOKEN = REGISTRY.registerCollectible("godmothers_token", GodmothersTokenItem::new);
-        DIVINE_CONCH = REGISTRY.registerCollectible("divine_conch", DivineConchItem::new);
-        FLAWLESS_JADESTONE = REGISTRY.registerCollectible("flawless_jadestone", FlawlessJadestoneItem::new);
-        ACTORS_JEWELRY_BOX = REGISTRY.registerCollectible("actors_jewelry_box", ActorsJewelryBoxItem::new);
-        SCOUTS_SCOPE = REGISTRY.registerCollectible("scouts_scope", ScoutsScopeItem::new);
-        SEA_TERROR_JERKY = REGISTRY.registerCollectible("sea_terror_jerky", SeaTerrorJerkyItem::new);
-        COBBLESTONE_ALTAR = REGISTRY.registerCollectible("cobblestone_altar", CobblestoneAltarItem::new);
-        ROCK_HORN = REGISTRY.registerCollectible("rock_horn", RockHornItem::new);
-        ANGELINA_INSPIRATION = REGISTRY.registerCollectible("angelina_inspiration", AngelinaInspirationItem::new);
-        OLD_FAN = REGISTRY.registerCollectible("old_fan", OldFanItem::new);
-        RAINBOW_JAR = REGISTRY.registerCollectible("rainbow_jar", RainbowJarItem::new);
-        LITTLE_GRAN_FARO = REGISTRY.registerCollectible("little_gran_faro", LittleGranFaroItem::new);
-        MEMORIES_THE_SHARD = REGISTRY.registerCollectible("memories_the_shard", MemoriesTheShardItem::new);
-        RING_OF_THORNS = REGISTRY.registerCollectible("ring_of_thorns", RingOfThornsItem::new);
-        PUNGENT_COFFEE_BEANS = REGISTRY.registerCollectible("pungent_coffee_beans", PungentCoffeeBeansItem::new);
-        ORIRON_ROUND_SHIELD = REGISTRY.registerCollectible("oriron_round_shield", OrironRoundShieldItem::new);
-        FRISTON_P = REGISTRY.registerCollectible("friston_p", FristonPItem::new);
-        STRING_PUPPET = REGISTRY.registerCollectible("string_puppet", StringPuppetItem::new);
-        EMPEROR_COLLECTION = REGISTRY.registerCollectible("emperor_collection", EmperorCollectionItem::new);
-        COIN_OPERATED_TOY = REGISTRY.registerCollectible("coin_operated_toy", CoinOperatedToyItem::new);
-        BLAZE_CHAINSAW = REGISTRY.registerCollectible("blaze_chainsaw", BlazeChainsawItem::new);
-        STANDARD_RIOT_GEAR = REGISTRY.registerCollectible("standard_riot_gear", StandardRiotGearItem::new);
-        EMPTY_FOWLBEAST = REGISTRY.registerCollectible("empty_fowlbeast", EmptyFowlbeastItem::new);
-        TIMEWORN_POETRY_STRIPS = REGISTRY.registerCollectible("timeworn_poetry_strips", TimewornPoetryStripsItem::new);
-        RUSTED_RAZOR = REGISTRY.registerCollectible("rusted_razor", RustedRazorItem::new);
-        FISSURED_RESTRAINTS = REGISTRY.registerCollectible("fissured_restraints", FissuredRestraintsItem::new);
-        ROSMONTIS_EMBRACE = REGISTRY.registerCollectible("rosmontis_embrace", RosmontisEmbraceItem::new);
-        GOLD_PLATED_DICE = REGISTRY.registerCollectible("gold_plated_dice", GoldPlatedDiceItem::new);
-        EMPERORS_FAVOR = REGISTRY.registerCollectible("emperors_favor", EmperorsFavorItem::new);
-        FROZEN_CLAW = REGISTRY.registerCollectible("frozen_claw", FrozenClawItem::new);
-        LAKEBED_AEGIS = REGISTRY.registerCollectible("lakebed_aegis", LakebedAegisItem::new);
-        SPINACH_PACK = REGISTRY.registerCollectible("spinach_pack", SpinachPackItem::new);
-        WRATH_OF_SIRACUSANS = REGISTRY.registerCollectible("wrath_of_siracusans", WrathOfSiracusansItem::new);
-        GLASS_BIRD = REGISTRY.registerCollectible("glass_bird", GlassBirdItem::new);
-        RED_BOW_TIE = REGISTRY.registerCollectible("red_bow_tie", RedBowTieItem::new);
-        FOUR_LEAF_CLOVER_FOSSIL = REGISTRY.registerCollectible("four_leaf_clover_fossil", FourLeafCloverFossilItem::new);
-        ANCIENT_TREE_FRUIT = REGISTRY.registerCollectible("ancient_tree_fruit", AncientTreeFruitItem::new);
-        ANTIQUE_CASTING = REGISTRY.registerCollectible("antique_casting", AntiqueCastingItem::new);
-        UNLEASHINGS = REGISTRY.registerCollectible("unleashings", UnleashingsItem::new);
-        DREAMBIND_CASTLE_MODEL = REGISTRY.registerCollectible("dreambind_castle_model", DreambindCastleModelItem::new);
-        CONDENSED_SUPPRESSANT = REGISTRY.registerCollectible("condensed_suppressant", CondensedSuppressantItem::new);
-        FOREST_NIGHT_WHISPERS = REGISTRY.registerCollectible("forest_night_whispers", ForestNightWhispersItem::new);
-        CANNOT_MARK = REGISTRY.registerCollectible("cannot_mark", CannotMarkItem::new);
-        DANCERS_BRACELETS = REGISTRY.registerCollectible("dancers_bracelets", DancersBraceletsItem::new);
-        SPECIAL_SUPPRESSOR = REGISTRY.registerCollectible("special_suppressor", SpecialSuppressorItem::new);
-        SHALLOWS_WHISPERS = REGISTRY.registerCollectible("shallows_whispers", ShallowsWhispersItem::new);
-        DESIGNERS_RULER = REGISTRY.registerCollectible("designers_ruler", DesignersRulerItem::new);
-        HONOR_RIBBON = REGISTRY.registerCollectible("honor_ribbon", HonorRibbonItem::new);
-        PURE_WHITE_DANCE_SHOES = REGISTRY.registerCollectible("pure_white_dance_shoes", PureWhiteDanceShoesItem::new);
-        JET_BLACK_DANCE_SHOES = REGISTRY.registerCollectible("jet_black_dance_shoes", JetBlackDanceShoesItem::new);
-        LIVING_WOODPLATE = REGISTRY.registerCollectible("living_woodplate", LivingWoodplateItem::new);
-        MEDICINE_STICKS = REGISTRY.registerCollectible("medicine_sticks", MedicineSticksItem::new);
-        END_OF_TIMES = REGISTRY.registerCollectible("end_of_times", EndOfTimesItem::new);
-        SECRET_HR_LETTER = REGISTRY.registerCollectible("secret_hr_letter", SecretHrLetterItem::new);
-        SPEECH_DRAFT = REGISTRY.registerCollectible("speech_draft", SpeechDraftItem::new);
-        REGIONAL_ACTION_PLAN = REGISTRY.registerCollectible("regional_action_plan", RegionalActionPlanItem::new);
-        COMPREHENSIVE_OPERATION_FILE = REGISTRY.registerCollectible("comprehensive_operation_file", OperationFileItem::new);
-        OLD_GEORGE_NUTRIPASTE = REGISTRY.registerCollectible("old_george_nutripaste", OldGeorgeNutripasteItem::new);
-        CASTLES_OFFSPRING = REGISTRY.registerCollectible("castles_offspring", CastlesOffspringItem::new);
-        MINIATURE_STAGE_MODEL = REGISTRY.registerCollectible("miniature_stage_model", MiniatureStageModelItem::new);
-        THERAPY_TAPE = REGISTRY.registerCollectible("therapy_tape", TherapyTapeItem::new);
-        ANCIENT_FRESCO = REGISTRY.registerCollectible("ancient_fresco", AncientFrescoItem::new);
-        EMERGENCY_ACTIVE_AGENT = REGISTRY.registerCollectible("emergency_active_agent", EmergencyActiveAgentItem::new);
-        DOLL_HOUSE = REGISTRY.registerCollectible("doll_house", DollHouseItem::new);
-        SPATIAL_ART_DISPLAY = REGISTRY.registerCollectible("spatial_art_display", SpatialArtDisplayItem::new);
-        DISASTERS_ORIGIN = REGISTRY.registerCollectible("disasters_origin", DisastersOriginItem::new);
-        NORTHWIND_CONSTRUCT = REGISTRY.registerCollectible("northwind_construct", NorthwindConstructItem::new);
-        PRIED_OPEN_TOOLBOX = REGISTRY.registerCollectible("pried_open_toolbox", PriedOpenToolboxItem::new);
-        URSUS_BIG_BREAD = REGISTRY.registerCollectible("ursus_big_bread", UrsusBigBreadItem::new);
-        BLUE_SILK_SCARF = REGISTRY.registerCollectible("blue_silk_scarf", BlueSilkScarfItem::new);
-        GLORIOUS_KAZIMIERZ = REGISTRY.registerCollectible("glorious_kazimierz", GloriousKazimierzItem::new);
-        THE_RETURN = REGISTRY.registerCollectible("the_return", TheReturnItem::new);
-        YANESE_DICTIONARY = REGISTRY.registerCollectible("yanese_dictionary", YaneseDictionaryItem::new);
+    public static void register(CollectibleRegistrar registrar) {
+        ORIGINIUM_IRIS_FLOWER = registrar.registerCollectible("originium_iris_flower", OriginiumIrisFlowerItem::new);
+        OMNIKEY = registrar.registerCollectible("omnikey", OmniKeyItem::new);
+        DURIN_OVERGROUND = registrar.registerCollectible("durin_overground", DurinOvergroundItem::new);
+        KETTLE = registrar.registerCollectible("kettle", KettleItem::new);
+        VAMPIRES_BED = registrar.registerCollectible("vampires_bed", VampireBedItem::new);
+        PITTS_ASSORTED_FRUITS = registrar.registerCollectible("pitts_assorted_fruits", PittsAssortedFruitsItem::new);
+        HAND_OF_BUCKLER = registrar.registerCollectible("hand_of_buckler", HandOfBucklerItem::new);
+        HAND_OF_THORNS = registrar.registerCollectible("hand_of_thorns", HandOfThornsItem::new);
+        HAND_OF_STRANGLE = registrar.registerCollectible("hand_of_strangle", HandOfStrangleItem::new);
+        HAND_OF_SPEED = registrar.registerCollectible("hand_of_speed", HandOfSpeedItem::new);
+        HAND_OF_FIREWORK = registrar.registerCollectible("hand_of_firework", HandOfFireworkItem::new);
+        HAND_OF_SWIPE = registrar.registerCollectible("hand_of_swipe", HandOfSwipeItem::new);
+        HAND_OF_SWORD = registrar.registerCollectible("hand_of_sword", HandOfSwordItem::new);
+        HAND_OF_ENGRAVE = registrar.registerCollectible("hand_of_engrave", HandOfEngraveItem::new);
+        HAND_OF_SNATCHER = registrar.registerCollectible("hand_of_snatcher", HandOfSnatcherItem::new);
+        HAND_OF_DIFFUSION = registrar.registerCollectible("hand_of_diffusion", HandOfDiffusionItem::new);
+        HAND_OF_FLOWING_WATER = registrar.registerCollectible("hand_of_flowing_water", HandOfFlowingWaterItem::new);
+        HAND_OF_PULVERIZATION = registrar.registerCollectible("hand_of_pulverization", HandOfPulverizationItem::new);
+        HAND_OF_PROTRACTION = registrar.registerCollectible("hand_of_protraction", HandOfProtractionItem::new);
+        CHITINOUS_RIPPER = registrar.registerCollectible("chitinous_ripper", ChitinousRipperItem::new);
+        FEARLESS_BLADE = registrar.registerCollectible("fearless_blade", FearlessBladeItem::new);
+        DEVOTION = registrar.registerCollectible("devotion", DevotionItem::new);
+        WHITE_FLOWER_CROWN = registrar.registerCollectible("white_flower_crown", WhiteFlowerCrownItem::new);
+        PRESENCE_NECKLACE = registrar.registerCollectible("presence_necklace", PresenceNecklaceItem::new);
+        REVOLVER_CYLINDER = registrar.registerCollectible("revolver_cylinder", RevolverCylinderItem::new);
+        LEITHANIAN_HONOR_MEDAL = registrar.registerCollectible("leithanian_honor_medal", LeithanianHonorMedalItem::new);
+        CONVAL_EXPERIENCE_CARD = registrar.registerCollectible("conval_experience_card", ConvalExperienceCardItem::new);
+        RUSTED_IRON_HAMMER = registrar.registerCollectible("rusted_iron_hammer", RustedIronHammerItem::new);
+        CONVAL_PRIME_MEMBERSHIP = registrar.registerCollectible("conval_prime_membership", ConvalPrimeMembershipItem::new);
+        SILVER_FORKS = registrar.registerCollectible("silver_forks", SilverForksItem::new);
+        FIRST_AID_KIT = registrar.registerCollectible("first_aid_kit", FirstAidKitItem::new);
+        THE_SILENCE = registrar.registerCollectible("the_silence", TheSilenceItem::new);
+        VIEUX_VANGUARDS_BLADE = registrar.registerCollectible("vieux_vanguards_blade", VieuxVanguardsBladeItem::new);
+        FOWLBEAST_LIVER_PATE = registrar.registerCollectible("fowlbeast_liver_pate", FowlbeastLiverPateItem::new);
+        VANILLA_SODA = registrar.registerCollectible("vanilla_soda", VanillaSodaItem::new);
+        ACTOR_PERFUME = registrar.registerCollectible("actor_perfume", ActorPerfumeItem::new);
+        DREAMING_ESSENCE = registrar.registerCollectible("dreaming_essence", DreamingEssenceItem::new);
+        CARRIAGE_WHIP = registrar.registerCollectible("carriage_whip", CarriageWhipItem::new);
+        CHILDREN_PUPPET = registrar.registerCollectible("children_puppet", ChildrenPuppetItem::new);
+        SECOND_REFORM_ACT = registrar.registerCollectible("second_reform_act", SecondReformActItem::new);
+        ROYAL_RAPIER = registrar.registerCollectible("royal_rapier", RoyalRapierItem::new);
+        AVENGER = registrar.registerCollectible("avenger", AvengerItem::new);
+        UNKNOWN_INSTRUMENT = registrar.registerCollectible("unknown_instrument", UnknownInstrumentItem::new);
+        SARKAZ_KING_BED = registrar.registerCollectible("sarkaz_king_bed", SarkazKingBedItem::new);
+        SARKAZ_KING_BANNER = registrar.registerCollectible("sarkaz_king_banner", ArchfiendsBannerItem::new);
+        SARKAZ_KING_ARTIFACT = registrar.registerCollectible("sarkaz_king_artifact", ArchfiendsArtifactItem::new);
+        ROYAL_ALLIANCE_TREATY = registrar.registerCollectible("royal_alliance_treaty", RoyalAllianceTreatyItem::new);
+        SEAGRASS_SALAD = registrar.registerCollectible("seagrass_salad", SeagrassSaladItem::new);
+        ACAHUALLAN_BOWL = registrar.registerCollectible("acahuallan_bowl", AcahuallanBowlItem::new);
+        BANSHEE_KISS = registrar.registerCollectible("banshees_kiss", BansheeKissItem::new);
+        PROOF_OF_LONGEVITY = registrar.registerCollectible("proof_of_longevity", ProofOfLongevityItem::new);
+        HEMOST = registrar.registerCollectible("hemost", SmellyHemostaticItem::new);
+        SOLO_MUSIC_BOX = registrar.registerCollectible("solo_music_box", SoloMusicBoxItem::new);
+        TOPONYM_ORIGINS = registrar.registerCollectible("toponym_origins", ToponymOriginsItem::new);
+        YEARNING = registrar.registerCollectible("yearning", UnripeYearningItem::new);
+        ALLAY_SCULPTURE = registrar.registerCollectible("allay_sculpture", AllaySculptureItem::new);
+        CHURCH_ALMS_VOUCHER = registrar.registerCollectible("church_alms_voucher", ChurchAlmsVoucherItem::new);
+        WORN_GROUP_PHOTO = registrar.registerCollectible("worn_group_photo", WornGroupPhotoItem::new);
+        ABYSSAL_WYRDMASK = registrar.registerCollectible("abyssal_wyrdmask", AbyssalWyrdmaskItem::new);
+        KING_ARMOR = registrar.registerCollectible("king_armor", KingsArmourItem::new);
+        KING_SPEAR = registrar.registerCollectible("king_spear", KingsSpearItem::new);
+        KING_EXTENSION = registrar.registerCollectible("king_extension", KingsExtensionItem::new);
+        KING_CRYSTAL = registrar.registerCollectible("king_crystal", KingsCrystalItem::new);
+        KING_CROWN = registrar.registerCollectible("king_crown", KingCrownItem::new);
+        KING_STAFF = registrar.registerCollectible("king_staff", KingsStaffItem::new);
+        KING_FELLOWSHIP = registrar.registerCollectible("king_fellowship", KingsFellowshipItem::new);
+        KING_BUCKLER = registrar.registerCollectible("king_buckler", KingsBucklerItem::new);
+        SURVIVOR_CONTRACT = registrar.registerCollectible("survivor_contract", SurvivorContractItem::new);
+        ROYAL_FATE = registrar.registerCollectible("royal_fate", RoyalFateItem::new);
+        CANNED_CHERRY = registrar.registerCollectible("canned_cherry", CannedCherryItem::new);
+        GOLDEN_CHALICE = registrar.registerCollectible("golden_chalice", GoldenChaliceItem::new);
+        BLACK_TULIP = registrar.registerCollectible("black_tulip", BlackTulipItem::new);
+        COFFEE_CANDY = registrar.registerCollectible("coffee_candy", CoffeeCandyItem::new);
+        ORANGE_STORM = registrar.registerCollectible("orange_storm", OrangeStormItem::new);
+        ODD_FLUTE = registrar.registerCollectible("odd_flute", OddFluteItem::new);
+        FEATURED_CANNED_MEAT = registrar.registerCollectible("featured_canned_meat", MeatCanItem::new);
+        RESCISSION = registrar.registerCollectible("rescission", RescissionItem::new);
+        SHEET_MUSIC = registrar.registerCollectible("sheet_music", SheetMusicItem::new);
+        OLD_STEAM_ARMOR = registrar.registerCollectible("old_steam_armor", OldSteamArmorItem::new);
+        BRILLIANT_LAMENT = registrar.registerCollectible("brilliant_lament", BrilliantLamentItem::new);
+        LIVE_ROSE = registrar.registerCollectible("live_rose", LiveRoseItem::new);
+        KNIGHTS_CODE = registrar.registerCollectible("knights_code", KnightsCodeItem::new);
+        DARKNIGHT_WHISPERER = registrar.registerCollectible("darknight_whisperer", DarknightWhispererItem::new);
+        TOPOGRAPHICAL_MAP = registrar.registerCollectible("topographical_map", TopographicalMapItem::new);
+        GODMOTHERS_TOKEN = registrar.registerCollectible("godmothers_token", GodmothersTokenItem::new);
+        DIVINE_CONCH = registrar.registerCollectible("divine_conch", DivineConchItem::new);
+        FLAWLESS_JADESTONE = registrar.registerCollectible("flawless_jadestone", FlawlessJadestoneItem::new);
+        ACTORS_JEWELRY_BOX = registrar.registerCollectible("actors_jewelry_box", ActorsJewelryBoxItem::new);
+        SCOUTS_SCOPE = registrar.registerCollectible("scouts_scope", ScoutsScopeItem::new);
+        SEA_TERROR_JERKY = registrar.registerCollectible("sea_terror_jerky", SeaTerrorJerkyItem::new);
+        COBBLESTONE_ALTAR = registrar.registerCollectible("cobblestone_altar", CobblestoneAltarItem::new);
+        ROCK_HORN = registrar.registerCollectible("rock_horn", RockHornItem::new);
+        ANGELINA_INSPIRATION = registrar.registerCollectible("angelina_inspiration", AngelinaInspirationItem::new);
+        OLD_FAN = registrar.registerCollectible("old_fan", OldFanItem::new);
+        RAINBOW_JAR = registrar.registerCollectible("rainbow_jar", RainbowJarItem::new);
+        LITTLE_GRAN_FARO = registrar.registerCollectible("little_gran_faro", LittleGranFaroItem::new);
+        MEMORIES_THE_SHARD = registrar.registerCollectible("memories_the_shard", MemoriesTheShardItem::new);
+        RING_OF_THORNS = registrar.registerCollectible("ring_of_thorns", RingOfThornsItem::new);
+        PUNGENT_COFFEE_BEANS = registrar.registerCollectible("pungent_coffee_beans", PungentCoffeeBeansItem::new);
+        ORIRON_ROUND_SHIELD = registrar.registerCollectible("oriron_round_shield", OrironRoundShieldItem::new);
+        FRISTON_P = registrar.registerCollectible("friston_p", FristonPItem::new);
+        STRING_PUPPET = registrar.registerCollectible("string_puppet", StringPuppetItem::new);
+        EMPEROR_COLLECTION = registrar.registerCollectible("emperor_collection", EmperorCollectionItem::new);
+        COIN_OPERATED_TOY = registrar.registerCollectible("coin_operated_toy", CoinOperatedToyItem::new);
+        BLAZE_CHAINSAW = registrar.registerCollectible("blaze_chainsaw", BlazeChainsawItem::new);
+        STANDARD_RIOT_GEAR = registrar.registerCollectible("standard_riot_gear", StandardRiotGearItem::new);
+        EMPTY_FOWLBEAST = registrar.registerCollectible("empty_fowlbeast", EmptyFowlbeastItem::new);
+        TIMEWORN_POETRY_STRIPS = registrar.registerCollectible("timeworn_poetry_strips", TimewornPoetryStripsItem::new);
+        RUSTED_RAZOR = registrar.registerCollectible("rusted_razor", RustedRazorItem::new);
+        FISSURED_RESTRAINTS = registrar.registerCollectible("fissured_restraints", FissuredRestraintsItem::new);
+        ROSMONTIS_EMBRACE = registrar.registerCollectible("rosmontis_embrace", RosmontisEmbraceItem::new);
+        GOLD_PLATED_DICE = registrar.registerCollectible("gold_plated_dice", GoldPlatedDiceItem::new);
+        EMPERORS_FAVOR = registrar.registerCollectible("emperors_favor", EmperorsFavorItem::new);
+        FROZEN_CLAW = registrar.registerCollectible("frozen_claw", FrozenClawItem::new);
+        LAKEBED_AEGIS = registrar.registerCollectible("lakebed_aegis", LakebedAegisItem::new);
+        SPINACH_PACK = registrar.registerCollectible("spinach_pack", SpinachPackItem::new);
+        WRATH_OF_SIRACUSANS = registrar.registerCollectible("wrath_of_siracusans", WrathOfSiracusansItem::new);
+        GLASS_BIRD = registrar.registerCollectible("glass_bird", GlassBirdItem::new);
+        RED_BOW_TIE = registrar.registerCollectible("red_bow_tie", RedBowTieItem::new);
+        FOUR_LEAF_CLOVER_FOSSIL = registrar.registerCollectible("four_leaf_clover_fossil", FourLeafCloverFossilItem::new);
+        ANCIENT_TREE_FRUIT = registrar.registerCollectible("ancient_tree_fruit", AncientTreeFruitItem::new);
+        ANTIQUE_CASTING = registrar.registerCollectible("antique_casting", AntiqueCastingItem::new);
+        UNLEASHINGS = registrar.registerCollectible("unleashings", UnleashingsItem::new);
+        DREAMBIND_CASTLE_MODEL = registrar.registerCollectible("dreambind_castle_model", DreambindCastleModelItem::new);
+        CONDENSED_SUPPRESSANT = registrar.registerCollectible("condensed_suppressant", CondensedSuppressantItem::new);
+        FOREST_NIGHT_WHISPERS = registrar.registerCollectible("forest_night_whispers", ForestNightWhispersItem::new);
+        CANNOT_MARK = registrar.registerCollectible("cannot_mark", CannotMarkItem::new);
+        DANCERS_BRACELETS = registrar.registerCollectible("dancers_bracelets", DancersBraceletsItem::new);
+        SPECIAL_SUPPRESSOR = registrar.registerCollectible("special_suppressor", SpecialSuppressorItem::new);
+        SHALLOWS_WHISPERS = registrar.registerCollectible("shallows_whispers", ShallowsWhispersItem::new);
+        DESIGNERS_RULER = registrar.registerCollectible("designers_ruler", DesignersRulerItem::new);
+        HONOR_RIBBON = registrar.registerCollectible("honor_ribbon", HonorRibbonItem::new);
+        PURE_WHITE_DANCE_SHOES = registrar.registerCollectible("pure_white_dance_shoes", PureWhiteDanceShoesItem::new);
+        JET_BLACK_DANCE_SHOES = registrar.registerCollectible("jet_black_dance_shoes", JetBlackDanceShoesItem::new);
+        LIVING_WOODPLATE = registrar.registerCollectible("living_woodplate", LivingWoodplateItem::new);
+        MEDICINE_STICKS = registrar.registerCollectible("medicine_sticks", MedicineSticksItem::new);
+        END_OF_TIMES = registrar.registerCollectible("end_of_times", EndOfTimesItem::new);
+        SECRET_HR_LETTER = registrar.registerCollectible("secret_hr_letter", SecretHrLetterItem::new);
+        SPEECH_DRAFT = registrar.registerCollectible("speech_draft", SpeechDraftItem::new);
+        REGIONAL_ACTION_PLAN = registrar.registerCollectible("regional_action_plan", RegionalActionPlanItem::new);
+        COMPREHENSIVE_OPERATION_FILE = registrar.registerCollectible("comprehensive_operation_file", OperationFileItem::new);
+        OLD_GEORGE_NUTRIPASTE = registrar.registerCollectible("old_george_nutripaste", OldGeorgeNutripasteItem::new);
+        CASTLES_OFFSPRING = registrar.registerCollectible("castles_offspring", CastlesOffspringItem::new);
+        MINIATURE_STAGE_MODEL = registrar.registerCollectible("miniature_stage_model", MiniatureStageModelItem::new);
+        THERAPY_TAPE = registrar.registerCollectible("therapy_tape", TherapyTapeItem::new);
+        ANCIENT_FRESCO = registrar.registerCollectible("ancient_fresco", AncientFrescoItem::new);
+        EMERGENCY_ACTIVE_AGENT = registrar.registerCollectible("emergency_active_agent", EmergencyActiveAgentItem::new);
+        DOLL_HOUSE = registrar.registerCollectible("doll_house", DollHouseItem::new);
+        SPATIAL_ART_DISPLAY = registrar.registerCollectible("spatial_art_display", SpatialArtDisplayItem::new);
+        DISASTERS_ORIGIN = registrar.registerCollectible("disasters_origin", DisastersOriginItem::new);
+        NORTHWIND_CONSTRUCT = registrar.registerCollectible("northwind_construct", NorthwindConstructItem::new);
+        PRIED_OPEN_TOOLBOX = registrar.registerCollectible("pried_open_toolbox", PriedOpenToolboxItem::new);
+        URSUS_BIG_BREAD = registrar.registerCollectible("ursus_big_bread", UrsusBigBreadItem::new);
+        BLUE_SILK_SCARF = registrar.registerCollectible("blue_silk_scarf", BlueSilkScarfItem::new);
+        GLORIOUS_KAZIMIERZ = registrar.registerCollectible("glorious_kazimierz", GloriousKazimierzItem::new);
+        THE_RETURN = registrar.registerCollectible("the_return", TheReturnItem::new);
+        YANESE_DICTIONARY = registrar.registerCollectible("yanese_dictionary", YaneseDictionaryItem::new);
 
-        GOLD_EXPEDITION = REGISTRY.registerCollectible("gold_expedition", 25, false, CollectibleTiers.ADVANCED, new Levels(0, 1, 0),
-                CollectibleActivation.builder().sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F).particle(ParticleTypes.WAX_OFF, 72).showOverlay(true).build(),
+        CollectibleSpec.Activation rewardActivation = new CollectibleSpec.Activation(SoundEvents.PLAYER_LEVELUP, 2F, 1F,
+                ParticleTypes.WAX_OFF, 72, 0D, 1D, true, false);
+        GOLD_EXPEDITION = registrar.registerCollectible("gold_expedition", new CollectibleSpec(25, false, CollectibleSpec.Tier.ADVANCED, 0, 1, 0, rewardActivation),
                 (ItemStack stack, Level level, Player player) -> {
                     if (level instanceof ServerLevel) {
                         player.giveExperienceLevels(6);
                         ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.GOLD_INGOT, 12));
                     }
                 });
-        GAULISH_SILVER_COIN = REGISTRY.registerCollectible("gaulish_silver_coin", 25, false, CollectibleTiers.NORMAL, new Levels(0, 1, 0),
-                CollectibleActivation.builder().sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F).particle(ParticleTypes.WAX_OFF, 72).showOverlay(true).build(),
+        GAULISH_SILVER_COIN = registrar.registerCollectible("gaulish_silver_coin", new CollectibleSpec(25, false, CollectibleSpec.Tier.NORMAL, 0, 1, 0, rewardActivation),
                 (ItemStack stack, Level level, Player player) -> {
                     if (!level.isClientSide()) {
                         ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.EMERALD, 6));
                     }
                 });
-        GAULISH_BANK_CHECK = REGISTRY.registerCollectible("gaulish_bank_check",
-                25, false, CollectibleTiers.RARE, new Levels(0, 1, 0),
-                CollectibleActivation.builder().sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F).particle(ParticleTypes.WAX_OFF, 72).showOverlay(true).build(),
+        GAULISH_BANK_CHECK = registrar.registerCollectible("gaulish_bank_check",
+                new CollectibleSpec(25, false, CollectibleSpec.Tier.RARE, 0, 1, 0, rewardActivation),
                 (ItemStack stack, Level level, Player player) -> {
                     if (!level.isClientSide()) {
                         ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.EMERALD, 12));
                     }
                 });
-        SUPREME_RING = REGISTRY.registerCollectible("supreme_ring", () -> new CollectibleItem(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
+        SUPREME_RING = registrar.registerCollectible("supreme_ring", () -> new CollectibleItem(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.ADVANCED,
                         new Levels(0, 1, 0),
                         CollectibleActivation.builder().sound(SoundEvents.AMETHYST_BLOCK_CHIME, 2F, 1F).particle(ParticleTypes.ENCHANT, 72).showOverlay(true).build()));
-        LUCKY_COIN = REGISTRY.registerCollectible("lucky_coin", () -> new CollectibleItem(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.NORMAL,
+        LUCKY_COIN = registrar.registerCollectible("lucky_coin", () -> new CollectibleItem(new Item.Properties().stacksTo(1), 25, false, CollectibleTiers.NORMAL,
                         new Levels(0, 1, 0),
                         CollectibleActivation.builder().sound(SoundEvents.PLAYER_LEVELUP, 2F, 1F).particle(ParticleTypes.WAX_OFF, 72).showOverlay(true).build()));
     }

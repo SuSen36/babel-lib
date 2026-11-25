@@ -12,6 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -39,36 +40,51 @@ public final class CollectibleAttributes {
             for (RegistryObject<Item> entry : Collectibles.getRegistry().values()) {
                 Item item = entry.get();
                 if (item instanceof CollectibleItem.CustomCollectibleItem collectible) {
-                    for (CollectibleItem.CustomCollectibleItem.AttributeBonus bonus : collectible.getAttributeBonuses()) {
-                        int stacks = 0;
-                        if (!Collectibles.isEffectSuppressed(player) && used != null && used.isUsed(item)) {
-                            stacks = bonus.stacks().getStacks(player, collectible);
-                        }
-                        AttributeInstance instance = player.getAttribute(bonus.attribute());
-                        if (instance != null) {
-                            ModifierIdentity identity = modifierIdentity(item, bonus.attribute(), "");
-                            AttributeModifier existing = instance.getModifier(identity.id());
-                            if (stacks > 0) {
-                                double expected = bonus.perStack() * stacks;
-                                if (existing == null || !Mth.equal(existing.getAmount(), expected)) {
-                                    if (existing != null) {
-                                        instance.removeModifier(identity.id());
-                                    }
-                                    instance.addTransientModifier(new AttributeModifier(identity.id(), identity.name(), expected, bonus.operation()));
-                                    healthChanged |= bonus.attribute() == Attributes.MAX_HEALTH;
-                                }
-                            } else if (existing != null) {
-                                instance.removeModifier(identity.id());
-                                healthChanged |= bonus.attribute() == Attributes.MAX_HEALTH;
-                            }
-                        }
-                    }
+                    healthChanged |= reconcileBonuses(player, used, collectible);
                 }
             }
             if (healthChanged) {
                 syncHealth(player);
             }
         }
+    }
+
+    public static void reconcile(Player player, CollectibleItem.CustomCollectibleItem collectible) {
+        if (!player.level().isClientSide) {
+            boolean healthChanged = reconcileBonuses(player, Collectibles.getData(player), collectible);
+            if (healthChanged) {
+                syncHealth(player);
+            }
+        }
+    }
+
+    private static boolean reconcileBonuses(Player player, @Nullable Collectibles used, CollectibleItem.CustomCollectibleItem collectible) {
+        boolean healthChanged = false;
+        for (CollectibleItem.CustomCollectibleItem.AttributeBonus bonus : collectible.getAttributeBonuses()) {
+            int stacks = 0;
+            if (!Collectibles.isEffectSuppressed(player) && used != null && used.isUsed(collectible)) {
+                stacks = bonus.stacks().getStacks(player, collectible);
+            }
+            AttributeInstance instance = player.getAttribute(bonus.attribute());
+            if (instance != null) {
+                ModifierIdentity identity = modifierIdentity(collectible, bonus.attribute(), "");
+                AttributeModifier existing = instance.getModifier(identity.id());
+                if (stacks > 0) {
+                    double expected = bonus.perStack() * stacks;
+                    if (existing == null || existing.getOperation() != bonus.operation() || !Mth.equal(existing.getAmount(), expected)) {
+                        if (existing != null) {
+                            instance.removeModifier(identity.id());
+                        }
+                        instance.addTransientModifier(new AttributeModifier(identity.id(), identity.name(), expected, bonus.operation()));
+                        healthChanged |= bonus.attribute() == Attributes.MAX_HEALTH;
+                    }
+                } else if (existing != null) {
+                    instance.removeModifier(identity.id());
+                    healthChanged |= bonus.attribute() == Attributes.MAX_HEALTH;
+                }
+            }
+        }
+        return healthChanged;
     }
 
     /**

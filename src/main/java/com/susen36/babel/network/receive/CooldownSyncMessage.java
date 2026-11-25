@@ -1,6 +1,7 @@
 package com.susen36.babel.network.receive;
 
 import com.susen36.babel.network.ClientPacketHandler;
+import com.susen36.babel.network.ClientboundHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
@@ -35,8 +36,6 @@ public class CooldownSyncMessage {
         return new CooldownSyncMessage(resourceLocation, buffer.readLong(), buffer.readLong());
     };
 
-    public static final BiConsumer<CooldownSyncMessage, Supplier<NetworkEvent.Context>> HANDLER = (message, ctx) -> {
-        ctx.get().enqueueWork(() -> ClientPacketHandler.handle(message));
-        ctx.get().setPacketHandled(true);
-    };
+    public static final BiConsumer<CooldownSyncMessage, Supplier<NetworkEvent.Context>> HANDLER =
+            ClientboundHandler.create(() -> ClientPacketHandler::handle);
 }

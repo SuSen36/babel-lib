@@ -11,7 +11,16 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "babel:vampires_bed_block"
+          "name": "babel:vampires_bed",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "babel:vampires_bed_block",
+              "properties": {
+                "part": "head"
+              }
+            }
+          ]
         }
       ],
       "rolls": 1.0

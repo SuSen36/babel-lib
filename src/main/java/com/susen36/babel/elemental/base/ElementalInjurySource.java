@@ -1,5 +1,6 @@
 package com.susen36.babel.elemental.base;
 
+import com.susen36.babel.api.elemental.ElementSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -9,8 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 // 元素损伤来源描述：来源类别加可选原始对象，供事件订阅方区分直接攻击、投射物、方块、物品与指令等来源。
-public record ElementalInjurySource<T>(FactorType factor, @Nullable T source) {
-    public enum FactorType { DAMAGE, ENTITY_DIRECT, ENTITY_INDIRECT, BLOCK, ITEM, VOID, COMMAND, OTHER }
+public record ElementalInjurySource<T>(FactorType factor, @Nullable T source) implements ElementSource<T> {
 
     public static <T> ElementalInjurySource<T> from(LivingEntity direct, @Nullable LivingEntity indirect) {
         return new ElementalInjurySource<>(FactorType.ENTITY_DIRECT, (T) direct);
@@ -48,14 +48,17 @@ public record ElementalInjurySource<T>(FactorType factor, @Nullable T source) {
         return new ElementalInjurySource<>(FactorType.COMMAND, (T) source);
     }
 
+    @Override
     public boolean isDirectEntity() {
         return this.factor == FactorType.ENTITY_DIRECT;
     }
 
+    @Override
     public boolean isIndirectEntity() {
         return this.factor == FactorType.ENTITY_INDIRECT || this.factor == FactorType.ENTITY_DIRECT;
     }
 
+    @Override
     public @Nullable Entity getAttackerEntity() {
         if (this.factor == FactorType.ENTITY_DIRECT) return (Entity) this.source;
         return null;

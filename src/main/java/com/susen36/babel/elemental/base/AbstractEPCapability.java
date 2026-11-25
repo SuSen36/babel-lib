@@ -1,11 +1,15 @@
 package com.susen36.babel.elemental.base;
 
 import com.susen36.babel.BabelMod;
+import com.susen36.babel.api.elemental.ElementType;
+import com.susen36.babel.api.elemental.HurtResult;
 import com.susen36.babel.capability.BabelCapability;
 import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.elemental.*;
 import com.susen36.babel.init.BabelAttributes;
+import com.susen36.babel.init.BabelDamageTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,23 +26,40 @@ import java.util.function.Function;
 public abstract class AbstractEPCapability implements INBTSerializable<CompoundTag> {
 
     public enum EPType {
-        NERVOUS("nervous", "nervous", "sanity", NervousInjury::new),
-        CORROSION("corrosion", "corrosion", "water", CorrosionInjury::new),
-        BURN("burn", "burn", "fire", BurnInjury::new),
-        NECROSIS("necrosis", "necrosis", "dark", NecrosisInjury::new),
-        FRENZY("frenzy", "frenzy", "anger", FrenzyInjury::new),
-        EMPTY("empty", "empty", "empty", null);
+        NERVOUS(ElementType.NERVOUS, "nervous", "nervous", "sanity", NervousInjury::new),
+        CORROSION(ElementType.CORROSION, "corrosion", "corrosion", "water", CorrosionInjury::new),
+        BURN(ElementType.BURN, "burn", "burn", "fire", BurnInjury::new),
+        NECROSIS(ElementType.NECROSIS, "necrosis", "necrosis", "dark", NecrosisInjury::new),
+        FRENZY(ElementType.FRENZY, "frenzy", "frenzy", "anger", FrenzyInjury::new),
+        EMPTY(ElementType.EMPTY, "empty", "empty", "empty", null);
 
+        private final ElementType apiType;
         private final String nickName;
         private final String descriptionID;
         private final String textureName;
         private final @Nullable Function<LivingEntity, AbstractEPCapability> factory;
 
-        EPType(String nickName, String descriptionID, String textureName, @Nullable Function<LivingEntity, AbstractEPCapability> factory) {
+        EPType(ElementType apiType, String nickName, String descriptionID, String textureName, @Nullable Function<LivingEntity, AbstractEPCapability> factory) {
+            this.apiType = apiType;
             this.nickName = nickName;
             this.descriptionID = "ep_type." + BabelMod.MODID + "." + descriptionID;
             this.textureName = textureName;
             this.factory = factory;
+        }
+
+        public ElementType apiType() {
+            return apiType;
+        }
+
+        public static EPType fromApi(ElementType type) {
+            return switch (type) {
+                case NERVOUS -> NERVOUS;
+                case CORROSION -> CORROSION;
+                case BURN -> BURN;
+                case NECROSIS -> NECROSIS;
+                case FRENZY -> FRENZY;
+                case EMPTY -> EMPTY;
+            };
         }
 
         public String getNickName() {
@@ -79,31 +100,8 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
         }
     }
 
-    public record HurtResult(
-            boolean failed,
-            boolean shouldBurst,
-            HurtReason reason,
-            int damage,
-            int burstDamage,
-            @Nullable ElementalInjurySource<?> source
-    ) {
-        public static HurtResult fail(int damage, ElementalInjurySource<?> src) {
-            return new HurtResult(true, false, HurtReason.FAILED, damage, 0, src);
-        }
-
-        public static HurtResult success(boolean burst, HurtReason why, int damage, int burstDamage, ElementalInjurySource<?> src) {
-            return new HurtResult(false, burst, why, damage, burstDamage, src);
-        }
-    }
-
-    protected enum HurtReason {
-        LOCKED,
-        RESISTED,
-        THRESHOLD,
-        NORMAL,
-        FAILED
-    }
-
+    private static final int REFERENCE_BURST_DAMAGE = 6;
+    private float burstDamageScale = 1.0F;
     protected final EPType type;
     protected final LivingEntity livingEntity;
     protected int value;
@@ -134,6 +132,17 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
     }
 
     public final void doBurst() {
+        doBurst(REFERENCE_BURST_DAMAGE, 1.0F);
+    }
+
+    public final void doBurst(int baseDamage, float damageMultiplier) {
+        if (!Float.isFinite(damageMultiplier) || damageMultiplier < 0.0F) {
+            throw new IllegalArgumentException("Burst damage multiplier must be finite and non-negative");
+        }
+        // 基数 6 对齐历史档位；限制溢出的自然增幅，不限制监听器有意设置的倍率。
+        float naturalScale = Mth.clamp(1.0F + (baseDamage - (float) REFERENCE_BURST_DAMAGE) * 0.02F, 0.8F, 1.2F);
+        burstDamageScale = (float) Math.min((double) naturalScale * damageMultiplier, Float.MAX_VALUE);
+        dirty = true;
         EPCapability ep = BabelCapability.getEP(livingEntity);
         if (ep != null) {
             ep.setUnderBreak(maxReviveTick);
@@ -142,6 +151,13 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
             doPlayerBurst();
         }
         else doNonPlayerBurst();
+    }
+
+    protected final void applyBurstDamage(float referenceDamage) {
+        float damage = (float) Math.min((double) referenceDamage * burstDamageScale, Float.MAX_VALUE);
+        if (damage > 0.0F && !livingEntity.level().isClientSide) {
+            livingEntity.hurt(BabelDamageTypes.source(livingEntity.level(), BabelDamageTypes.ELEMENT_BREAK), damage);
+        }
     }
 
     public EPType getType() {
@@ -201,7 +217,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
 
     public HurtResult hurtAndBurst(ElementalInjurySource<?> source, int amount) {
         if (isImmune(source)) {
-            return HurtResult.fail(amount, source);
+            return new HurtResult(true, false, HurtResult.Reason.FAILED, amount, 0, source);
         }
         AttributeInstance thresholdAttr = livingEntity.getAttribute(BabelAttributes.MAX_ELEMENTAL_VALUE.get());
         AttributeInstance resistanceAttr = livingEntity.getAttribute(BabelAttributes.ELEMENTAL_RESISTANCE.get());
@@ -211,7 +227,7 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
         float effectiveAmountF = Mth.clamp((float) amount * (1.0F - resistance * 0.01F), 0.0F, Float.MAX_VALUE);
         int effectiveAmount = Mth.floor(effectiveAmountF);
         if (effectiveAmount <= 0) {
-            return HurtResult.success(false, HurtReason.RESISTED, 0, 0, source);
+            return new HurtResult(false, false, HurtResult.Reason.RESISTED, 0, 0, source);
         }
         int previousValue = value;
         value = Mth.clamp(value - effectiveAmount, 0, getMaxValue());
@@ -221,12 +237,12 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
 
         if (shouldBurst(source)) {
             float overkill = (float) effectiveAmount - previousValue;
-            int burstDamage = Mth.floor(Mth.clamp(overkill * 0.1F + 6.0F, 6.0F, threshold * 0.4F));
+            int burstDamage = Mth.floor(Mth.clamp(overkill * 0.1F + REFERENCE_BURST_DAMAGE, REFERENCE_BURST_DAMAGE, threshold * 0.4F));
             reviveTick = maxReviveTick;
             setImmune(maxReviveTick);
-            return HurtResult.success(true, HurtReason.NORMAL, effectiveAmount, burstDamage, source);
+            return new HurtResult(false, true, HurtResult.Reason.NORMAL, effectiveAmount, burstDamage, source);
         }
-        return HurtResult.success(false, HurtReason.NORMAL, effectiveAmount, 0, source);
+        return new HurtResult(false, false, HurtResult.Reason.NORMAL, effectiveAmount, 0, source);
     }
 
     public int hurt(ElementalInjurySource<?> source, int amount) {
@@ -250,14 +266,16 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
     public void onReviveTick() {
         int maxValue = getMaxValue();
         reviveTick--;
-        value = Mth.floor(maxValue * (maxReviveTick - reviveTick) / (float) maxReviveTick);
+        int elapsed = Mth.clamp(maxReviveTick - reviveTick, 0, maxReviveTick);
+        value = (int) ((long) maxValue * elapsed / maxReviveTick);
         this.dirty = true;
         burstTick();
     }
 
     public void doBesideBurst(int lockTime) {
-        if (underBurst()) return;
-        setImmune(Math.max(immunityTick, lockTime));
+        if (!underBurst() && immunityTick != -1) {
+            setImmune(Math.max(immunityTick, lockTime));
+        }
     }
 
     public void restoreValue() {
@@ -304,15 +322,21 @@ public abstract class AbstractEPCapability implements INBTSerializable<CompoundT
         tag.putInt(type.getNickName() + ".maxReviveTick", maxReviveTick);
         tag.putInt(type.getNickName() + ".leftReviveTick", reviveTick);
         tag.putInt(type.getNickName() + ".immunityTick", immunityTick);
+        if (underBurst() && burstDamageScale != 1.0F) {
+            tag.putFloat("burstDamageScale", burstDamageScale);
+        }
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
+        float scale = tag.contains("burstDamageScale", Tag.TAG_FLOAT) ? tag.getFloat("burstDamageScale") : 1.0F;
+        burstDamageScale = Float.isFinite(scale) && scale >= 0.0F ? scale : 1.0F;
         String prefix = type.getNickName() + ".";
         if (tag.contains(prefix + "injury")) this.value = Mth.clamp(tag.getInt(prefix + "injury"), 0, getMaxValue());
-        if (tag.contains(prefix + "maxReviveTick")) this.maxReviveTick = tag.getInt(prefix + "maxReviveTick");
+        if (tag.contains(prefix + "maxReviveTick")) this.maxReviveTick = Math.max(1, tag.getInt(prefix + "maxReviveTick"));
         if (tag.contains(prefix + "leftReviveTick")) this.reviveTick = tag.getInt(prefix + "leftReviveTick");
+        this.reviveTick = Mth.clamp(this.reviveTick, 0, this.maxReviveTick);
         if (tag.contains(prefix + "immunityTick")) this.immunityTick = tag.getInt(prefix + "immunityTick");
     }
 }

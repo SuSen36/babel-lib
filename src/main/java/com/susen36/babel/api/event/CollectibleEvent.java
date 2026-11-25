@@ -1,11 +1,7 @@
 package com.susen36.babel.api.event;
 
-import com.susen36.babel.BabelConfig;
-import com.susen36.babel.collectible.Collectibles;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
 /**
@@ -13,9 +9,9 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
  * <p>
  * 三个子事件：
  * <ul>
- *   <li>{@link Used}        - 玩家使用（获得）收集品，由 {@code CollectibleItem.finishUsingItem} 或 {@code Collectibles.activateAndSync} 触发</li>
- *   <li>{@link Removed}     - 玩家移除收集品，由库外部调用 {@link #onRemoved} 触发</li>
- *   <li>{@link LayerChanged}- 收集品层级变更，由库外部调用 {@link #onLayerChanged} 触发</li>
+ *   <li>{@link Used}        - 玩家使用（获得）收集品，成功激活时触发</li>
+ *   <li>{@link Removed}     - 玩家移除收集品</li>
+ *   <li>{@link LayerChanged}- 收集品层级变更</li>
  * </ul>
  */
 public class CollectibleEvent extends PlayerEvent {
@@ -60,20 +56,5 @@ public class CollectibleEvent extends PlayerEvent {
         public int getNewLayer() {
             return newLayer;
         }
-    }
-
-    public static void onUsed(Player player, Item item) {
-        if (player.level() instanceof ServerLevel serverLevel) {
-            Collectibles.getCooldownData(player).setCooldownEndTick(item, serverLevel.getServer(), BabelConfig.collectibleDurationTicks);
-        }
-        MinecraftForge.EVENT_BUS.post(new Used(player, item));
-    }
-
-    public static void onRemoved(Player player, Item item) {
-        MinecraftForge.EVENT_BUS.post(new Removed(player, item));
-    }
-
-    public static void onLayerChanged(Player player, Item item, int newLayer) {
-        MinecraftForge.EVENT_BUS.post(new LayerChanged(player, item, newLayer));
     }
 }

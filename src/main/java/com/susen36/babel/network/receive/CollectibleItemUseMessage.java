@@ -1,6 +1,7 @@
 package com.susen36.babel.network.receive;
 
 import com.susen36.babel.network.ClientPacketHandler;
+import com.susen36.babel.network.ClientboundHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
@@ -24,8 +25,6 @@ public class CollectibleItemUseMessage {
     public static final Function<FriendlyByteBuf, CollectibleItemUseMessage> DECODER = buffer ->
             new CollectibleItemUseMessage(buffer.readResourceLocation());
 
-    public static final BiConsumer<CollectibleItemUseMessage, Supplier<NetworkEvent.Context>> HANDLER = (message, ctx) -> {
-        ctx.get().enqueueWork(() -> ClientPacketHandler.handle(message));
-        ctx.get().setPacketHandled(true);
-    };
+    public static final BiConsumer<CollectibleItemUseMessage, Supplier<NetworkEvent.Context>> HANDLER =
+            ClientboundHandler.create(() -> ClientPacketHandler::handle);
 }

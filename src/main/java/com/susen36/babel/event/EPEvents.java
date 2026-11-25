@@ -79,12 +79,14 @@ public class EPEvents {
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public static void handleElementalAttackDamage(LivingDamageEvent event) {
         LivingEntity target = event.getEntity();
-        Entity sourceEntity = event.getSource().getEntity();
+        DamageSource source = event.getSource();
+        Entity sourceEntity = source.getEntity();
         LivingEntity attacker = sourceEntity instanceof Projectile projectile && projectile.getOwner() instanceof LivingEntity owner
                 ? owner : sourceEntity instanceof LivingEntity living ? living : null;
 
         if (attacker != null) {
-            EPManager.ElementalAttackConfig attackConfig = EPManager.getElementalAttackConfig(attacker);
+            Entity directEntity = source.getDirectEntity();
+            EPManager.ElementalAttackConfig attackConfig = EPManager.getElementalAttackConfig(attacker, directEntity != null ? directEntity : attacker);
             AbstractEPCapability.EPType epType = attackConfig.type();
             double rate = attackConfig.rate();
             double injuryDamage = attackConfig.injuryDamage();

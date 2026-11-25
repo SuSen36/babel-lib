@@ -8,6 +8,7 @@ import com.susen36.babel.network.receive.*;
 import com.susen36.babel.util.CooldownUtils;
 import com.susen36.babel.util.RobberyClientUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,7 +23,7 @@ public class ClientPacketHandler {
 
     public static void handle(EPSyncMessage message) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level != null) {
+        if (mc.level != null && message.nbt != null) {
             Entity entity = mc.level.getEntity(message.entityId);
             if (entity instanceof LivingEntity living) {
                 EPCapability ep = BabelCapability.getEP(living);
@@ -35,7 +36,7 @@ public class ClientPacketHandler {
 
     public static void handle(LivesSyncMessage message) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level != null) {
+        if (mc.level != null && message.nbt != null) {
             Entity entity = mc.level.getEntity(message.entityId);
             if (entity instanceof LivingEntity living) {
                 HealthCapability health = BabelCapability.getHealth(living);
@@ -48,10 +49,11 @@ public class ClientPacketHandler {
 
     public static void handle(CollectibleSyncMessage message) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level != null) {
+        if (mc.level != null && message.data != null) {
             Entity entity = mc.level.getEntity(message.playerId);
-            if (entity instanceof Player player) {
-                Collectibles.deserializeStates(player, message.data.getList("states", Tag.TAG_COMPOUND));
+            if (entity instanceof Player player && message.data.get("states") instanceof ListTag states
+                    && (states.isEmpty() || states.getElementType() == Tag.TAG_COMPOUND)) {
+                Collectibles.deserializeStates(player, states);
             }
         }
     }

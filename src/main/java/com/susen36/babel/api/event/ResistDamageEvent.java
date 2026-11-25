@@ -2,7 +2,6 @@ package com.susen36.babel.api.event;
 
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
 
 /**
@@ -48,17 +47,5 @@ public class ResistDamageEvent extends LivingEvent {
         public MagicResistance(LivingEntity entity, DamageSource source, float amount, double value) {
             super(entity, source, amount, value);
         }
-    }
-
-    public static double modifyEffectiveDefenseValue(LivingEntity entity, DamageSource source, float amount, double value) {
-        Defense event = new Defense(entity, source, amount, value);
-        MinecraftForge.EVENT_BUS.post(event);
-        return event.getAttrValue();
-    }
-
-    public static double modifyEffectiveResistanceValue(LivingEntity entity, DamageSource source, float amount, double value) {
-        MagicResistance event = new MagicResistance(entity, source, amount, value);
-        MinecraftForge.EVENT_BUS.post(event);
-        return event.getAttrValue();
     }
 }

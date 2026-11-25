@@ -1,0 +1,28 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "com.susen36.babel.mixin",
+  "refmap": "babel.refmap.json",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "AbstractVillagerMixin",
+    "BeaconBlockEntityMixin",
+    "CarvedPumpkinBlockMixin",
+    "CreeperMixin",
+    "CrossbowItemMixin",
+    "EnderManMixin",
+    "PlayerMixin",
+    "ThrownTridentMixin",
+    "VillagerMixin"
+  ],
+  "client": [
+    "EntityRendererMixin",
+    "LivingEntityRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

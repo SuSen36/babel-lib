@@ -4,10 +4,10 @@ import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.susen36.babel.BabelConfig;
-import com.susen36.babel.api.event.CollectibleDropEvent;
 import com.susen36.babel.collectible.CollectibleLike;
 import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.collectible.Collectibles;
+import com.susen36.babel.event.BabelEventFactory;
 import com.susen36.babel.init.BabelEntityTypeTags;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.world.entity.Entity;
@@ -46,7 +46,7 @@ public class CollectibleLootModifier extends LootModifier {
         String path = context.getQueriedLootTableId().getPath();
         if (path.startsWith("chests/")) {
             // chance 上限 0.99 防止配置为 1.0 时几何分布退化
-            float chance = (float) Math.min(BabelConfig.collectibleLootChance, 0.99);
+            float chance = (float) Math.min(BabelConfig.COLLECTIBLE_LOOT_CHANCE.get(), 0.99);
             if (chance > 0.0F) {
                 for (int i = 0; i < MAX_DROPS; i++) {
                     if (context.getRandom().nextFloat() < chance) {
@@ -61,7 +61,7 @@ public class CollectibleLootModifier extends LootModifier {
                 boolean boss = victim.getType().is(BabelEntityTypeTags.FORGE_BOSSES);
                 float chance = boss ? CHANCE_GUARANTEED
                         : victim.getType().is(BabelEntityTypeTags.ELITE) ? CHANCE_ELITE : CHANCE_NORMAL;
-                chance = CollectibleDropEvent.fire(context, boss, chance);
+                chance = BabelEventFactory.collectibleDropChance(context, boss, chance);
                 if (context.getRandom().nextFloat() < chance) {
                     if (boss) {
                         List<RegistryObject<Item>> advanced = new ArrayList<>();

@@ -23,6 +23,7 @@ public class DataGenerators {
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 
+        generator.addProvider(event.includeServer(), new BabelLootModifierProvider(output));
         generator.addProvider(event.includeServer(), new DamageTypeTagsProvider(output, lookupProvider, existingFileHelper));
         generator.addProvider(event.includeServer(), new EntityTypeTagsProvider(output, lookupProvider, existingFileHelper));
     }

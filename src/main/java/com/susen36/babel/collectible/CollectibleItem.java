@@ -1,19 +1,21 @@
 package com.susen36.babel.collectible;
 
 import com.susen36.babel.BabelConfig;
-import com.susen36.babel.api.event.CollectibleEvent;
 import com.susen36.babel.api.event.ElementEvent;
 import com.susen36.babel.api.event.LifePointConsumeEvent;
 import com.susen36.babel.difficulty.NDifficulty;
+import com.susen36.babel.event.BabelEventFactory;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -112,7 +114,7 @@ public class CollectibleItem extends Item implements CollectibleLike {
      * 每行优先读取 description_N.<难度小写>，缺失时回退 description_N（EASY 默认文案）。
      */
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @NotNull Level level, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
         String descKey = this.getDescriptionId() + ".description";
         // 描述难度变体键：expert 为顶格挡位，险境及以上并入 expert
@@ -122,16 +124,16 @@ public class CollectibleItem extends Item implements CollectibleLike {
             case HARD -> "hard";
             case EXPERT, PERILOUS -> "expert";
         };
+        Language language = Language.getInstance();
         for (int i = 0; ; i++) {
             String key = descKey + "_" + i;
             String tieredKey = key + tierSuffix;
-            MutableComponent tiered = Component.translatable(tieredKey);
-            MutableComponent line = tiered.getString().equals(tieredKey)
-                    ? Component.translatable(key)
-                    : tiered;
-            if (line.getString().equals(key)) {
+            if (language.has(tieredKey)) {
+                key = tieredKey;
+            } else if (!language.has(key)) {
                 break;
             }
+            MutableComponent line = Component.translatable(key);
             if (i == 0) {
                 tooltip.add(line.withStyle(ChatFormatting.AQUA));
             } else {
@@ -167,7 +169,7 @@ public class CollectibleItem extends Item implements CollectibleLike {
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean isBanned() {
-        return tier == CollectibleTiers.ADVANCED && BabelConfig.banAdvancedCollectibles;
+        return tier == CollectibleTiers.ADVANCED && BabelConfig.BAN_ADVANCED_COLLECTIBLES.get();
     }
 
     @Override
@@ -209,10 +211,9 @@ public class CollectibleItem extends Item implements CollectibleLike {
             @NotNull LivingEntity livingEntity
     ) {
         ItemStack result = stack;
-        if (livingEntity instanceof Player player && level instanceof ServerLevel) {
-            // 冷却中可重复使用：每次使用重新触发完整激活流程，冷却由 Used 事件监听器统一重置
+        if (livingEntity instanceof Player player && level instanceof ServerLevel serverLevel) {
             if (canAlwaysUse || !isBanned()) {
-                activate(level, player, stack, this);
+                activate(serverLevel, player, stack, this);
                 if (consumeOnActivation()) {
                     result = consumeSelf(stack, player);
                 }
@@ -250,32 +251,37 @@ public class CollectibleItem extends Item implements CollectibleLike {
         double x = player.getX();
         double y = player.getY();
         double z = player.getZ();
-        var sound = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("minecraft", "block.chest.locked"));
-        if (sound == null)
-            throw new RuntimeException("cannot found sound event: block.chest.locked");
-        level.playSound(
-                null,
-                BlockPos.containing(x, y, z),
-                sound,
-                SoundSource.NEUTRAL,
-                activation.volume(),
-                activation.pitch()
-        );
+        SoundEvent sound = ForgeRegistries.SOUND_EVENTS.getValue(SoundEvents.CHEST_LOCKED.getLocation());
+        if (sound != null) {
+            level.playSound(
+                    null,
+                    BlockPos.containing(x, y, z),
+                    sound,
+                    SoundSource.NEUTRAL,
+                    activation.volume(),
+                    activation.pitch()
+            );
+        }
     }
 
-    void activate(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack, @NotNull Item item) {
+    /** 有藏品数据时先更新并同步冷却；缺少数据只跳过状态写入，不跳过 Used 通知和激活效果。 */
+    void activate(@NotNull ServerLevel level, @NotNull Player player, @NotNull ItemStack stack, @NotNull Item item) {
+        CollectibleEffect effect = prepareActivation(player);
         Collectibles data = Collectibles.getData(player);
         if (data != null) {
-            // 重新激活视为重新获取，清除上一次的已使用开关
             data.unmarkUsedUp(item);
             data.markUsed(item);
+            data.cooldown.setCooldownEndTick(item, level.getServer(), BabelConfig.COLLECTIBLE_DURATION_TICKS.get());
         }
-        CollectibleEvent.onUsed(player, item);
+        BabelEventFactory.onUsed(player, item);
         playSuccess(level, player, stack);
-        onEffectStarted(stack, level, player);
-        if (level instanceof ServerLevel) {
-            BabelNetwork.syncCollectibles(player);
-        }
+        effect.onEffectStarted(stack, level, player);
+        BabelNetwork.syncCollectibles(player);
+    }
+
+    /** 在标记激活和发布 Used 事件前捕获本次使用所需的状态；效果仍在原回调位置结算。 */
+    protected CollectibleEffect prepareActivation(Player player) {
+        return this::onEffectStarted;
     }
 
     /** 激活后是否立即消耗物品；触发型藏品可延后到效果结算时消耗。 */
@@ -297,11 +303,11 @@ public class CollectibleItem extends Item implements CollectibleLike {
     @Override
     public final void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, level, entity, slot, selected);
-        if (activation.autoUseOnGain() && entity instanceof Player player && entity.tickCount % 10 == 0) {
+        if (level instanceof ServerLevel serverLevel && activation.autoUseOnGain() && entity instanceof Player player && entity.tickCount % 10 == 0) {
             Collectibles data = Collectibles.getData(player);
             Item item = stack.getItem();
             if (data != null && !data.isUsed(item) && !isBanned()) {
-                activate(level, player, stack, item);
+                activate(serverLevel, player, stack, item);
                 if (!player.getAbilities().instabuild) {
                     stack.shrink(1);
                 }
@@ -351,7 +357,7 @@ public class CollectibleItem extends Item implements CollectibleLike {
         public static final AttributeStacks ONE_STACK = (player, self) -> 1;
 
         public static final AttributeStacks LAYER_STACKS = (player, self) ->
-                Collectibles.getLayerData(player).getLayer(self);
+                Collectibles.getLayerOrDefault(player, self);
 
         /** 固定值通道：收藏品激活期间恒定 perStack 加成；注册期即确定数值，不经过运行时上下文，无法读取玩家或世界状态。 */
         protected final CustomCollectibleItem addAttributeModifier(Attribute attribute, double perStack, AttributeModifier.Operation operation) {
@@ -380,17 +386,12 @@ public class CollectibleItem extends Item implements CollectibleLike {
 
         protected static boolean matchesConfigured(Iterable<? extends String> rules, String name) {
             boolean matched = false;
-            for (String rule : rules) {
-                if (name != null && ("*".equals(rule) || name.equals(rule))) {
-                    matched = true;
-                } else if (rule != null && name != null) {
-                    int wildcardIndex = rule.indexOf('*');
-                    if (wildcardIndex > 0 && name.startsWith(rule.substring(0, wildcardIndex))) {
-                        matched = true;
+            for (Object entry : rules) {
+                if (name != null && entry instanceof String rule && BabelConfig.isValidRegistryRule(rule)) {
+                    matched = rule.endsWith("*") ? name.regionMatches(0, rule, 0, rule.length() - 1) : name.equals(rule);
+                    if (matched) {
+                        break;
                     }
-                }
-                if (matched) {
-                    break;
                 }
             }
             return matched;

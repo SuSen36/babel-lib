@@ -282,7 +282,7 @@ public class CannotEntity extends AbstractVillager {
                     available.add(offer);
                 }
             }
-            int dropCount = Math.max(1, available.size() * 3 / 5);
+            int dropCount = available.isEmpty() ? 0 : Math.max(1, available.size() * 3 / 5);
             for (int i = 0; i < dropCount; i++) {
                 this.spawnAtLocation(available.remove(this.getRandom().nextInt(available.size())).getResult().copy());
             }

@@ -1,10 +1,12 @@
 package com.susen36.babel.network.receive;
 
 import com.susen36.babel.network.ClientPacketHandler;
+import com.susen36.babel.network.ClientboundHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
+import javax.annotation.Nullable;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -22,9 +24,10 @@ import java.util.function.Supplier;
 public class CollectibleSyncMessage {
 
     public final int playerId;
+    @Nullable
     public final CompoundTag data;
 
-    public CollectibleSyncMessage(int playerId, CompoundTag data) {
+    public CollectibleSyncMessage(int playerId, @Nullable CompoundTag data) {
         this.playerId = playerId;
         this.data = data;
     }
@@ -37,8 +40,6 @@ public class CollectibleSyncMessage {
     public static final Function<FriendlyByteBuf, CollectibleSyncMessage> DECODER = buffer ->
             new CollectibleSyncMessage(buffer.readInt(), buffer.readNbt());
 
-    public static final BiConsumer<CollectibleSyncMessage, Supplier<NetworkEvent.Context>> HANDLER = (message, ctx) -> {
-        ctx.get().enqueueWork(() -> ClientPacketHandler.handle(message));
-        ctx.get().setPacketHandled(true);
-    };
+    public static final BiConsumer<CollectibleSyncMessage, Supplier<NetworkEvent.Context>> HANDLER =
+            ClientboundHandler.create(() -> ClientPacketHandler::handle);
 }

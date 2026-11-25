@@ -1,10 +1,10 @@
 package com.susen36.babel.menu;
 
-import com.susen36.babel.api.event.LostAndFoundEvent;
 import com.susen36.babel.collectible.CollectibleItem;
 import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.entity.CannotEntity;
+import com.susen36.babel.event.BabelEventFactory;
 import com.susen36.babel.init.BabelMenus;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -170,27 +170,39 @@ public class CannotMenu extends AbstractContainerMenu {
         if (!player.level().isClientSide() && player instanceof ServerPlayer serverPlayer
                 && (this.traderEntity == null || this.traderEntity.hasLostAndFound())) {
             Collectibles data = Collectibles.getData(player);
-            List<Item> tradeable = new ArrayList<>();
-            List<Item> pool = new ArrayList<>();
-            for (RegistryObject<Item> entry : Collectibles.getRegistry().values()) {
-                Item candidate = entry.get();
-                if (data != null && data.isUsed(candidate)) {
-                    tradeable.add(candidate);
-                } else if (candidate instanceof CollectibleItem collectible && collectible.getTier() != CollectibleTiers.CURSED) {
-                    pool.add(candidate);
-                }
+            if (data != null) {
+                exchanged = this.exchangeCollectible(serverPlayer, data, index);
             }
-            if (index >= 0 && index < tradeable.size() && !pool.isEmpty()) {
-                Item lost = tradeable.get(index);
-                Item gained = LostAndFoundEvent.onPre(serverPlayer, this.traderEntity, lost, pool.get(player.getRandom().nextInt(pool.size())));
-                if (gained != null) {
-                    Collectibles.removeAndSync(serverPlayer, lost);
-                    Collectibles.activateAndSync(serverPlayer, gained);
+        }
+        return exchanged;
+    }
+
+    private boolean exchangeCollectible(ServerPlayer player, Collectibles data, int index) {
+        List<Item> tradeable = new ArrayList<>();
+        List<Item> pool = new ArrayList<>();
+        for (RegistryObject<Item> entry : Collectibles.getRegistry().values()) {
+            Item candidate = entry.get();
+            if (data.isUsed(candidate)) {
+                tradeable.add(candidate);
+            } else if (candidate instanceof CollectibleItem collectible && collectible.getTier() != CollectibleTiers.CURSED) {
+                pool.add(candidate);
+            }
+        }
+        boolean exchanged = false;
+        if (index >= 0 && index < tradeable.size() && !pool.isEmpty()) {
+            Item lost = tradeable.get(index);
+            Item gained = BabelEventFactory.beforeLostAndFound(player, this.traderEntity, lost, pool.get(player.getRandom().nextInt(pool.size())));
+            // Pre 和移除通知都可能使原能力失效，不能用新挂载的状态完成旧交易。
+            if (gained instanceof CollectibleItem && Collectibles.getData(player) == data && data.isUsed(lost)) {
+                boolean removed = Collectibles.removeAndSync(player, lost);
+                if (removed && Collectibles.getData(player) == data) {
+                    exchanged = Collectibles.activateAndSync(player, gained);
+                }
+                if (exchanged) {
                     if (this.traderEntity != null) {
                         this.traderEntity.setHasLostAndFound(false);
                     }
-                    LostAndFoundEvent.afterLostAndFound(serverPlayer, this.traderEntity, lost, gained);
-                    exchanged = true;
+                    BabelEventFactory.afterLostAndFound(player, this.traderEntity, lost, gained);
                 }
             }
         }

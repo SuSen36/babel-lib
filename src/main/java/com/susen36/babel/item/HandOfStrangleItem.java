@@ -51,6 +51,6 @@ public class HandOfStrangleItem extends CollectibleItem.CustomCollectibleItem {
 
     private static boolean isStrangleWeapon(ItemStack stack, String registryName) {
         return stack.is(Tags.Items.TOOLS_CROSSBOWS) || stack.getItem() instanceof CrossbowItem
-                || matchesConfigured(BabelConfig.handStrangleRecognizable, registryName);
+                || matchesConfigured(BabelConfig.HAND_STRANGLE_RECOGNIZABLE.get(), registryName);
     }
 }

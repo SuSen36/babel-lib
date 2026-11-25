@@ -19,7 +19,7 @@ public class ColdEvents {
     public static void onColdTrigger(LivingHurtEvent event) {
         LivingEntity target = event.getEntity();
         DamageSource source = event.getSource();
-        if (!target.level().isClientSide() && BabelConfig.coldToFrozen
+        if (!target.level().isClientSide() && BabelConfig.COLD_TO_FROZEN.get()
                 && source.is(DamageTypes.FREEZE) && target.canFreeze()) {
             if (target.getTicksFrozen() > 0) {
                 // 融化速率为每 tick -2，冻结时长取触发时寒冷的剩余时间

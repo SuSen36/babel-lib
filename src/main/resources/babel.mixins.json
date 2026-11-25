@@ -5,25 +5,11 @@
   "refmap": "babel.refmap.json",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "AbstractVillagerMixin",
-    "BeaconBlockEntityMixin",
     "BowItemMixin",
-    "CarvedPumpkinBlockMixin",
-    "CreeperMixin",
-    "CrossbowItemMixin",
-    "EnderManMixin",
     "EntityMixin",
     "LivingEntityMixin",
-    "LootModifierManagerMixin",
-    "PlayerMixin",
-    "ThrownTridentMixin",
-    "VillagerMixin",
     "WitherBossMixin",
     "WitherSkullMixin"
-  ],
-  "client": [
-    "EntityRendererMixin",
-    "LivingEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

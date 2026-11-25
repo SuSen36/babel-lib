@@ -1,7 +1,6 @@
 package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
-import com.susen36.babel.api.event.DodgeEvent;
 import com.susen36.babel.init.BabelAttributes;
 import com.susen36.babel.init.BabelDamageTags;
 import com.susen36.babel.init.BabelMobEffects;
@@ -34,7 +33,7 @@ public class DodgeEvents {
                 SimpleParticleType particle = DataUtils.isMagic(source) ? BabelParticles.MISS_MAGIC.get() : BabelParticles.MISS_PHYSICAL.get();
                 level.sendParticles(particle, target.getX(), target.getY(), target.getZ(), 6, 1, 1, 1, 0.1);
             }
-            DodgeEvent.postDodge(target, source);
+            BabelEventFactory.postDodge(target, source);
             event.setCanceled(true);
         }
     }

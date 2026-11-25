@@ -37,24 +37,28 @@ public class EPManager {
     }
 
     public static ElementalAttackConfig getElementalAttackConfig(Entity entity) {
-        LivingEntity attackerEntity = entity instanceof Projectile projectile && projectile.getOwner() instanceof LivingEntity owner  ? owner
+        LivingEntity attackerEntity = entity instanceof Projectile projectile && projectile.getOwner() instanceof LivingEntity owner ? owner
                 : entity instanceof LivingEntity living ? living : null;
+        return getElementalAttackConfig(attackerEntity, entity);
+    }
+
+    public static ElementalAttackConfig getElementalAttackConfig(@Nullable LivingEntity attackerEntity, Entity directEntity) {
         AbstractEPCapability.EPType type = AbstractEPCapability.EPType.NERVOUS;
         double rate = 0;
         double injuryDamage = 0;
         if (attackerEntity instanceof ElementalAttacker attacker) {
-            type = attacker.getElementalType();
+            type = AbstractEPCapability.EPType.fromApi(attacker.getElementalType());
             rate = attacker.getElementalRate();
-            injuryDamage = attacker.getElementalInjuryDamage(entity);
+            injuryDamage = attacker.getElementalInjuryDamage(directEntity);
         }
         if (attackerEntity != null) {
             for (EquipmentSlot slot : EquipmentSlot.values()) {
                 ItemStack stack = attackerEntity.getItemBySlot(slot);
                 if (stack.getItem() instanceof ElementalAttacker attacker) {
                     rate += attacker.getElementalRate();
-                    injuryDamage += attacker.getElementalInjuryDamage();
+                    injuryDamage += attacker.getElementalInjuryDamage(directEntity);
                     if (!(attackerEntity instanceof ElementalAttacker)) {
-                        type = attacker.getElementalType();
+                        type = AbstractEPCapability.EPType.fromApi(attacker.getElementalType());
                     }
                 }
             }
@@ -84,7 +88,7 @@ public class EPManager {
         double baseModifier = 1.0;
         double totalModifier = 1.0;
         if (entity instanceof ElementalDefender defender) {
-            type = defender.getElementalDefenseType();
+            type = AbstractEPCapability.EPType.fromApi(defender.getElementalDefenseType());
             baseModifier = defender.getElementalDefenseBaseModifier();
             totalModifier = defender.getElementalDefenseTotalModifier();
         }
@@ -93,7 +97,7 @@ public class EPManager {
         }
         for (MobEffectInstance effect : entity.getActiveEffects()) {
             if (effect.getEffect() instanceof ElementalDefenseModifier modifier
-                    && modifier.getElementalDefenseType() == type) {
+                    && modifier.getElementalDefenseType() == type.apiType()) {
                 baseModifier = modifier.modifyElementalDefenseBase(entity, baseModifier, effect.getAmplifier());
                 totalModifier = modifier.modifyElementalDefenseTotal(entity, totalModifier, effect.getAmplifier());
             }

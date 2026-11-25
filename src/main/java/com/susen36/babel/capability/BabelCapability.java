@@ -6,11 +6,13 @@ import com.susen36.babel.capability.health.HealthCapability;
 import com.susen36.babel.entity.robbery.RobberyCapability;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.*;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -19,6 +21,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 // Capability 注册与访问入口：为所有 LivingEntity 挂载 EP 与目标生命，为玩家额外挂载劫掠状态。
 // getEP / getHealth 可能返回 null，调用前需判空。
@@ -50,12 +53,17 @@ public class BabelCapability {
     @SubscribeEvent
     public static void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof LivingEntity living) {
-            CapabilityProvider provider = new CapabilityProvider(living);
-            event.addCapability(EP_CAP_ID, provider);
-            event.addCapability(HEALTH_CAP_ID, provider);
+            StoredCapability<EPCapability> ep = new StoredCapability<>(EP_CAP, "ep", () -> new EPCapability(living));
+            StoredCapability<HealthCapability> health = new StoredCapability<>(HEALTH_CAP, "health", () -> new HealthCapability(living));
+            event.addCapability(EP_CAP_ID, ep);
+            event.addCapability(HEALTH_CAP_ID, health);
+            event.addListener(ep.data::invalidate);
+            event.addListener(health.data::invalidate);
         }
         if (event.getObject() instanceof Player) {
-            event.addCapability(RobberyCapability.KEY, new RobberyCapability());
+            RobberyCapability robbery = new RobberyCapability();
+            event.addCapability(RobberyCapability.KEY, robbery);
+            event.addListener(robbery::invalidate);
         }
     }
 
@@ -71,47 +79,34 @@ public class BabelCapability {
         return entity.getCapability(HEALTH_CAP).orElse(null);
     }
 
-    public static class CapabilityProvider implements ICapabilitySerializable<CompoundTag> {
-        private final LazyOptional<EPCapability> epCap;
-        private final LazyOptional<HealthCapability> healthCap;
+    private static final class StoredCapability<T extends INBTSerializable<CompoundTag>> implements ICapabilitySerializable<CompoundTag> {
+        private final EntityCapabilityHandle<T> data;
+        private final String key;
 
-        public CapabilityProvider(LivingEntity living) {
-            this.epCap = LazyOptional.of(() -> new EPCapability(living));
-            this.healthCap = LazyOptional.of(() -> new HealthCapability(living));
+        private StoredCapability(Capability<T> type, String key, Supplier<T> factory) {
+            this.data = new EntityCapabilityHandle<>(type, factory);
+            this.key = key;
         }
 
         @Nonnull
         @Override
-        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-            if (cap == EP_CAP) {
-                return epCap.cast();
-            }
-            if (cap == HEALTH_CAP) {
-                return healthCap.cast();
-            }
-            return LazyOptional.empty();
+        public <R> LazyOptional<R> getCapability(@Nonnull Capability<R> cap, @Nullable Direction side) {
+            return data.getCapability(cap, side);
         }
 
         @Override
         public CompoundTag serializeNBT() {
             CompoundTag tag = new CompoundTag();
-            epCap.ifPresent(ep -> tag.put("ep", ep.serializeNBT()));
-            healthCap.ifPresent(health -> tag.put("health", health.serializeNBT()));
+            tag.put(key, data.get().serializeNBT());
             return tag;
         }
 
         @Override
         public void deserializeNBT(CompoundTag tag) {
-            epCap.ifPresent(ep -> {
-                if (tag.contains("ep")) {
-                    ep.deserializeNBT(tag.getCompound("ep"));
-                }
-            });
-            healthCap.ifPresent(health -> {
-                if (tag.contains("health")) {
-                    health.deserializeNBT(tag.getCompound("health"));
-                }
-            });
+            // 沿用旧键与子标签，只读取自己负责的分支，不重放另一键的副本。
+            if (tag.contains(key, Tag.TAG_COMPOUND)) {
+                data.get().deserializeNBT(tag.getCompound(key));
+            }
         }
     }
 }

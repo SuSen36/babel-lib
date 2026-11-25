@@ -18,7 +18,7 @@ public class PlayerLogInEventHandler {
 	public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
 		if (event.getEntity() instanceof ServerPlayer serverPlayer) {
 			ResourceLocation relicBanNoticeId = new ResourceLocation(BabelMod.MODID, "ban_relic_notice");
-			if (BabelConfig.banAdvancedCollectibles) {
+			if (BabelConfig.BAN_ADVANCED_COLLECTIBLES.get()) {
 				Advancement relicBanNoticeAdvancement = serverPlayer.server.getAdvancements().getAdvancement(relicBanNoticeId);
 				AdvancementProgress relicBanNoticeProgress = serverPlayer.getAdvancements().getOrStartProgress(relicBanNoticeAdvancement);
 				if (!relicBanNoticeProgress.isDone()) {

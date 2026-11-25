@@ -3,8 +3,8 @@ package com.susen36.babel.loot;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.susen36.babel.api.event.OriginiumIngotDropEvent;
 import com.susen36.babel.collectible.Collectibles;
+import com.susen36.babel.event.BabelEventFactory;
 import com.susen36.babel.init.BabelCollectible;
 import com.susen36.babel.init.BabelEntityTypeTags;
 import com.susen36.babel.init.BabelItems;
@@ -70,7 +70,7 @@ public class OriginiumIngotLootModifier extends LootModifier {
                 } else {
                     float chance = victim.getType().is(BabelEntityTypeTags.ELITE) ? CHANCE_ELITE : CHANCE_NORMAL;
                     if (context.getRandom().nextFloat() < chance) {
-                        float multiplier = OriginiumIngotDropEvent.fire(context, 1.0F);
+                        float multiplier = BabelEventFactory.originiumDropMultiplier(context, 1.0F);
                         int count = Mth.floor(multiplier);
                         if (context.getRandom().nextFloat() < multiplier - count) {
                             count++;

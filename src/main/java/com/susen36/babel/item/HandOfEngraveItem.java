@@ -48,7 +48,7 @@ public class HandOfEngraveItem extends CollectibleItem.CustomCollectibleItem {
         if (layer >= 0 && layer < 99 && victim instanceof LivingEntity living && ENEMY_OF_PLAYER.test(living, player)) {
             ItemStack mainHandItem = player.getMainHandItem();
             boolean validWeapon = mainHandItem.is(Items.TRIDENT) || mainHandItem.is(FORGE_TRIDENTS) || mainHandItem.is(ItemTags.AXES) || event.getSource().is(DamageTypes.TRIDENT)
-                    || matchesConfigured(BabelConfig.handEngraveRecognizable,
+                    || matchesConfigured(BabelConfig.HAND_ENGRAVE_RECOGNIZABLE.get(),
                             BuiltInRegistries.ITEM.getKey(mainHandItem.getItem()).toString());
             if (validWeapon) {
                 Collectibles.addLayerAndSync(player, this, 1);

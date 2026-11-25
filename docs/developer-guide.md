@@ -2,6 +2,8 @@
 
 本文面向需要依赖 Babel 的模组作者，说明对外稳定接口、事件时机与扩展流程。示例基于 Forge 1.20.1 与 Java 17。
 
+当前开发版本为 `1.2.53`。重构将分阶段推进到 `1.5.0`；[重构迁移指南](api-migration-1.5.0.md) 记录已落地的变化。从 `1.2.6` 升级时，使用旧签名的模组需重新编译。
+
 ## 目录
 
 - [依赖引入](#依赖引入)
@@ -26,7 +28,7 @@
 
 ```groovy
 dependencies {
-    implementation fg.deobf("com.susen36.babel:babel-lib:1.2.6")
+    implementation fg.deobf("com.susen36.babel:babel-lib:1.2.53")
 }
 ```
 
@@ -46,9 +48,9 @@ dependencies {
 
 | 包 | 定位 | 升级兼容性 |
 |---|---|---|
-| `com.susen36.babel.api` | 对外事件与实体接口 | 稳定，可放心依赖 |
-| `collectible` | 收藏品框架与物品基类 | 稳定 |
-| `elemental` | 元素损伤实现与 `EPManager` | 稳定 |
+| `com.susen36.babel.api` | 对外事件、元素类型、结算结果、注册接口与实体扩展接口 | 稳定，可放心依赖 |
+| `collectible` | 主动创建注册表、自定义物品及运行时操作 | 框架层，不属于事件 API |
+| `elemental` | 元素损伤实现与 `EPManager` | 框架层，不属于事件 API |
 | `capability` | EP / Health 两类 Capability | 稳定 |
 | `difficulty` | 难度等级与倍率工具 | 稳定 |
 | `client`、`mixin`、`datagen`、`init`、`network`、`event` | 内部实现 | 可能随版本变动 |
@@ -62,55 +64,27 @@ dependencies {
 | `ElementEvent.Hurt` | 元素损伤结算前 | 可取消；可改 `amount` |
 | `ElementEvent.PostHurt` | 元素损伤结算后 | 只读 |
 | `ElementEvent.Heal` | 元素损伤恢复前 | 可取消；可改 `amount` |
-| `ElementEvent.Burst` | 损伤攒满爆条时 | 只读 |
+| `ElementEvent.Burst` | 损伤攒满爆条时 | 可改伤害倍率，不可取消 |
 | `ResistDamageEvent.Defense` | 物理防御参与减伤 | 可改生效属性值 |
 | `ResistDamageEvent.MagicResistance` | 法术抗性参与减伤 | 可改生效属性值 |
 | `DodgeEvent` | 物理或法术闪避触发 | 只读 |
-| `LifePointConsumeEvent.Pre` | 目标生命扣除前 | 可取消 |
-| `LifePointConsumeEvent.Post` | 护盾 / 目标生命扣除时 | 可取消 |
+| `LifePointConsumeEvent.Pre` | 致命伤结算前 | 可取消以跳过保护、修改扣除方案、登记备用复活 |
+| `LifePointConsumeEvent.Post` | Babel 完成本次死亡保护判定后 | 只读；报告实际扣除量或复活 / 未阻止结果 |
 | `LivingAddEffectEvent` | 实体获得药水效果 | 可整体替换效果实例 |
-| `CollectibleEvent.Used` / `.Removed` / `.LayerChanged` | 收藏品使用 / 移除 / 层数变化 | 只读 |
+| `CollectibleEvent.Used` / `.Removed` / `.LayerChanged` | 服务端激活 / 整条状态移除（含过期）/ 实际层数变化；读档与客户端同步不重放 | 只读 |
 | `CollectibleDropEvent` | 实体死亡结算收藏品掉落 | 可改概率，设 0 阻止 |
-| `CollectibleRegisterEvent` | 收藏品注册表就绪 | 注入收藏品 |
 | `OriginiumIngotDropEvent` | 结算源石锭掉落 | 可改倍率，设 0 阻止 |
 | `LostAndFoundEvent.Pre` / `.Post` | 坎诺特兑换前 / 后 | `Pre` 可取消、可替换获得藏品 |
 
-所有事件都发布在 Forge 事件总线（`MinecraftForge.EVENT_BUS`），除 `CollectibleRegisterEvent` 发布在 mod 事件总线。
+以上玩法事件均发布在 `MinecraftForge.EVENT_BUS`。收藏品声明是加载回调，不是玩法事件。
 
-## 打开收藏品
+## 注册收藏品
 
-`CollectibleBuilder.create(modid, modBus)` 在 mod 构造阶段调用，内部会注册 `DeferredRegister<Item>` 并触发 `CollectibleRegisterEvent`，因此收藏品字段可直接写成 `public static final`：
+在模组构造函数中调用一次 `CollectibleRegistration.register(MOD_ID, modBus, MyCollectibles::declare)`，传入**自己的 mod 总线**。在 `declare(CollectibleRegistrar registrar)` 中声明本模组的全部藏品；相同路径可以出现在不同命名空间，同一命名空间不要重复安装。
 
-```java
-public final class MyCollectibles {
+构造阶段只安装监听器。所有模组构造完成后，Forge 在 `NewRegistryEvent` 阶段执行回调；这时可以保存 `RegistryObject<Item>`，不能取物品实例。在后续物品 `RegisterEvent` 中 Forge 才运行工厂。请在物品注册完成后读取句柄和运行时目录；若尚无声明或已声明的物品还未就绪，目录查询会报错，可以在注册完成后重试。
 
-    private static final CollectibleBuilder BUILDER =
-            CollectibleBuilder.create("mymod", FMLJavaModLoadingContext.get().getModEventBus());
-
-    public static final RegistryObject<Item> SAMPLE_RELIC = BUILDER.registerCollectible(
-            "sample_relic",                        // 注册名 → mymod:sample_relic
-            25,                                    // 使用耗时（tick）
-            false,                                 // 是否可无限次重复使用
-            CollectibleTiers.RARE,                 // 稀有度
-            new CollectibleItem.Levels(0, 3, 1),   // 层数 min / max / 默认
-            CollectibleActivation.standard(),      // 音效、粒子与是否自动使用
-            (stack, level, player) -> {            // 激活效果
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 1200, 0));
-            });
-}
-```
-
-已有注册表时也可以只注入：
-
-```java
-@SubscribeEvent
-public static void onRegister(CollectibleRegisterEvent event) {
-    event.builder().registerCollectible("other_relic",
-            (stack, level, player) -> player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 600, 1)));
-}
-```
-
-`registerCollectible` 提供多组重载：只给效果时使用默认 25 tick、普通稀有度、0–1 层；需要完整控制时使用七参版本（使用耗时、可重复使用、稀有度、层数、激活动画）。
+[完整示例及旧签名迁移](api-migration-1.5.0.md#示例二只用-api-注册自己命名空间的收藏品)。
 
 ## 运行时读写收藏品
 
@@ -150,11 +124,11 @@ long endTick = Collectibles.getCooldownData(player).getCooldownEndTick(relic);
 | `underBurst` / `isUnderBreak` | 是否处于爆条 / 破条状态 |
 | `isImmune` / `setImmune` / `setAllImmune` / `setPermanentImmunity` | 免疫控制 |
 
-损伤类型见 `AbstractEPCapability.EPType`：`NERVOUS`、`CORROSION`、`BURN`、`NECROSIS`、`FRENZY`，另有 `empty` 占位类型，传入占位类型时不产生效果。
+事件和实体扩展接口使用 `api.elemental.ElementType`；主动调用框架层 `EPManager` 时使用 `AbstractEPCapability.EPType`：`NERVOUS`、`CORROSION`、`BURN`、`NECROSIS`、`FRENZY`，另有 `empty` 占位类型，传入占位类型时不产生效果。
 
 ### 自定义攻击与防御
 
-- 实现 `ElementalAttacker`（实体或被攻击者任意装备栏物品）：提供损伤类型、累积速率与单次损伤值，多来源会累加。
+- 实现 `ElementalAttacker`（攻击实体或其任意装备栏物品）：提供损伤类型、累积速率与单次损伤值，多来源会累加。`getElementalInjuryDamage(Entity directEntity)` 在箭击时收到箭矢，近战时收到攻击者；无参实现仍由默认方法调用。装备和效果仍从攻击者读取。
 - 实现 `ElementalDefender`（受击实体）：提供受击时的损伤类型与基础 / 总倍率，未实现时按神经损伤与 1.0 倍率处理。
 - 实现 `ElementalAttackModifier` / `ElementalDefenseModifier`（通常由 `MobEffect` 实现）：在结算时修改倍率，防御侧仅在效果类型与受击方损伤类型一致时生效。
 
@@ -182,7 +156,7 @@ if (health != null) {
 
 `BabelCapability.getEP(living)` 返回 `EPCapability`，同样可能为 null。两者都由 Capability 系统自动挂到 `LivingEntity` 上并持久化，无需自行注册。
 
-致命伤害的扣除顺序为护盾 → 目标生命 → 真实死亡，对应 `LifePointConsumeEvent.Type` 的 `SHIELD`、`LIVES`、`FAIL`。
+默认先扣护盾，再扣目标生命（保留最后 1 点）；无法扣除时，执行已登记的备用复活，否则让死亡继续。`Post` 的结果依次可能是 `SHIELD`、`LIVES`、`REVIVED` 或 `FAIL`；不要取消 `Post`。参见[致命伤事件迁移示例](api-migration-1.5.0.md#致命伤保护与复活)。
 
 ## 难度
 
@@ -196,6 +170,8 @@ int scaled = NDifficulty.multiplier(world, 10, new float[]{1.0F, 1.2F, 1.5F, 2.0
 - `NDifficulty.acceptSynced` / `clearSynced` 由网络层使用，第三方无需调用。
 
 ## 掉落接入
+
+从 1.2.16 起，Babel 通过 Forge 全局战利品修改器加载掉落。高优先级数据包可覆盖 `data/babel/loot_modifiers/collectibles_in_chests.json` 或 `originium_ingot_from_entities.json`，保留原 `type` 并设置 `conditions`。这两个历史 ID 分别代表收藏品和源石锭，**两者都处理箱子和实体表**。仅限制 Babel 的一个修改器时请覆盖对应 JSON，不要用 `replace: true` 替换 Forge 全局清单，以免移除其他模组的条目。
 
 - 收藏品掉落：监听 `CollectibleDropEvent`，`isGuaranteed()` 为 true 表示 boss 必掉且固定取高级藏品；`setChance(0)` 阻止掉落。
 - 源石锭掉落：监听 `OriginiumIngotDropEvent`，倍率作用于基础数量 1，小数部分按概率进位（1.5 表示必掉 1 个且有 50% 再掉 1 个）。
@@ -227,8 +203,8 @@ int scaled = NDifficulty.multiplier(world, 10, new float[]{1.0F, 1.2F, 1.5F, 2.0
 
 ## 版本与兼容策略
 
-- 依赖时使用 `fg.deobf` 与固定版本；需要放宽可写 `[1.2,1.3)` 这类范围，避免小版本间的行为差异。
-- `api`、`collectible`、`elemental`、`capability`、`difficulty` 五个包内的公开类与事件名不会在小版本中删除；新增方法保持可选，已有方法签名不做破坏性变更。
+- 重构期间请用 `fg.deobf` 固定依赖到已验证的构建。例如，针对 `1.2.53` 验证后，下游可在 `mods.toml` 中用 `[1.2.53]` 精确匹配。
+- `1.5.0` 是重构目标，不是当前版本。后续升级逐版核对迁移指南，不预先声明兼容尚未验证的版本。
 - MixinExtras 由 jarJar 内嵌提供，依赖方不要重复打包，否则会出现重复类。
 - 升级前先对照本指南的事件表检查是否有新增的取消语义或参数变化。
 
@@ -254,4 +230,4 @@ Capability 由实体加入世界时附加，刚创建尚未入世界、或实体
 
 - 元素损伤、目标生命、护盾均为服务端结算，客户端只负责渲染，多人服务器下需客户端与服务端同时安装本模组。
 - 本模组通过 jarJar 内嵌 MixinExtras，作为依赖引入时不会把你的 MixinExtras 打包进本体。
-- Jade 为软依赖，JEI 仅编译期依赖，均不影响运行。
+- 玩家无需安装 Jade、JEI。开发环境默认仅使用编译依赖；要联调完整模组，运行 `gradlew runClient -PdevCompatRuntime=true`。开关只向本项目的 `runtimeClasspath` 加入完整模组，不向下游发布运行时依赖；即使在发布时开启也一样。Jade 的编译 API 仍取自 `jade_version` 固定的 CurseMaven 文件。

@@ -2,10 +2,12 @@ package com.susen36.babel.capability.ep;
 
 import com.mojang.datafixers.util.Pair;
 import com.susen36.babel.BabelMod;
+import com.susen36.babel.api.elemental.HurtResult;
 import com.susen36.babel.api.event.ElementEvent;
 import com.susen36.babel.elemental.*;
 import com.susen36.babel.elemental.base.AbstractEPCapability;
 import com.susen36.babel.elemental.base.ElementalInjurySource;
+import com.susen36.babel.event.BabelEventFactory;
 import com.susen36.babel.network.BabelNetwork;
 import com.susen36.babel.network.receive.EPSyncMessage;
 import net.minecraft.nbt.CompoundTag;
@@ -84,18 +86,21 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
         if (isEntityProtected()) return false;
         AbstractEPCapability ep = EP_TYPES.get(pType);
         if (ep != null) {
-            pAmount = ElementEvent.onElementalHurt(entity, pType, pSource, pAmount, hurtType, attacker);
-            if (pAmount <= 0) return false;
-            AbstractEPCapability.HurtResult result = ep.hurtAndBurst(pSource, pAmount);
-            ElementEvent.afterElementalHurt(entity, pType, pSource, result);
+            ElementEvent.Hurt event = BabelEventFactory.onElementalHurt(entity, pType.apiType(), pSource, pAmount, hurtType, attacker);
+            if (event.isCanceled()) return false;
+            HurtResult result = event.getAmount() == 0
+                    ? new HurtResult(true, false, HurtResult.Reason.ZERO_AMOUNT, 0, 0, pSource)
+                    : ep.hurtAndBurst(pSource, event.getAmount());
+            BabelEventFactory.afterElementalHurt(entity, pType.apiType(), pSource, result);
             if (!result.failed()) {
                 if (result.damage() > 0) {
                     this.resetRegenDelay();
                 }
                 if (result.shouldBurst()) {
-                    ElementEvent.onElementalBurst(entity, pType, pSource);
+                    int baseDamage = result.burstDamage();
+                    float damageMultiplier = BabelEventFactory.onElementalBurst(entity, pType.apiType(), pSource, baseDamage);
                     doOnBurst();
-                    ep.doBurst();
+                    ep.doBurst(baseDamage, damageMultiplier);
                 }
                 if (entity != null && !entity.level().isClientSide) {
                     this.syncDirty();
@@ -118,9 +123,9 @@ public class EPCapability implements INBTSerializable<CompoundTag> {
         if (pType.isEmpty()) return;
         AbstractEPCapability ep = EP_TYPES.get(pType);
         if (ep != null) {
-            pAmount = ElementEvent.onElementalHeal(entity, pType, ElementalInjurySource.fromNothing(), pAmount);
-            if (pAmount > 0) {
-                ep.heal(pAmount);
+            ElementEvent.Heal event = BabelEventFactory.onElementalHeal(entity, pType.apiType(), ElementalInjurySource.fromNothing(), pAmount);
+            if (!event.isCanceled() && event.getAmount() > 0) {
+                ep.heal(event.getAmount());
                 if (entity != null && !entity.level().isClientSide) {
                     this.syncDirty();
                 }

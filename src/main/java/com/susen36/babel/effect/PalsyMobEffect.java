@@ -11,7 +11,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 
 /**
- * 麻痹（Numb）药水效果。
+ * 麻痹（Paralysis）药水效果。
  * <p>
  * 属于 {@link MobEffectCategory#HARMFUL 有害} 类别，表现为深灰色粒子效果（颜色值 {@code -8355712}）。
  * <p>

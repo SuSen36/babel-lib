@@ -1,7 +1,6 @@
 package com.susen36.babel.event;
 
 import com.susen36.babel.BabelMod;
-import com.susen36.babel.api.event.ResistDamageEvent;
 import com.susen36.babel.init.BabelAttributes;
 import com.susen36.babel.util.DataUtils;
 import net.minecraft.util.Mth;
@@ -27,7 +26,7 @@ public class ResistanceEvents {
                 AttributeInstance magic = entity.getAttribute(BabelAttributes.MAGIC_RESISTANCE.get());
                 if (magic != null) {
                     double v = magic.getValue();
-                    v = ResistDamageEvent.modifyEffectiveResistanceValue(entity, source, amount, v);
+                    v = BabelEventFactory.modifyEffectiveResistanceValue(entity, source, amount, v);
                     if (v > 0) {
                         amount *= (float) ((100.0 - Mth.clamp(v, 0.0, 100.0)) * 0.01);
                     }
@@ -36,7 +35,7 @@ public class ResistanceEvents {
                 AttributeInstance defense = entity.getAttribute(BabelAttributes.DEFENSE.get());
                 if (defense != null) {
                     double v = defense.getValue();
-                    v = ResistDamageEvent.modifyEffectiveDefenseValue(entity, source, amount, v);
+                    v = BabelEventFactory.modifyEffectiveDefenseValue(entity, source, amount, v);
                     if (v > 0) {
                         amount -= (float) v;
                     }

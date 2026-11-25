@@ -17,7 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -54,13 +53,13 @@ public class EPShowOverlay {
                 float progress = currentElement == null ? 0.0F : currentElement.getInjuryProgress();
 
                 if (threshold > 0 && currentElement != null && progress < 1.0F) {
-                    int dx = (int) Math.round(BabelConfig.epXOffset);
-                    int dy = (int) Math.round(BabelConfig.epYOffset);
+                    int dx = (int) Math.round(BabelConfig.EP_X_OFFSET.get());
+                    int dy = (int) Math.round(BabelConfig.EP_Y_OFFSET.get());
                     AbstractEPCapability.EPType type = currentElement.getType();
 
                     mc.getProfiler().push("ep");
                     RenderSystem.enableBlend();
-                    if (BabelConfig.epBarStyle) {
+                    if (BabelConfig.EP_BAR_STYLE.get()) {
                         int left = mc.getWindow().getGuiScaledWidth() / 2 + 91 + dx;
                         int top = mc.getWindow().getGuiScaledHeight() - 39 + dy;
                         renderIcons(guiGraphics, player, left, top, type, progress, currentElement.underBurst(), mc.gui.getGuiTicks());

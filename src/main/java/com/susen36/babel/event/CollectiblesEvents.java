@@ -11,6 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.MobEffectEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
@@ -53,14 +54,12 @@ public class CollectiblesEvents {
         }
     }
 
-    @SubscribeEvent
-    public static void onLifePointConsume(@NotNull LifePointConsumeEvent.Post event) {
-        if (event.getType() == LifePointConsumeEvent.Type.FAIL
-                && event.getEntity() instanceof Player player && !player.level().isClientSide()
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onLifePointConsume(@NotNull LifePointConsumeEvent.Pre event) {
+        if (event.getEntity() instanceof Player player && !player.level().isClientSide()
                 && Collectibles.isUsed(player, BabelCollectible.END_OF_TIMES)
                 && !Collectibles.isUsedUp(player, BabelCollectible.END_OF_TIMES)) {
-            event.setCanceled(true);
-            EndOfTimesItem.revive(player);
+            event.requestRevival(player.getMaxHealth(), () -> EndOfTimesItem.onRevived(player));
         }
     }
 

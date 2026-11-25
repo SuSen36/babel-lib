@@ -1,10 +1,11 @@
 package com.susen36.babel.api.event;
 
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 实体战利品结算掉落源石锭时触发，用于让其他模组调整掉落倍率。
@@ -15,13 +16,13 @@ import net.minecraftforge.eventbus.api.Event;
 public class OriginiumIngotDropEvent extends Event {
 
     private final LootContext context;
-    private final Entity killer;
+    private final @Nullable Entity killer;
     private float multiplier;
 
-    public OriginiumIngotDropEvent(LootContext context, float multiplier) {
+    public OriginiumIngotDropEvent(LootContext context, @Nullable Entity killer, float multiplier) {
         this.context = context;
-        this.killer = context.getParamOrNull(LootContextParams.KILLER_ENTITY);
-        this.multiplier = multiplier;
+        this.killer = killer;
+        this.multiplier = Float.isFinite(multiplier) ? Mth.clamp(multiplier, 0F, Item.MAX_STACK_SIZE) : 0F;
     }
 
     public LootContext getContext() {
@@ -31,7 +32,7 @@ public class OriginiumIngotDropEvent extends Event {
     /**
      * 击杀者，可能为 null（如环境伤害导致的死亡）。
      */
-    public Entity getKiller() {
+    public @Nullable Entity getKiller() {
         return killer;
     }
 
@@ -39,16 +40,8 @@ public class OriginiumIngotDropEvent extends Event {
         return multiplier;
     }
 
+    /** 有限值限制在 [0, 64]（一次至多一组源石锭）；NaN 和无穷值按 0 处理。 */
     public void setMultiplier(float multiplier) {
-        this.multiplier = multiplier;
-    }
-
-    /**
-     * 触发事件并返回最终倍率。
-     */
-    public static float fire(LootContext context, float multiplier) {
-        OriginiumIngotDropEvent event = new OriginiumIngotDropEvent(context, multiplier);
-        MinecraftForge.EVENT_BUS.post(event);
-        return event.getMultiplier();
+        this.multiplier = Float.isFinite(multiplier) ? Mth.clamp(multiplier, 0F, Item.MAX_STACK_SIZE) : 0F;
     }
 }

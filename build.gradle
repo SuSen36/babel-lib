@@ -73,6 +73,7 @@ sourceSets.main.resources {
 mixin {
     add sourceSets.main, "${mod_id}.refmap.json"
     config "${mod_id}.mixins.json"
+    config "${mod_id}.optional.mixins.json"
 }
 
 repositories {
@@ -104,6 +105,14 @@ repositories {
     }
 }
 
+configurations {
+    devCompatMods {
+        canBeConsumed = false
+        canBeResolved = false
+    }
+    runtimeClasspath.extendsFrom devCompatMods
+}
+
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
@@ -121,20 +130,15 @@ dependencies {
         jarJar.ranged(it, "[0.3.0,)")
     }
 
-    // JEI相关
-    // compile against the JEI API but do not include it at runtime
     compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"))
     compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"))
-    // at runtime, use the full JEI jar for Forge
-    runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
-
-    // Jade相关（软依赖，mods.toml 中 mandatory=false）
     compileOnly fg.deobf("curse.maven:jade-324717:${jade_version}")
-    runtimeOnly fg.deobf("curse.maven:jade-324717:${jade_version}")
 
-    runtimeOnly fg.deobf("curse.maven:spark-361579:4738952")
-    // 伤害数字显示
-    runtimeOnly fg.deobf("curse.maven:damage-numbers-floating-damage-indicators-crits-1754205:9369101")
+    // -PdevCompatRuntime=true：仅在本地运行类路径加载完整模组，不加入发布依赖。
+    if (providers.gradleProperty('devCompatRuntime').orNull == 'true') {
+        devCompatMods fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
+        devCompatMods fg.deobf("curse.maven:jade-324717:${jade_version}")
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -163,7 +167,7 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Version'  : project.jar.archiveVersion,
                 'Implementation-Vendor'   : 'susen36',
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                'MixinConfigs'            : "${mod_id}.mixins.json"
+                'MixinConfigs'            : "${mod_id}.mixins.json,${mod_id}.optional.mixins.json"
         ])
     }
 

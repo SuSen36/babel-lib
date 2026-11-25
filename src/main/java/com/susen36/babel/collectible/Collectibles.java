@@ -5,6 +5,7 @@ import com.google.common.math.LongMath;
 import com.mojang.logging.LogUtils;
 import com.susen36.babel.BabelConfig;
 import com.susen36.babel.BabelMod;
+import com.susen36.babel.event.BabelEventFactory;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -13,6 +14,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -26,13 +28,14 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistryModifiable;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -47,6 +50,10 @@ public class Collectibles implements INBTSerializable<ListTag> {
 
     // 首次查询须在物品注册完成后；索引保留Builder声明顺序，共享池沿用Forge注册表顺序。
     private static final Supplier<CollectibleDirectory> DIRECTORY = Suppliers.memoize(() -> {
+        // Babel 自己的句柄就绪并不代表其他模组已注册完；Forge 在最后一个物品回调之后才锁表。
+        if (!(ForgeRegistries.ITEMS instanceof IForgeRegistryModifiable<?> items) || !items.isLocked()) {
+            throw new IllegalStateException("Collectible directory is not available during item registration");
+        }
         Map<ResourceLocation, RegistryObject<Item>> registry = new LinkedHashMap<>();
         List<RegistryObject<Item>> collectibleItems = new ArrayList<>();
         for (Map.Entry<ResourceLocation, RegistryObject<Item>> entry : CollectibleBuilder.getDeclaredCollectibles().entrySet()) {
@@ -78,6 +85,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
 
     // 激活、层数与冷却必须同步生命周期，同源存储避免平行数据不同步
     private final HashMap<Item, CollectibleState> states = new HashMap<>();
+    private final @Nullable ServerPlayer player;
     final Layer layer;
     final Cooldown cooldown;
 
@@ -103,10 +111,12 @@ public class Collectibles implements INBTSerializable<ListTag> {
                     cooldownEndTick = Cooldown.finiteEndTick(currentTick, duration);
                     cooldownDuration = duration;
                 } else if (cooldownEndTick != 0L || cooldownDuration != 0L) {
-                    // 平移截止时间，保留已消耗的时间和额外续时。
-                    long delta = duration - configuredDuration;
-                    cooldownDuration = Math.max(0L, LongMath.saturatedAdd(cooldownDuration, delta));
-                    cooldownEndTick = Math.max(1L, Cooldown.finiteEndTick(cooldownEndTick, delta));
+                    // 配置差可能超出 long；先精确平移，再分别限制时长和有限截止刻。
+                    BigInteger delta = BigInteger.valueOf(duration).subtract(BigInteger.valueOf(configuredDuration));
+                    cooldownDuration = BigInteger.valueOf(cooldownDuration).add(delta)
+                            .max(BigInteger.ZERO).min(BigInteger.valueOf(Long.MAX_VALUE)).longValueExact();
+                    cooldownEndTick = BigInteger.valueOf(cooldownEndTick).add(delta)
+                            .max(BigInteger.ONE).min(BigInteger.valueOf(Long.MAX_VALUE - 1L)).longValueExact();
                 }
                 configuredDuration = duration;
             }
@@ -115,14 +125,14 @@ public class Collectibles implements INBTSerializable<ListTag> {
     }
 
     Collectibles(@Nullable ServerPlayer player) {
+        this.player = player;
         this.layer = new Layer(this);
-        this.cooldown = new Cooldown(this, player);
+        this.cooldown = new Cooldown(this);
     }
 
     public static void register(IEventBus modBus) {
         modBus.addListener(CollectiblesEventsAdapter::onRegisterCapabilities);
         MinecraftForge.EVENT_BUS.addGenericListener(Entity.class, CollectiblesEventsAdapter::onAttachCapabilities);
-        MinecraftForge.EVENT_BUS.addListener(CollectiblesEventsAdapter::onPlayerClone);
     }
 
     public static @NotNull Map<ResourceLocation, RegistryObject<Item>> getRegistry() {
@@ -145,10 +155,6 @@ public class Collectibles implements INBTSerializable<ListTag> {
         private static void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
             doAttachCapabilities(event);
         }
-
-        private static void onPlayerClone(PlayerEvent.Clone event) {
-            doPlayerClone(event);
-        }
     }
 
     private static void doRegisterCapabilities(@NotNull RegisterCapabilitiesEvent event) {
@@ -159,19 +165,8 @@ public class Collectibles implements INBTSerializable<ListTag> {
         if (event.getObject() instanceof Player player) {
             CollectibleCapability cap = new CollectibleCapability(player);
             event.addCapability(CAPABILITY_KEY, cap);
+            event.addListener(cap::invalidate);
         }
-    }
-
-    private static void doPlayerClone(@NotNull PlayerEvent.Clone event) {
-        Player original = event.getOriginal();
-        // 死亡后 capability 已被 invalidate，先恢复才能读取旧数据；复制完成后再失效。
-        original.reviveCaps();
-        Collectibles oldData = original.getCapability(CAPABILITY).orElse(null);
-        Collectibles newData = event.getEntity().getCapability(CAPABILITY).orElse(null);
-        if (oldData != null && newData != null) {
-            newData.deserializeNBT(oldData.serializeNBT());
-        }
-        original.invalidateCaps();
     }
 
     /** 收藏品效果总闸：命中即全部停效（自身属性、范围光环、事件钩子、效果 tick）； */
@@ -207,15 +202,26 @@ public class Collectibles implements INBTSerializable<ListTag> {
         return data != null && data.isUsedUp(item);
     }
 
-    // capability 失效（死亡克隆等瞬态）时回退到空数据实例：读取到默认值，写入不落到真实存档
+    /** 可变视图要求能力已挂载；瞬态读取应使用 getData 或 getLayerOrDefault。 */
     public static @NotNull Collectibles.Layer getLayerData(@NotNull Player player) {
         Collectibles data = getData(player);
-        return data != null ? data.layer : new Collectibles(null).layer;
+        if (data == null) {
+            throw new IllegalStateException("Collectible capability unavailable for " + player.getUUID());
+        }
+        return data.layer;
     }
 
     public static @NotNull Collectibles.Cooldown getCooldownData(@NotNull Player player) {
         Collectibles data = getData(player);
-        return data != null ? data.cooldown : new Collectibles(null).cooldown;
+        if (data == null) {
+            throw new IllegalStateException("Collectible capability unavailable for " + player.getUUID());
+        }
+        return data.cooldown;
+    }
+
+    public static int getLayerOrDefault(Player player, Item item) {
+        Collectibles data = getData(player);
+        return data != null ? data.layer.getLayer(item) : item instanceof CollectibleLike collectible ? collectible.defaultLevel() : 0;
     }
 
     public static Tag serializeStates(@NotNull Player player) {
@@ -236,42 +242,55 @@ public class Collectibles implements INBTSerializable<ListTag> {
      *
      * @param delta 层数增量，可为负值
      */
-    public static void addLayerAndSync(@NotNull Player player, @NotNull Item item, int delta) {
-        if (!player.level().isClientSide) {
-            getLayerData(player).addLayer(item, delta);
+    public static boolean addLayerAndSync(@NotNull Player player, @NotNull Item item, int delta) {
+        Collectibles data = getData(player);
+        if (!player.level().isClientSide && data != null) {
+            data.layer.addLayer(item, delta);
             BabelNetwork.syncCollectibles(player);
+            return true;
         }
+        return false;
     }
 
     /**
      * 指令等场景的激活入口，复用完整激活流程但不消耗物品；层数沿用当前值（未设置时为默认层数）。
      */
-    public static void activateAndSync(@NotNull Player player, @NotNull Item item) {
-        if (item instanceof CollectibleItem collectible) {
-            collectible.activate(player.level(), player, new ItemStack(collectible), collectible);
+    public static boolean activateAndSync(@NotNull Player player, @NotNull Item item) {
+        boolean activated = false;
+        if (player.level() instanceof ServerLevel serverLevel && item instanceof CollectibleItem collectible) {
+            Collectibles data = getData(player);
+            if (data != null) {
+                collectible.activate(serverLevel, player, new ItemStack(collectible), collectible);
+                activated = getData(player) == data;
+            }
         }
+        return activated;
     }
 
     /**
      * 主动技能结算后的“已使用”开关：藏品仍保留在生效列表中，冷却到期时随状态一起清理。
      */
-    public static void markUsedUpAndSync(@NotNull Player player, @NotNull Item item) {
+    public static boolean markUsedUpAndSync(@NotNull Player player, @NotNull Item item) {
         Collectibles data = getData(player);
         if (!player.level().isClientSide && data != null) {
             data.markUsedUp(item);
             BabelNetwork.syncCollectibles(player);
+            return true;
         }
+        return false;
     }
 
     /**
      * 整条移除收藏品状态；unmarkUsed 仅取消激活，层与冷却数据保留。
      */
-    public static void removeAndSync(@NotNull Player player, @NotNull Item item) {
+    public static boolean removeAndSync(@NotNull Player player, @NotNull Item item) {
         Collectibles data = getData(player);
         if (!player.level().isClientSide && data != null) {
             data.remove(item);
             BabelNetwork.syncCollectibles(player);
+            return true;
         }
+        return false;
     }
 
     public static void expireUsedCollectibles(@NotNull Player player) {
@@ -280,13 +299,19 @@ public class Collectibles implements INBTSerializable<ListTag> {
 
             long currentTick = player.level().getServer().overworld().getGameTime();
             boolean changed = false;
-            long duration = BabelConfig.collectibleDurationTicks;
-            Iterator<CollectibleState> states = data.states.values().iterator();
+            long duration = BabelConfig.COLLECTIBLE_DURATION_TICKS.get();
+            List<Item> removed = null;
+            Iterator<Map.Entry<Item, CollectibleState>> states = data.states.entrySet().iterator();
             while (states.hasNext()) {
-                CollectibleState state = states.next();
+                Map.Entry<Item, CollectibleState> entry = states.next();
+                CollectibleState state = entry.getValue();
                 if (state.used) {
                     changed |= state.applyConfiguredDuration(duration, currentTick);
                     if (state.cooldownEndTick > 0 && currentTick > state.cooldownEndTick) {
+                        if (removed == null) {
+                            removed = new ArrayList<>();
+                        }
+                        removed.add(entry.getKey());
                         states.remove();
                         changed = true;
                     }
@@ -294,6 +319,12 @@ public class Collectibles implements INBTSerializable<ListTag> {
                     // 已取消激活的残留 usedUp 标记不再有意义，随过期检查一并清理。
                     state.usedUp = false;
                     changed = true;
+                }
+            }
+            // 监听器可以再次修改藏品；先完成整批删除，再发布通知。
+            if (removed != null) {
+                for (Item item : removed) {
+                    data.notifyRemoved(item);
                 }
             }
             if (changed) {
@@ -380,7 +411,16 @@ public class Collectibles implements INBTSerializable<ListTag> {
     }
 
     public void remove(@NotNull Item item) {
-        states.remove(item);
+        CollectibleState removed = states.remove(item);
+        if (removed != null) {
+            notifyRemoved(item);
+        }
+    }
+
+    private void notifyRemoved(Item item) {
+        if (player != null) {
+            BabelEventFactory.onRemoved(player, item);
+        }
     }
 
     private @NotNull CollectibleState ensureState(@NotNull Item item) {
@@ -501,7 +541,16 @@ public class Collectibles implements INBTSerializable<ListTag> {
                 minLevel = collectible.minLevel();
                 maxLevel = collectible.maxLevel();
             }
-            owner.ensureState(item).layer = Mth.clamp(layer, minLevel, maxLevel);
+            updateLayer(item, owner.ensureState(item), Mth.clamp(layer, minLevel, maxLevel));
+        }
+
+        private void updateLayer(Item item, CollectibleState state, int newLayer) {
+            if (state.layer != newLayer) {
+                state.layer = newLayer;
+                if (owner.player != null) {
+                    BabelEventFactory.onLayerChanged(owner.player, item, newLayer);
+                }
+            }
         }
 
         public void addLayer(@NotNull Item item, @NotNull Integer layer) {
@@ -515,7 +564,7 @@ public class Collectibles implements INBTSerializable<ListTag> {
         public void removeLayer(@NotNull Item item) {
             CollectibleState state = owner.states.get(item);
             if (state != null) {
-                state.layer = item instanceof CollectibleLike collectible ? collectible.defaultLevel() : 0;
+                updateLayer(item, state, item instanceof CollectibleLike collectible ? collectible.defaultLevel() : 0);
             }
         }
 
@@ -527,15 +576,9 @@ public class Collectibles implements INBTSerializable<ListTag> {
     public static class Cooldown {
         private static final long PERMANENT = -1L;
         private final Collectibles owner;
-        private final @Nullable ServerPlayer player;
 
-        Cooldown(Collectibles owner, @Nullable ServerPlayer player) {
+        Cooldown(Collectibles owner) {
             this.owner = owner;
-            this.player = player;
-        }
-
-        private @Nullable ServerPlayer getPlayer() {
-            return this.player;
         }
 
         private static long finiteEndTick(long startTick, long duration) {
@@ -544,11 +587,13 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
 
         public void setCooldownEndTick(Item item, MinecraftServer server, Long offsetTicks) {
-            CollectibleState state = owner.ensureState(item);
-            state.cooldownEndTick = offsetTicks == PERMANENT ? PERMANENT : finiteEndTick(server.overworld().getGameTime(), offsetTicks);
-            state.cooldownDuration = offsetTicks;
-            state.configuredDuration = BabelConfig.collectibleDurationTicks;
-            BabelNetwork.syncCollectibles(Objects.requireNonNull(getPlayer()));
+            if (owner.player != null) {
+                CollectibleState state = owner.ensureState(item);
+                state.cooldownEndTick = offsetTicks == PERMANENT ? PERMANENT : finiteEndTick(server.overworld().getGameTime(), offsetTicks);
+                state.cooldownDuration = offsetTicks;
+                state.configuredDuration = BabelConfig.COLLECTIBLE_DURATION_TICKS.get();
+                BabelNetwork.syncCollectibles(owner.player);
+            }
         }
 
         public void setCooldownEndTick(Holder<Item> item, MinecraftServer server, Long offsetTicks) {
@@ -556,14 +601,16 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
 
         public void addCooldownEndTick(Item item, MinecraftServer server, Long addToEndTick) {
-            CollectibleState state = owner.ensureState(item);
-            if (state.cooldownEndTick != PERMANENT) {
-                long startTick = state.cooldownEndTick == 0L ? server.overworld().getGameTime() : state.cooldownEndTick;
-                state.cooldownEndTick = finiteEndTick(startTick, addToEndTick);
-                state.cooldownDuration = LongMath.saturatedAdd(state.cooldownDuration, addToEndTick);
-                // 同步配置基准，避免下次过期检查把配置时长差再次叠加到本次冷却。
-                state.configuredDuration = BabelConfig.collectibleDurationTicks;
-                BabelNetwork.syncCollectibles(Objects.requireNonNull(getPlayer()));
+            if (owner.player != null) {
+                CollectibleState state = owner.ensureState(item);
+                if (state.cooldownEndTick != PERMANENT) {
+                    long startTick = state.cooldownEndTick == 0L ? server.overworld().getGameTime() : state.cooldownEndTick;
+                    state.cooldownEndTick = finiteEndTick(startTick, addToEndTick);
+                    state.cooldownDuration = LongMath.saturatedAdd(state.cooldownDuration, addToEndTick);
+                    // 同步配置基准，避免下次过期检查把配置时长差再次叠加到本次冷却。
+                    state.configuredDuration = BabelConfig.COLLECTIBLE_DURATION_TICKS.get();
+                    BabelNetwork.syncCollectibles(owner.player);
+                }
             }
         }
 
@@ -596,24 +643,24 @@ public class Collectibles implements INBTSerializable<ListTag> {
         }
 
         public void removeCooldown(Item item) {
-            CollectibleState state = owner.states.get(item);
-            if (state != null) {
-                state.cooldownEndTick = 0L;
-                state.cooldownDuration = 0L;
+            if (owner.player != null) {
+                CollectibleState state = owner.states.get(item);
+                if (state != null) {
+                    state.cooldownEndTick = 0L;
+                    state.cooldownDuration = 0L;
+                }
             }
         }
 
-        private long getLastTicks(Item item, Long currentTick) {
+        long getRemainingTicks(Item item, long currentTick) {
             long endTick = getCooldownEndTick(item);
-            return endTick == PERMANENT ? 0L : Math.max(currentTick - endTick, 0L);
+            return endTick == 0L || endTick == PERMANENT || endTick <= currentTick
+                    ? 0L : LongMath.saturatedSubtract(endTick, currentTick);
         }
 
-        private long getLastTicks(Holder<Item> item, Long currentTick) {
-            return getLastTicks(item.value(), currentTick);
-        }
-
+        /** 返回有限冷却的剩余 tick；未设置、永久或已到截止 tick 时返回 0，不代表可以清除。 */
         public long getLastTicks(Item item, MinecraftServer server) {
-            return getLastTicks(item, server.overworld().getGameTime());
+            return getRemainingTicks(item, server.overworld().getGameTime());
         }
 
         public long getLastTicks(Holder<Item> item, MinecraftServer server) {

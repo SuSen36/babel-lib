@@ -1,9 +1,10 @@
 modLoader="javafml"
 loaderVersion="${loader_version_range}"
 license="${mod_license}"
-logoFile="babel_logo.png"
+logoFile="babel_icon.png"
 
 [[mods]]
+logoFile="babel_logo.png"
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"

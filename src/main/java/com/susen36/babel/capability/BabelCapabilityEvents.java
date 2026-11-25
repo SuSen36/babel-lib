@@ -3,6 +3,7 @@ package com.susen36.babel.capability;
 import com.susen36.babel.BabelMod;
 import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.capability.health.HealthCapability;
+import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.entity.robbery.RobberyCapability;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.world.entity.Entity;
@@ -92,19 +93,28 @@ public class BabelCapabilityEvents {
         Player player = event.getEntity();
         Player oldPlayer = event.getOriginal();
         oldPlayer.reviveCaps();
-        RobberyCapability oldRobbery = RobberyCapability.of(oldPlayer);
-        RobberyCapability robbery = RobberyCapability.of(player);
-        robbery.deserializeNBT(oldRobbery.serializeNBT());
-        EPCapability oldEP = BabelCapability.getEP(oldPlayer);
-        EPCapability ep = BabelCapability.getEP(player);
-        if (oldEP != null && ep != null) {
-            ep.deserializeNBT(oldEP.serializeNBT());
-        }
-        HealthCapability oldHealth = BabelCapability.getHealth(oldPlayer);
-        HealthCapability health = BabelCapability.getHealth(player);
-        if (oldHealth != null && health != null) {
-            health.deserializeNBT(oldHealth.serializeNBT());
-            health.sync();
+        try {
+            Collectibles oldData = Collectibles.getData(oldPlayer);
+            Collectibles newData = Collectibles.getData(player);
+            if (oldData != null && newData != null) {
+                newData.deserializeNBT(oldData.serializeNBT());
+            }
+            RobberyCapability oldRobbery = RobberyCapability.of(oldPlayer);
+            RobberyCapability robbery = RobberyCapability.of(player);
+            robbery.deserializeNBT(oldRobbery.serializeNBT());
+            EPCapability oldEP = BabelCapability.getEP(oldPlayer);
+            EPCapability ep = BabelCapability.getEP(player);
+            if (oldEP != null && ep != null) {
+                ep.deserializeNBT(oldEP.serializeNBT());
+            }
+            HealthCapability oldHealth = BabelCapability.getHealth(oldPlayer);
+            HealthCapability health = BabelCapability.getHealth(player);
+            if (oldHealth != null && health != null) {
+                health.deserializeNBT(oldHealth.serializeNBT());
+                health.sync();
+            }
+        } finally {
+            oldPlayer.invalidateCaps();
         }
     }
 }

@@ -36,7 +36,7 @@ public class RoyalAllianceTreatyItem extends CollectibleItem.CustomCollectibleIt
 			boolean valid = sourceEntity.getType().is(BabelEntityTypeTags.SARKAZ);
 			if (!valid) {
 				String regName = BuiltInRegistries.ENTITY_TYPE.getKey(sourceEntity.getType()).toString();
-				valid = matchesConfigured(BabelConfig.royalAllianceTreatyRecognizable, regName);
+				valid = matchesConfigured(BabelConfig.ROYAL_ALLIANCE_TREATY_RECOGNIZABLE.get(), regName);
 			}
 			if (valid) {
 				double amount = event.getAmount();
