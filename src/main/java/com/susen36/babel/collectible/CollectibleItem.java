@@ -7,6 +7,7 @@ import com.susen36.babel.api.event.LifePointConsumeEvent;
 import com.susen36.babel.difficulty.NDifficulty;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -137,6 +138,13 @@ public class CollectibleItem extends Item implements CollectibleLike {
                 tooltip.add(line.withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
             }
         }
+        // 红字只对应 usedUp（本次效果已兑现），与藏品是否生效无关
+        if (level != null && level.isClientSide) {
+            Player player = Minecraft.getInstance().player;
+            if (player != null && Collectibles.isUsedUp(player, this)) {
+                tooltip.add(Component.translatable("gui.babel.collectibles.used").withStyle(ChatFormatting.RED));
+            }
+        }
     }
 
     @Override
@@ -205,7 +213,9 @@ public class CollectibleItem extends Item implements CollectibleLike {
             // 冷却中可重复使用：每次使用重新触发完整激活流程，冷却由 Used 事件监听器统一重置
             if (canAlwaysUse || !isBanned()) {
                 activate(level, player, stack, this);
-                result = consumeSelf(stack, player);
+                if (consumeOnActivation()) {
+                    result = consumeSelf(stack, player);
+                }
             } else {
                 playFailure(level, player, stack);
             }
@@ -256,6 +266,8 @@ public class CollectibleItem extends Item implements CollectibleLike {
     void activate(@NotNull Level level, @NotNull Player player, @NotNull ItemStack stack, @NotNull Item item) {
         Collectibles data = Collectibles.getData(player);
         if (data != null) {
+            // 重新激活视为重新获取，清除上一次的已使用开关
+            data.unmarkUsedUp(item);
             data.markUsed(item);
         }
         CollectibleEvent.onUsed(player, item);
@@ -264,6 +276,11 @@ public class CollectibleItem extends Item implements CollectibleLike {
         if (level instanceof ServerLevel) {
             BabelNetwork.syncCollectibles(player);
         }
+    }
+
+    /** 激活后是否立即消耗物品；触发型藏品可延后到效果结算时消耗。 */
+    protected boolean consumeOnActivation() {
+        return true;
     }
 
     private ItemStack consumeSelf(@NotNull ItemStack stack, @NotNull Player player) {

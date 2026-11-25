@@ -21,8 +21,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 /**
- * “时光之末”：目标生命耗尽后真实死亡时原地满血复活并使收藏品失效；
- * 被目标生命/护盾阻断的死亡计入累计损失，累计达到阈值时回复失去的全部，否则回复固定量。
+ * “时光之末”：目标生命耗尽后真实死亡时原地满血复活并把收藏品标记为已使用；
+ * 被目标生命/护盾阻断的死亡计入累计损失，累计超过阈值时回复失去的全部，否则回复固定量。
  */
 public class EndOfTimesItem extends CollectibleItem.CustomCollectibleItem {
 
@@ -87,7 +87,8 @@ public class EndOfTimesItem extends CollectibleItem.CustomCollectibleItem {
     public static void revive(Player player) {
         int lostLives = getLostLives(player);
         int lostShields = getLostShields(player);
-        if (lostLives + lostShields >= RESTORE_ALL_LOSS_THRESHOLD) {
+        // 与图鉴文案对齐：累计损失超过阈值时按真实损失数量回复生命与护盾，未超过则固定补 10 点护盾
+        if (lostLives + lostShields > RESTORE_ALL_LOSS_THRESHOLD) {
             LifePointUtils.addLifePoint(player, lostLives);
             LifePointUtils.addShieldPoint(player, lostShields);
         } else {
@@ -105,6 +106,6 @@ public class EndOfTimesItem extends CollectibleItem.CustomCollectibleItem {
         if (player instanceof ServerPlayer serverPlayer) {
             BabelNetwork.syncCollectibleUse(serverPlayer, new ItemStack(BabelCollectible.END_OF_TIMES.get()));
         }
-        Collectibles.removeAndSync(player, BabelCollectible.END_OF_TIMES.get());
+        Collectibles.markUsedUpAndSync(player, BabelCollectible.END_OF_TIMES.get());
     }
 }

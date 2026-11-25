@@ -1,51 +1,52 @@
 package com.susen36.babel.block;
 
-import com.susen36.babel.init.BabelBlocks;
 import com.susen36.babel.init.BabelCollectible;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
 
-public class VampireBedBlock extends Block {
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
-
+public class VampireBedBlock extends BedBlock {
     public VampireBedBlock() {
-        super(BlockBehaviour.Properties.of().sound(SoundType.WOOD).strength(0.5f, 1f).jumpFactor(1.3f).noOcclusion().pushReaction(PushReaction.DESTROY).isRedstoneConductor((bs, br, bp) -> false));
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+        super(DyeColor.RED, BlockBehaviour.Properties.of().sound(SoundType.WOOD).strength(0.5f, 1f).jumpFactor(1.3f).noOcclusion().pushReaction(PushReaction.DESTROY).isRedstoneConductor((bs, br, bp) -> false));
     }
 
     /**
-     * 对创造模式中键获取物品的修改
+     * 创造模式中键取床时返回收藏品物品，而不是方块对应的 BlockItem。
      */
     @Override
     public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
@@ -76,7 +77,17 @@ public class VampireBedBlock extends Block {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        return switch (state.getValue(FACING)) {
+        //原版 FACING 为脚→头，模型按头→脚制作，取反后才能与模型旋转和碰撞箱对齐。
+        Direction facing = state.getValue(FACING).getOpposite();
+        if (state.getValue(PART) == BedPart.HEAD) {
+            return switch (facing) {
+                case NORTH -> Shapes.or(box(0, 0, 14, 16, 12, 16), box(0, 0, 0, 2, 12, 14), box(14, 0, 0, 16, 12, 14), box(2, 0, 0, 14, 2, 14), box(2, 2, 0, 14, 5, 14));
+                case EAST -> Shapes.or(box(0, 0, 0, 2, 12, 16), box(2, 0, 0, 16, 12, 2), box(2, 0, 14, 16, 12, 16), box(2, 0, 2, 16, 2, 14), box(2, 2, 2, 16, 5, 14));
+                case WEST -> Shapes.or(box(14, 0, 0, 16, 12, 16), box(0, 0, 14, 14, 12, 16), box(0, 0, 0, 14, 12, 2), box(0, 0, 2, 14, 2, 14), box(0, 2, 2, 14, 5, 14));
+                default -> Shapes.or(box(0, 0, 0, 16, 12, 2), box(14, 0, 2, 16, 12, 16), box(0, 0, 2, 2, 12, 16), box(2, 0, 2, 14, 2, 16), box(2, 2, 2, 14, 5, 16));
+            };
+        }
+        return switch (facing) {
             case NORTH -> Shapes.or(box(0, 0, 0, 16, 12, 2), box(0, 0, 2, 2, 12, 16), box(14, 0, 2, 16, 12, 16), box(2, 0, 2, 14, 2, 16), box(2, 2, 2, 14, 5, 16));
             case EAST -> Shapes.or(box(14, 0, 0, 16, 12, 16), box(0, 0, 0, 14, 12, 2), box(0, 0, 14, 14, 12, 16), box(0, 0, 2, 14, 2, 14), box(0, 2, 2, 14, 5, 14));
             case WEST -> Shapes.or(box(0, 0, 0, 2, 12, 16), box(2, 0, 14, 16, 12, 16), box(2, 0, 0, 16, 12, 2), box(2, 0, 2, 16, 2, 14), box(2, 2, 2, 16, 5, 14));
@@ -84,70 +95,45 @@ public class VampireBedBlock extends Block {
         };
     }
 
+    /**
+     * 右击脚部或枕部都换算到枕部，再交给原版睡眠流程处理夜间判定、被阻挡与刷怪检查。
+     */
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
-        builder.add(FACING);
-    }
-
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return super.getStateForPlacement(context).setValue(FACING, context.getHorizontalDirection().getOpposite());
-    }
-
-    @Override
-    public BlockState rotate(BlockState state, Rotation rot) {
-        return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
-    }
-
-    @Override
-    public BlockState mirror(BlockState state, Mirror mirrorIn) {
-        return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
-    }
-
-    private static Direction getFacing(BlockState bs) {
-        return bs.getValue(FACING);
-    }
-
-    @Override
-    public boolean canSurvive(BlockState blockstate, LevelReader worldIn, BlockPos pos) {
-        if (worldIn instanceof LevelAccessor world) {
-            int x = pos.getX();
-            int y = pos.getY();
-            int z = pos.getZ();
-            return world.getBlockState(BlockPos.containing((double) x + getFacing(blockstate).getOpposite().getStepX(), y, (double) z + getFacing(blockstate).getOpposite().getStepZ())).canBeReplaced()
-                    || world.getBlockState(BlockPos.containing((double) x + getFacing(blockstate).getOpposite().getStepX(), y, (double) z + getFacing(blockstate).getOpposite().getStepZ())).getBlock() == BabelBlocks.VAMPIRES_BED_UPPER.get();
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (level.isClientSide) {
+            return InteractionResult.CONSUME;
         }
-        return super.canSurvive(blockstate, worldIn, pos);
-    }
-
-    @Override
-    public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor world, BlockPos currentPos, BlockPos facingPos) {
-        return !state.canSurvive(world, currentPos) ? Blocks.AIR.defaultBlockState() : super.updateShape(state, facing, facingState, world, currentPos, facingPos);
-    }
-
-    @Override
-    public void onPlace(BlockState blockstate, Level world, BlockPos pos, BlockState oldState, boolean moving) {
-        super.onPlace(blockstate, world, pos, oldState, moving);
-        world.scheduleTick(pos, this, 20);
-        double x = pos.getX();
-        double y = pos.getY();
-        double z = pos.getZ();
-        if (world.getBlockState(BlockPos.containing(x + getFacing(blockstate).getOpposite().getStepX(), y, z + getFacing(blockstate).getOpposite().getStepZ())).canBeReplaced()) {
-            world.setBlock(BlockPos.containing(x + getFacing(blockstate).getOpposite().getStepX(), y, z + getFacing(blockstate).getOpposite().getStepZ()), BabelBlocks.VAMPIRES_BED_UPPER.get().defaultBlockState().setValue(FACING, getFacing(blockstate)), 3);
+        BlockPos headPos = state.getValue(PART) == BedPart.HEAD ? pos : pos.relative(state.getValue(FACING));
+        BlockState headState = level.getBlockState(headPos);
+        if (!headState.is(this) || headState.getValue(PART) != BedPart.HEAD) {
+            return InteractionResult.CONSUME;
         }
+        player.startSleepInBed(headPos).ifLeft(problem -> {
+            Component message = problem.getMessage();
+            if (message != null) {
+                player.displayClientMessage(message, true);
+            }
+        });
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void neighborChanged(BlockState blockstate, Level world, BlockPos pos, Block neighborBlock, BlockPos fromPos, boolean moving) {
-        super.neighborChanged(blockstate, world, pos, neighborBlock, fromPos, moving);
-        double x = pos.getX();
-        double y = pos.getY();
-        double z = pos.getZ();
-        if (world.getBlockState(BlockPos.containing(x + getFacing(world.getBlockState(pos)).getOpposite().getStepX(), y, z + getFacing(world.getBlockState(pos)).getOpposite().getStepZ())).getBlock() != BabelBlocks.VAMPIRES_BED_UPPER.get()) {
-            BlockPos blockPos = BlockPos.containing(x, y, z);
-            dropResources(world.getBlockState(blockPos), world, BlockPos.containing(x, y, z), null);
-            world.destroyBlock(blockPos, false);
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        //棺木使用普通方块模型渲染，不需要原版床方块实体。
+        return null;
+    }
+
+    @Override
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean moving) {
+        super.onPlace(state, level, pos, oldState, moving);
+        if (state.getValue(PART) == BedPart.FOOT) {
+            level.scheduleTick(pos, this, 20);
         }
     }
 

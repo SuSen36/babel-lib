@@ -33,6 +33,7 @@ public class CollectiblesScreen extends Screen {
     private static final int DRAG_THRESHOLD = 40;
     private static final ResourceLocation BACKGROUND = new ResourceLocation(BabelMod.MODID, "textures/gui/screen/relic_bg.png");
     private static final Component LOST_AND_FOUND_HINT = Component.translatable("gui.babel.collectibles.lost_and_found_hint");
+    private static final Component USED_LABEL = Component.translatable("gui.babel.collectibles.used");
 
     private final List<ItemStack> entries = new ArrayList<>();
     // >=0 表示失与得模式
@@ -116,10 +117,17 @@ public class CollectiblesScreen extends Screen {
             guiGraphics.drawString(this.font, LOST_AND_FOUND_HINT, this.leftPos + 60, this.topPos - 12, -1, false);
         }
         if (hovered != -1) {
-            String descriptionId = this.entries.get(hovered).getItem().getDescriptionId();
+            ItemStack hoveredStack = this.entries.get(hovered);
+            String descriptionId = hoveredStack.getItem().getDescriptionId();
             String name = Component.translatable(descriptionId).getString();
             Component desc = Component.translatable(descriptionId + ".description_0").withStyle(ChatFormatting.AQUA);
-            guiGraphics.renderTooltip(this.font, List.of(Component.literal(name + ": ").append(desc)), Optional.empty(), mouseX, mouseY);
+            List<Component> lines = new ArrayList<>();
+            lines.add(Component.literal(name + ": ").append(desc));
+            if (this.minecraft != null && this.minecraft.player != null
+                    && Collectibles.isUsedUp(this.minecraft.player, hoveredStack.getItem())) {
+                lines.add(USED_LABEL.copy().withStyle(ChatFormatting.RED));
+            }
+            guiGraphics.renderTooltip(this.font, lines, Optional.empty(), mouseX, mouseY);
         }
     }
 

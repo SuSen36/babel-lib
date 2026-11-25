@@ -1,6 +1,8 @@
 package com.susen36.babel.menu;
 
 import com.susen36.babel.api.event.LostAndFoundEvent;
+import com.susen36.babel.collectible.CollectibleItem;
+import com.susen36.babel.collectible.CollectibleTiers;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.entity.CannotEntity;
 import com.susen36.babel.init.BabelMenus;
@@ -28,7 +30,7 @@ public class CannotMenu extends AbstractContainerMenu {
     public static final int PAYMENT_SLOT = 0;
     public static final int RESULT_SLOT = 1;
     public static final int LOST_AND_FOUND_ID = 1000;
-    public static final int ATTACK_BUTTON_ID = 2000;
+    public static final int ATTACK_BUTTON_ID = -48;
     private static final double ATTACK_REACH_SQR = 81.0D;
     private static final int RESULT_CONTAINER_SLOT = 2;
     private static final int INV_SLOT_START = 2;
@@ -43,6 +45,8 @@ public class CannotMenu extends AbstractContainerMenu {
     @Nullable
     private final CannotEntity traderEntity;
     private int hasLostAndFoundData;
+    private boolean attackingTrader;
+    private boolean closeAfterAttack;
 
     public CannotMenu(int containerId, Inventory playerInventory) {
         this(containerId, playerInventory, new ClientSideMerchant(playerInventory.player), -1);
@@ -120,33 +124,64 @@ public class CannotMenu extends AbstractContainerMenu {
         return result;
     }
 
-    // 服务端走玩家真实近战攻击路径（含攻速冷却、附魔、横扫），客户端不执行
     private boolean attackTrader(Player player) {
         boolean attacked = false;
-        if (!player.level().isClientSide() && this.traderEntity != null && this.traderEntity.isAlive()
-                && player.distanceToSqr(this.traderEntity) <= ATTACK_REACH_SQR) {
-            player.attack(this.traderEntity);
-            attacked = true;
+        if (player instanceof ServerPlayer serverPlayer && serverPlayer.containerMenu == this && !this.attackingTrader
+                && this.traderEntity != null && this.traderEntity.isAlive() && player.distanceToSqr(this.traderEntity) <= ATTACK_REACH_SQR) {
+            Inventory inventory = player.getInventory();
+            int handSlot = inventory.selected;
+            ItemStack carried = this.getCarried();
+            this.setCarried(inventory.getItem(handSlot));
+            inventory.setItem(handSlot, carried);
+            this.attackingTrader = true;
+            try {
+                // 近战直接读取玩家的属性，不能等到下一 tick 再更新装备。
+                serverPlayer.detectEquipmentUpdates();
+                serverPlayer.attack(this.traderEntity);
+                attacked = true;
+            } finally {
+                if (serverPlayer.containerMenu == this) {
+                    ItemStack weaponAfterAttack = inventory.getItem(handSlot);
+                    inventory.setItem(handSlot, this.getCarried());
+                    this.setCarried(weaponAfterAttack);
+                }
+                this.attackingTrader = false;
+                serverPlayer.detectEquipmentUpdates();
+                if (this.closeAfterAttack && serverPlayer.containerMenu == this) {
+                    serverPlayer.closeContainer();
+                }
+                this.closeAfterAttack = false;
+            }
         }
         return attacked;
     }
 
-    // index 为已激活收藏品列表中的位置
+    public void closeForRobbery(ServerPlayer player) {
+        if (this.attackingTrader) {
+            this.closeAfterAttack = true;
+        } else {
+            player.closeContainer();
+        }
+    }
+
+    // index 为可交易藏品列表中的位置
     private boolean lostAndFoundExchange(Player player, int index) {
         boolean exchanged = false;
         if (!player.level().isClientSide() && player instanceof ServerPlayer serverPlayer
                 && (this.traderEntity == null || this.traderEntity.hasLostAndFound())) {
             Collectibles data = Collectibles.getData(player);
-            List<Item> used = new ArrayList<>();
+            List<Item> tradeable = new ArrayList<>();
             List<Item> pool = new ArrayList<>();
             for (RegistryObject<Item> entry : Collectibles.getRegistry().values()) {
                 Item candidate = entry.get();
                 if (data != null && data.isUsed(candidate)) {
-                    used.add(candidate);
+                    tradeable.add(candidate);
+                } else if (candidate instanceof CollectibleItem collectible && collectible.getTier() != CollectibleTiers.CURSED) {
+                    pool.add(candidate);
                 }
             }
-            if (index >= 0 && index < used.size() && !pool.isEmpty()) {
-                Item lost = used.get(index);
+            if (index >= 0 && index < tradeable.size() && !pool.isEmpty()) {
+                Item lost = tradeable.get(index);
                 Item gained = LostAndFoundEvent.onPre(serverPlayer, this.traderEntity, lost, pool.get(player.getRandom().nextInt(pool.size())));
                 if (gained != null) {
                     Collectibles.removeAndSync(serverPlayer, lost);

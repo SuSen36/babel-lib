@@ -71,7 +71,7 @@ Babel 脱胎于「水月与深蓝之树」主题模组（Caerula Arbor），现�
 ### 收藏品（集成战略）
 
 - 百余件收藏品，分四级：`NORMAL`、`RARE`、`ADVANCED`（可被配置禁用）、`CURSED`（诅咒，自动激活且名字染红）。
-- 每件收藏品可有**层数**（`Levels(min, max, default)`）、**冷却**、**持续时间**（默认 576000 tick ≈ 8 小时 / 24 游戏日）。
+- 每件收藏品可有**层数**（`Levels(min, max, default)`）、**冷却**、**持续时间**（默认 864000 tick ≈ 12 小时 / 36 游戏日）。
 - 获取途径：战利品表注入（默认 30% 概率）、怪物 / Boss 掉落（Boss 必掉高级藏品）、`/collectible give`。
 - 自带收藏品界面（默认 `C` 键），可查看已持有藏品、层数、冷却；坎诺特的「失与得」界面可用已有藏品交换随机藏品。
 - 某些藏品带有特殊功能，详情见`docs/collectibles-effect/`
@@ -175,7 +175,7 @@ gradlew.bat build
 | `life_point_global_limit` | `32767` | 目标生命全局上限 |
 | `player_shield_global_limit` | `99999` | 护盾全局上限 |
 | `collectible_loot_chance` | `0.3` | 战利品表额外注入收藏品的概率 |
-| `collectible_duration_ticks` | `576000` | 收藏品生效时长（tick） |
+| `collectible_duration_ticks` | `864000` | 收藏品生效时长（tick） |
 | `ban_advanced_collectibles` | `false` | 禁用 `ADVANCED` 级收藏品（无法激活） |
 | `hand_strangle_recognizable` | `CrossbowMod2:item.woodenCrossbow` | 额外可触发「扼喉之手」的物品 |
 | `hand_firework_recognizable` | `twilightforest:triple_bow` | 额外可触发「烟花之手」的物品 |

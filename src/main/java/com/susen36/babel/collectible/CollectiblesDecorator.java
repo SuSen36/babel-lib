@@ -26,19 +26,21 @@ public class CollectiblesDecorator implements IItemDecorator {
         if (player != null) {
             var cd = Collectibles.getCooldownData(player);
             Item item = stack.getItem();
-            long lastTicks = cd.getCooldownEndTick(item) - CooldownUtils.getServerCurrentTick();
             long maxTicks = cd.getCooldownDuration(item);
-            if (lastTicks > 0 && maxTicks > 0) {
-                float progress = Mth.clamp(
-                        ((float) lastTicks + mc.getFrameTime()) / (float) maxTicks,
-                        0.0F, 1.0F);
-                int height = Math.round(SLOT_SIZE * progress);
-                int topY = y + (SLOT_SIZE - height);
-                guiGraphics.fill(
-                        RenderType.guiOverlay(),
-                        x, topY,
-                        x + SLOT_SIZE, topY + height,
-                        COOLDOWN_OVERLAY_COLOR);
+            if (maxTicks > 0) {
+                long lastTicks = cd.getCooldownEndTick(item) - CooldownUtils.getServerCurrentTick();
+                if (lastTicks > 0) {
+                    float progress = Mth.clamp(
+                            ((float) lastTicks + mc.getFrameTime()) / (float) maxTicks,
+                            0.0F, 1.0F);
+                    int height = Math.round(SLOT_SIZE * progress);
+                    int topY = y + (SLOT_SIZE - height);
+                    guiGraphics.fill(
+                            RenderType.guiOverlay(),
+                            x, topY,
+                            x + SLOT_SIZE, topY + height,
+                            COOLDOWN_OVERLAY_COLOR);
+                }
             }
         }
         return false;

@@ -9,9 +9,16 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-// 收藏品状态同步消息：把某玩家的收藏品状态（已激活标记、数值层、冷却）整体同步到客户端。
-// 数据载荷为单个 CompoundTag，仅含一个键 states：ListTag，每个元素对应一件收藏品，
-// 内含 id（收藏品 id）、used（是否已激活）、layer（数值层）、cooldown（冷却结束 tick）、duration（冷却时长）。
+/**
+ * 收藏品状态同步消息：把某玩家的收藏品状态整体同步到客户端。
+ * <p>
+ * 数据载荷为单个 {@link CompoundTag}，只含一个 {@code states} 子键：
+ * <ul>
+ *   <li>{@code states}：{@code ListTag}，每个元素是一个 {@code CompoundTag}，包含
+ *   {@code id}、{@code used}、{@code used_up}、{@code layer}、{@code cooldown}、
+ *   {@code duration}、{@code configured_duration}</li>
+ * </ul>
+ */
 public class CollectibleSyncMessage {
 
     public final int playerId;

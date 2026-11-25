@@ -95,7 +95,18 @@ public class CannotEntity extends AbstractVillager {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new TradeWithPlayerGoal(this));
+        this.goalSelector.addGoal(1, new TradeWithPlayerGoal(this) {
+            @Override
+            public boolean canUse() {
+                CannotEntity cannot = CannotEntity.this;
+                Player player = cannot.getTradingPlayer();
+                // 殴打导致的受击标记和短暂离地不应打断当前交易。
+                return super.canUse() || (cannot.hurtTime > 0 && player != null && cannot.getLastHurtByMob() == player
+                        && player.containerMenu instanceof CannotMenu menu && menu.getTraderEntity() == cannot
+                        && cannot.isAlive() && !cannot.isInWater() && !cannot.isRobberyActive()
+                        && cannot.distanceToSqr(player) <= 16.0D);
+            }
+        });
         this.goalSelector.addGoal(1, new LookAtTradingPlayerGoal(this));
         this.goalSelector.addGoal(4, new MoveTowardsRestrictionGoal(this, 0.5D));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 0.5D));
@@ -439,7 +450,6 @@ public class CannotEntity extends AbstractVillager {
         private int waveSpawnCount;
         private int waveCooldownTicks;
         private int postRaidTicks;
-        private float waveTotalHealth;
         private long nextSpawnAt;
         private long nextSupportAt;
         private long ticksActive;
@@ -474,12 +484,10 @@ public class CannotEntity extends AbstractVillager {
                 this.waveSpawnCount = 0;
                 this.waveCooldownTicks = config.getWaveIntervalTicks();
                 this.postRaidTicks = 0;
-                this.waveTotalHealth = 0.0F;
                 this.nextSpawnAt = 0L;
                 this.nextSupportAt = level.getGameTime() + config.getSupportIntervalTicks();
                 this.ticksActive = 0L;
-                this.bossEvent.setName(config.getBossBarName());
-                this.bossEvent.setProgress(0.0F);
+                this.updateBossbar(level, config);
                 for (ServerPlayer viewer : level.players()) {
                     if (viewer.blockPosition().distSqr(cannot.blockPosition()) <= BOSSBAR_VISIBLE_RANGE_SQR) {
                         this.bossEvent.addPlayer(viewer);
@@ -488,8 +496,8 @@ public class CannotEntity extends AbstractVillager {
                 RobberyCapability.of(player).startRestriction(level.getGameTime());
                 if (player instanceof ServerPlayer serverPlayer) {
                     BabelNetwork.syncRobberyRestriction(serverPlayer);
-                    if (serverPlayer.containerMenu instanceof CannotMenu) {
-                        serverPlayer.closeContainer();
+                    if (serverPlayer.containerMenu instanceof CannotMenu menu) {
+                        menu.closeForRobbery(serverPlayer);
                     }
                 }
                 player.sendSystemMessage(Component.translatable("event.babel.robbery.started"));
@@ -504,7 +512,7 @@ public class CannotEntity extends AbstractVillager {
                 } else if (this.config != null) {
                     Robbery config = this.config;
                     this.spawnedMobs.removeIf(uuid -> this.removeFromRaid(level, cannot, uuid));
-                    if (this.wavesSpawned >= config.getWaveCount() && this.spawnedMobs.isEmpty()) {
+                    if (this.isRaidCleared(config)) {
                         if (this.postRaidTicks < POST_RAID_TICKS) {
                             this.postRaidTicks++;
                         } else {
@@ -524,6 +532,10 @@ public class CannotEntity extends AbstractVillager {
                             this.nextSpawnAt = level.getGameTime() + config.getTicksBetweenSpawn();
                         } else {
                             this.nextSpawnAt = level.getGameTime() + SPAWN_RETRY_DELAY_TICKS;
+                            // 本波已无存活怪物且一轮补怪全部失败，直接结束本波生成阶段，避免永久卡在补怪。
+                            if (this.spawnedMobs.isEmpty()) {
+                                this.waveSpawnCount = config.getMobsPerWave();
+                            }
                         }
                     }
                     if (level.getGameTime() >= this.nextSupportAt && !this.spawnedMobs.isEmpty()) {
@@ -536,7 +548,6 @@ public class CannotEntity extends AbstractVillager {
         }
 
         private void startWave(ServerLevel level, CannotEntity cannot, Robbery config) {
-            this.waveTotalHealth = 0.0F;
             this.waveSpawnCount = 0;
             int opening = Math.min(config.getInitialSpawnCount(), config.getMobsPerWave());
             boolean spawned = false;
@@ -595,9 +606,6 @@ public class CannotEntity extends AbstractVillager {
                     if (spawned) {
                         this.spawnedMobs.add(entity.getUUID());
                         this.waveSpawnCount++;
-                        if (entity instanceof LivingEntity living) {
-                            this.waveTotalHealth += living.getHealth();
-                        }
                         level.sendParticles(ParticleTypes.SMOKE, x, y + 0.5D, z, SMOKE_PARTICLE_COUNT, 0.4D, 0.5D, 0.4D, 0.01D);
                         level.sendParticles(ParticleTypes.FLAME, x, y + 0.5D, z, FLAME_PARTICLE_COUNT, 0.4D, 0.5D, 0.4D, 0.02D);
                     }
@@ -634,33 +642,40 @@ public class CannotEntity extends AbstractVillager {
             Entity entity = level.getEntity(uuid);
             boolean dead = entity == null || !entity.isAlive();
             boolean far = !dead && entity.blockPosition().distSqr(cannot.blockPosition()) > MAX_TRACK_DISTANCE_SQR;
-            if (far && entity instanceof LivingEntity living) {
-                this.waveTotalHealth -= living.getHealth();
-            }
             return dead || far;
         }
 
+        private boolean isRaidCleared(Robbery config) {
+            return this.wavesSpawned >= config.getWaveCount() && this.waveSpawnCount >= config.getMobsPerWave()
+                    && this.spawnedMobs.isEmpty();
+        }
+
         private void updateBossbar(ServerLevel level, Robbery config) {
-            if (this.wavesSpawned >= config.getWaveCount() && this.spawnedMobs.isEmpty()) {
-                this.bossEvent.removeAllPlayers();
-            } else {
-                if (this.waveCooldownTicks > 0) {
+            if (this.active) {
+                if (this.isRaidCleared(config)) {
+                    this.bossEvent.setVisible(false);
+                } else if (this.waveSpawnCount == 0) {
                     int interval = config.getWaveIntervalTicks();
                     this.bossEvent.setProgress(Mth.clamp((float) (interval - this.waveCooldownTicks) / (float) interval, 0.0F, 1.0F));
+                    this.bossEvent.setName(config.getBossBarName().copy().append(" - ")
+                            .append(Component.translatable("event.babel.robbery.preparing_wave", this.wavesSpawned + 1, config.getWaveCount())));
+                    this.bossEvent.setVisible(true);
                 } else {
-                    float health = 0.0F;
+                    // Reinforcements already count as full health, so spawning them does not refill the bar.
+                    float remaining = config.getMobsPerWave() - this.waveSpawnCount;
                     for (UUID uuid : this.spawnedMobs) {
-                        if (level.getEntity(uuid) instanceof LivingEntity living) {
-                            health += living.getHealth();
+                        Entity entity = level.getEntity(uuid);
+                        if (entity instanceof LivingEntity living && living.getMaxHealth() > 0.0F) {
+                            remaining += Mth.clamp(living.getHealth() / living.getMaxHealth(), 0.0F, 1.0F);
+                        } else if (entity != null && entity.isAlive()) {
+                            remaining += 1.0F;
                         }
                     }
-                    this.bossEvent.setProgress(this.waveTotalHealth > 0.0F ? Mth.clamp(health / this.waveTotalHealth, 0.0F, 1.0F) : 0.0F);
+                    this.bossEvent.setProgress(Mth.clamp(remaining / config.getMobsPerWave(), 0.0F, 1.0F));
+                    this.bossEvent.setName(config.getBossBarName().copy().append(" - ")
+                            .append(Component.translatable("event.babel.robbery.wave", this.wavesSpawned, config.getWaveCount())));
+                    this.bossEvent.setVisible(true);
                 }
-                this.bossEvent.setName(this.spawnedMobs.isEmpty()
-                        ? config.getBossBarName()
-                        : config.getBossBarName().copy()
-                                .append(" - ")
-                                .append(Component.translatable("event.babel.robbery.wave", this.wavesSpawned, config.getWaveCount())));
             }
         }
 
@@ -706,7 +721,6 @@ public class CannotEntity extends AbstractVillager {
                 this.waveSpawnCount = 0;
                 this.waveCooldownTicks = 0;
                 this.postRaidTicks = 0;
-                this.waveTotalHealth = 0.0F;
                 this.nextSpawnAt = 0L;
                 this.ticksActive = 0L;
                 this.config = null;
@@ -729,7 +743,6 @@ public class CannotEntity extends AbstractVillager {
                 tag.putInt("RobberyWaveSpawned", this.waveSpawnCount);
                 tag.putInt("RobberyWaveCooldown", this.waveCooldownTicks);
                 tag.putInt("RobberyPostRaidTicks", this.postRaidTicks);
-                tag.putFloat("RobberyWaveTotalHealth", this.waveTotalHealth);
                 tag.putLong("RobberyNextSpawnAt", this.nextSpawnAt);
                 tag.putLong("RobberyNextSupportAt", this.nextSupportAt);
                 tag.putLong("RobberyTicksActive", this.ticksActive);
@@ -743,7 +756,6 @@ public class CannotEntity extends AbstractVillager {
             this.waveSpawnCount = 0;
             this.waveCooldownTicks = 0;
             this.postRaidTicks = 0;
-            this.waveTotalHealth = 0.0F;
             this.nextSpawnAt = 0L;
             this.nextSupportAt = 0L;
             this.ticksActive = 0L;
@@ -775,9 +787,6 @@ public class CannotEntity extends AbstractVillager {
                 }
                 if (tag.contains("RobberyPostRaidTicks", 99)) {
                     this.postRaidTicks = tag.getInt("RobberyPostRaidTicks");
-                }
-                if (tag.contains("RobberyWaveTotalHealth", 99)) {
-                    this.waveTotalHealth = tag.getFloat("RobberyWaveTotalHealth");
                 }
                 if (tag.contains("RobberyNextSpawnAt", 99)) {
                     this.nextSpawnAt = tag.getLong("RobberyNextSpawnAt");

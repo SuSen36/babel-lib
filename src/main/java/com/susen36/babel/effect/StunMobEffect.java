@@ -21,6 +21,7 @@ public class StunMobEffect extends MobEffect {
         this.addAttributeModifier(Attributes.ATTACK_SPEED, "5f9a3c7e-1d2b-4c8a-9e0f-000000000003", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(Attributes.JUMP_STRENGTH, "5f9a3c7e-1d2b-4c8a-9e0f-000000000004", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(Attributes.MOVEMENT_SPEED, "5f9a3c7e-1d2b-4c8a-9e0f-000000000005", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        this.addAttributeModifier(Attributes.FLYING_SPEED, "5f9a3c7e-1d2b-4c8a-9e0f-000000000027", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(ForgeMod.SWIM_SPEED.get(), "5f9a3c7e-1d2b-4c8a-9e0f-000000000006", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(ForgeMod.BLOCK_REACH.get(), "5f9a3c7e-1d2b-4c8a-9e0f-000000000007", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(ForgeMod.ENTITY_REACH.get(), "5f9a3c7e-1d2b-4c8a-9e0f-000000000008", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
@@ -54,11 +55,9 @@ public class StunMobEffect extends MobEffect {
                 mob.setNoGravity(false);
             }
             Brain<?> brain = mob.getBrain();
-            if (brain != null) {
-                brain.eraseMemory(MemoryModuleType.ATTACK_TARGET);
-                brain.eraseMemory(MemoryModuleType.ANGRY_AT);
-                brain.eraseMemory(MemoryModuleType.HURT_BY_ENTITY);
-            }
+            brain.eraseMemory(MemoryModuleType.ATTACK_TARGET);
+            brain.eraseMemory(MemoryModuleType.ANGRY_AT);
+            brain.eraseMemory(MemoryModuleType.HURT_BY_ENTITY);
         }
         if (entity.level() instanceof ServerLevel level && entity.tickCount % 10 == 0) {
             level.sendParticles(BabelParticles.STUN.get(),

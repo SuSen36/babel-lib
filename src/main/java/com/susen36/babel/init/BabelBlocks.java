@@ -12,7 +12,6 @@ public class BabelBlocks {
 
     public static final RegistryObject<? extends Block> BLOCK_KETTLE = REGISTRY.register("block_kettle", KettleBlock::new);
     public static final RegistryObject<? extends Block> VAMPIRES_BED = REGISTRY.register("vampires_bed_block", VampireBedBlock::new);
-    public static final RegistryObject<? extends Block> VAMPIRES_BED_UPPER = REGISTRY.register("vampires_bed_upper", VampireBedUpperBlock::new);
     public static final RegistryObject<? extends Block> KING_PEDESTAL = REGISTRY.register("king_pedestal", KingPedestalBlock::new);
     public static final RegistryObject<? extends Block> BERRY_CAN = REGISTRY.register("berry_can", BerryCanBlock::new);
     public static final RegistryObject<? extends Block> ALLAY_BLOCK = REGISTRY.register("allay_block", AllayBlockBlock::new);

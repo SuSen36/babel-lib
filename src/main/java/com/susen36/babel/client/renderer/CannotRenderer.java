@@ -17,6 +17,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
 
+import java.util.Locale;
+
 @OnlyIn(Dist.CLIENT)
 public class CannotRenderer extends MobRenderer<CannotEntity, CannotModel> {
     private static final float SCALE = 0.875F;
@@ -26,6 +28,8 @@ public class CannotRenderer extends MobRenderer<CannotEntity, CannotModel> {
     private static final float ICON_GAP = 1.0F;
     private static final float TEXT_SCALE = 0.025F;
     private static final int TICKS_PER_SECOND = 20;
+    private static final int SECONDS_PER_MINUTE = 60;
+    private static final int MINUTES_PER_HOUR = 60;
 
     public CannotRenderer(EntityRendererProvider.Context context) {
         super(context, new CannotModel(context.bakeLayer(CannotModel.LAYER_LOCATION)), 0.5F);
@@ -36,8 +40,13 @@ public class CannotRenderer extends MobRenderer<CannotEntity, CannotModel> {
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
         long remainingTicks = RobberyClientUtils.getRemainingTicks();
         if (remainingTicks > 0L && !entity.isRobberyActive()) {
-            long seconds = (remainingTicks + TICKS_PER_SECOND - 1L) / TICKS_PER_SECOND;
-            Component text = Component.literal(seconds / TICKS_PER_SECOND + ":" + String.format("%02d", seconds % TICKS_PER_SECOND));
+            long totalSeconds = (remainingTicks - 1L) / TICKS_PER_SECOND + 1L;
+            long totalMinutes = totalSeconds / SECONDS_PER_MINUTE;
+            long seconds = totalSeconds % SECONDS_PER_MINUTE;
+            long hours = totalMinutes / MINUTES_PER_HOUR;
+            Component text = Component.literal(hours > 0L
+                    ? String.format(Locale.ROOT, "%02d:%02d:%02d", hours, totalMinutes % MINUTES_PER_HOUR, seconds)
+                    : String.format(Locale.ROOT, "%02d:%02d", totalMinutes, seconds));
             Font font = this.getFont();
             poseStack.pushPose();
             poseStack.translate(0.0D, entity.getBbHeight() + 0.275D, 0.0D);

@@ -21,6 +21,7 @@ public class SleepingMobEffect extends MobEffect {
         this.addAttributeModifier(Attributes.ATTACK_SPEED, "5f9a3c7e-1d2b-4c8a-9e0f-00000000001a", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(Attributes.JUMP_STRENGTH, "5f9a3c7e-1d2b-4c8a-9e0f-00000000001b", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(Attributes.MOVEMENT_SPEED, "5f9a3c7e-1d2b-4c8a-9e0f-00000000001c", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        this.addAttributeModifier(Attributes.FLYING_SPEED, "5f9a3c7e-1d2b-4c8a-9e0f-000000000026", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(ForgeMod.SWIM_SPEED.get(), "5f9a3c7e-1d2b-4c8a-9e0f-00000000001d", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(ForgeMod.BLOCK_REACH.get(), "5f9a3c7e-1d2b-4c8a-9e0f-00000000001e", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(ForgeMod.ENTITY_REACH.get(), "5f9a3c7e-1d2b-4c8a-9e0f-00000000001f", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);

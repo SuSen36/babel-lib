@@ -52,7 +52,7 @@ public final class CollectibleActivation {
     }
 
     /**
-     * 通用成功表现：原版物品使用成功音效 + 幸福村民粒子 + 激活动画，不自动使用。
+     * 通用成功表现：玩家升级音效 + 刮蜡粒子 + 激活动画，获得时不自动使用。
      */
     public static CollectibleActivation standard() {
         return builder().build();
@@ -111,7 +111,7 @@ public final class CollectibleActivation {
     }
 
     public static final class Builder {
-        private SoundEvent soundEvent = SoundEvents.PLAYER_BURP;
+        private SoundEvent soundEvent = SoundEvents.PLAYER_LEVELUP;
         private float volume = 1.5F;
         private float pitch = 1F;
         private ParticleOptions particle = ParticleTypes.WAX_OFF;

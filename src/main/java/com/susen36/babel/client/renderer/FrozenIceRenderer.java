@@ -23,7 +23,6 @@ public final class FrozenIceRenderer {
     private static final float CUBE_HEIGHT = 0.4F;
 
     private FrozenIceRenderer() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     public static void render(LivingEntity entity, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {

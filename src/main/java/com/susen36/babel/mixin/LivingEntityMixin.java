@@ -47,6 +47,13 @@ public abstract class LivingEntityMixin {
     @Shadow
     protected abstract void triggerItemUseEffects(ItemStack stack, int count);
 
+    @ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/LivingEntity;isImmobile()Z"))
+    private boolean isImmobileWhileSleepingOrStunned(boolean original) {
+        LivingEntity self = (LivingEntity) (Object) this;
+        return original || self.hasEffect(BabelMobEffects.SLEEP.get()) || self.hasEffect(BabelMobEffects.STUN.get());
+    }
+
     @Inject(method = "startUsingItem", at = @At(value = "FIELD",
             target = "Lnet/minecraft/world/entity/LivingEntity;useItemRemaining:I", opcode = Opcodes.PUTFIELD,
             shift = At.Shift.AFTER))

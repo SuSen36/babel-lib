@@ -13,6 +13,7 @@ public class BindingMobEffect extends MobEffect {
     public BindingMobEffect() {
         super(MobEffectCategory.HARMFUL, 7890778);
         this.addAttributeModifier(Attributes.MOVEMENT_SPEED, "5f9a3c7e-1d2b-4c8a-9e0f-000000000021", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        this.addAttributeModifier(Attributes.FLYING_SPEED, "5f9a3c7e-1d2b-4c8a-9e0f-000000000028", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(ForgeMod.SWIM_SPEED.get(), "5f9a3c7e-1d2b-4c8a-9e0f-000000000022", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(Attributes.JUMP_STRENGTH, "5f9a3c7e-1d2b-4c8a-9e0f-000000000023", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
         this.addAttributeModifier(ForgeMod.STEP_HEIGHT_ADDITION.get(), "5f9a3c7e-1d2b-4c8a-9e0f-000000000024", -1, AttributeModifier.Operation.MULTIPLY_TOTAL);
