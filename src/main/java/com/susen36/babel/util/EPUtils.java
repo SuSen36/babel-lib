@@ -7,8 +7,8 @@ import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
 public class EPUtils {
+    // Suppresses default constructor, ensuring non-instantiability.
     private EPUtils() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     public static void causeElementalInjury(LivingEntity target, AbstractEPCapability.EPType type, double value) {

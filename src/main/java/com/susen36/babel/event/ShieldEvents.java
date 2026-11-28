@@ -18,8 +18,8 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = BabelMod.MODID)
 public class ShieldEvents {
 
-    // LOWEST 保证在 BarrierEvents(LOW) 的屏障按量吸收之后结算
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    // LOW 保证在 BarrierEvents(LOWEST) 之前结算，次数盾优先拦截伤害
+    @SubscribeEvent(priority = EventPriority.LOW)
     public static void onShieldDamageBlock(LivingDamageEvent event) {
         DamageSource source = event.getSource();
         LivingEntity entity = event.getEntity();

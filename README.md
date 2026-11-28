@@ -5,7 +5,7 @@
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-62B47A.svg)](#环境要求)
 [![Forge](https://img.shields.io/badge/Forge-47.1.47%2B-orange.svg)](#环境要求)
 [![Java](https://img.shields.io/badge/Java-17-blue.svg)](#环境要求)
-[![Version](https://img.shields.io/badge/version-1.2.53-lightgrey.svg)](gradle.properties)
+[![Version](https://img.shields.io/badge/version-1.2.68-lightgrey.svg)](gradle.properties)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ---
@@ -114,7 +114,7 @@ gradlew.bat build
 ./gradlew build
 ```
 
-产物：`build/libs/babellib-1.20.1-forge-1.2.53.jar`。
+产物：`build/libs/babellib-1.20.1-forge-1.2.68.jar`。
 
 常用任务：
 
@@ -170,7 +170,7 @@ gradlew.bat build
 
 ## 配置
 
-配置文件：`config/babel-common.toml`（COMMON 类型，改动后 `/reload` 或重启生效）。
+客户端 HUD 读取 `config/babel-client.toml`；游戏规则和数值仍读取各端的 `config/babel-common.toml`（不是自动同步的 SERVER 配置）。从旧版本升级并保留 HUD 设置时，**第一次启动前**备份旧 COMMON 文件，将下表前四行的七个键值复制到客户端文件；已有客户端设置优先保留。未迁移则使用默认布局。
 
 | 配置项 | 默认值 | 说明 |
 |---|---|---|
@@ -178,6 +178,11 @@ gradlew.bat build
 | `ep_x_offset` / `ep_y_offset` | `0` | 元素损伤 HUD 偏移（右 / 下为正） |
 | `life_point_x_offset` / `life_point_y_offset` | `0` | 目标生命 HUD 偏移 |
 | `shield_x_offset` / `shield_y_offset` | `0` | 护盾 HUD 偏移（相对目标生命 UI） |
+
+下列为 COMMON 项：
+
+| 配置项 | 默认值 | 说明 |
+|---|---|---|
 | `initial_life_point` | `6.0` | 初始目标生命 |
 | `life_point_global_limit` | `32767` | 目标生命全局上限 |
 | `player_shield_global_limit` | `99999` | 护盾全局上限 |
@@ -190,13 +195,13 @@ gradlew.bat build
 | `royal_alliance_treaty_recognizable` | `cataclysm:ignis` 等 | 额外可触发「王庭盟约」的生物 |
 | `wither_elemental_damage` | `true` | 凋灵攻击改为施加凋亡损伤 |
 | `cold_to_frozen` | `true` | 两段式寒冷：先标记寒冷，再次冻结伤害转为冰冻效果 |
-| `robbery_restriction_duration_ticks` | `108000` | 劫掠后坎诺特无视该玩家的时长 |
+| `robbery_restriction_duration_ticks` | `252000` | 劫掠后坎诺特无视该玩家的时长 |
 
 上述四个识别列表支持完整注册 ID（如 `twilightforest:triple_bow`）、整个命名空间（`tacz:*`）、同一命名空间内的路径前缀（`babel:oceanized_*`），以及匹配全部的 `*`。`[]` 表示不添加额外匹配，不会关闭藏品原有的类型或标签判断。
 
 ## 开发者 API
 
-当前开发版本为 `1.2.53`，重构目标为 `1.5.0`。本次已修改事件 API；从 `1.2.6` 升级的模组若使用了受影响的签名，需重新编译，详见[重构迁移指南](docs/api-migration-1.5.0.md)。完整的依赖引入、事件时机与扩展流程见 [`docs/developer-guide.md`](docs/developer-guide.md)。
+当前开发版本为 `1.2.68`，重构目标为 `1.5.0`。本次已修改事件 API；从 `1.2.6` 升级的模组若使用了受影响的签名，需重新编译，详见[重构迁移指南](docs/api-migration-1.5.0.md)。完整的依赖引入、事件时机与扩展流程见 [`docs/developer-guide.md`](docs/developer-guide.md)。
 
 对外接口集中在 `api`（事件）、`collectible`（收藏品框架）、`elemental`（EPManager 等）、`capability` 与 `difficulty`；`client`、`mixin`、`datagen`、`init` 属内部实现，升级时可能变动。
 
@@ -272,7 +277,7 @@ if (health != null) {
 
 ```groovy
 dependencies {
-    implementation fg.deobf("com.susen36.babel:babel-lib:1.2.53")
+    implementation fg.deobf("com.susen36.babel:babel-lib:1.2.68")
 }
 ```
 

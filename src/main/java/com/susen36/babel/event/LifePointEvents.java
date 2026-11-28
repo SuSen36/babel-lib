@@ -74,7 +74,8 @@ public class LifePointEvents {
         BabelEventFactory.afterLifePointConsume(player, event.getSource(), result, (float) spent);
     }
 
-    @SubscribeEvent
+    // 先让藏品对账更新临时上限，再夹取当前目标生命。
+    @SubscribeEvent(priority = EventPriority.LOW)
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             Player player = event.player;

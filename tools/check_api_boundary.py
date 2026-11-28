@@ -14,6 +14,9 @@ def main():
         raise SystemExit(f'No Java API sources in {API}')
     for path in files:
         source = path.read_text(encoding='utf-8')
+        if path == API / 'collectible/CollectibleRegistration.java':
+            # Allow the inlined provider ID, not the entry point class or its other members.
+            source = source.replace('\nimport static com.susen36.babel.BabelMod.MODID;\n', '\n\n')
         for match in INTERNAL.finditer(source):
             line = source.count('\n', 0, match.start()) + 1
             violations.append(f'{path.relative_to(API)}:{line}: {match.group()}')

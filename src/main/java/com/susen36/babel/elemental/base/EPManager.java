@@ -25,8 +25,8 @@ import java.util.WeakHashMap;
 public class EPManager {
     private static final Map<LivingEntity, Double> ELEMENTAL_DEFENSE_BASE_MODIFIERS = new WeakHashMap<>();
 
+    // Suppresses default constructor, ensuring non-instantiability.
     private EPManager() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     public static @Nullable EPCapability getEP(LivingEntity entity) {

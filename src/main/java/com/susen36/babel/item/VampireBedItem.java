@@ -30,7 +30,7 @@ public class VampireBedItem extends CollectibleItem.CustomCollectibleItem {
 
     @Override
     public void onEffectStarted(ItemStack stack, Level level, Player player) {
-        LifePointUtils.setLifePoint(player, LifePointUtils.getLifePoint(player) + 4);
+        LifePointUtils.addLifePoint(player, 4);
     }
 
     @Override

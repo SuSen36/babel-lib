@@ -10,6 +10,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nullable;
@@ -109,7 +110,8 @@ public class HealthCapability implements INBTSerializable<CompoundTag> {
         if (nbt.contains("maxLives", Tag.TAG_ANY_NUMERIC)) {
             setMaxLives(nbt.getDouble("maxLives"));
         }
-        if (this.lives > getMaxLives()) {
+        // 玩家读档或收包时，临时上限可能尚未恢复；由服务端恢复修饰符后校验。
+        if (!(entity instanceof Player) && this.lives > getMaxLives()) {
             this.lives = getMaxLives();
         }
         if (nbt.contains("shield", Tag.TAG_ANY_NUMERIC)) {

@@ -35,6 +35,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -68,7 +69,7 @@ public class CollectibleItem extends Item implements CollectibleLike {
     }
 
     /**
-     * 等级 → 原版稀有度：高稀有度（ADVANCED）为 EPIC，稀有为 RARE，诅咒对齐原版诅咒附魔书为 UNCOMMON，其余为 COMMON（诅咒另染红）。
+     * 等级 → 原版稀有度：高稀有度（ADVANCED）为 EPIC，稀有为 RARE，诅咒对齐原版诅咒附魔书为 UNCOMMON（诅咒另染红），低稀有度为 COMMON。
      */
     private static Rarity rarityForTier(CollectibleTiers tier) {
         Rarity rarity;
@@ -428,14 +429,53 @@ public class CollectibleItem extends Item implements CollectibleLike {
             void apply(T entity, Player player, int layer);
         }
 
-        public record RangeBinding<T extends LivingEntity>(Class<T> entityType, double range, RangeEffect<T> effect, @Nullable BiPredicate<LivingEntity, Player> ownerFilter) {
+        /** 只描述目标范围和归属，不保存持有者或扫描结果。 */
+        public record RangeTargetSelector<T extends LivingEntity>(Class<T> entityType, double range, @Nullable BiPredicate<LivingEntity, Player> ownerFilter) {
+            List<T> scanCandidates(Player player) {
+                return player.level().getEntitiesOfClass(entityType, new AABB(player.position(), player.position()).inflate(range));
+            }
+
+            boolean matches(T candidate, Player player) {
+                return candidate != player && (ownerFilter == null || ownerFilter.test(candidate, player));
+            }
+
+            /** 即时查询；不读取或修改周期效果的候选缓存。 */
+            public List<T> findTargets(Player player) {
+                List<T> targets = scanCandidates(player);
+                targets.removeIf(candidate -> !matches(candidate, player));
+                return targets;
+            }
+        }
+
+        public record RangeBinding<T extends LivingEntity>(RangeTargetSelector<T> selector, RangeEffect<T> effect) {
+            public RangeBinding(Class<T> entityType, double range, RangeEffect<T> effect, @Nullable BiPredicate<LivingEntity, Player> ownerFilter) {
+                this(new RangeTargetSelector<>(entityType, range, ownerFilter), effect);
+            }
+
+            public Class<T> entityType() {
+                return selector.entityType();
+            }
+
+            public double range() {
+                return selector.range();
+            }
+
+            @Nullable
+            public BiPredicate<LivingEntity, Player> ownerFilter() {
+                return selector.ownerFilter();
+            }
         }
 
         private final List<RangeBinding<?>> rangeEffects = new ArrayList<>();
 
+        /** 只声明范围；调用 findTargets(player) 时才扫描，不注册周期回调。 */
+        protected final <T extends LivingEntity> RangeTargetSelector<T> addRangeEffect(Class<T> entityType, double range, @Nullable BiPredicate<LivingEntity, Player> ownerFilter) {
+            return new RangeTargetSelector<>(entityType, range, ownerFilter);
+        }
+
         /** 注册范围效果：每 20 tick 对玩家周围 range×2 立方体内的每只指定类型实体回调一次。 */
         protected final <T extends LivingEntity> void addRangeEffect(Class<T> entityType, double range, RangeEffect<T> effect, @Nullable BiPredicate<LivingEntity, Player> ownerFilter) {
-            this.rangeEffects.add(new RangeBinding<>(entityType, range, effect, ownerFilter));
+            this.rangeEffects.add(new RangeBinding<>(this.addRangeEffect(entityType, range, ownerFilter), effect));
         }
 
         protected final <T extends LivingEntity> void addRangeEffect(Class<T> entityType, double range, RangeEffect<T> effect) {

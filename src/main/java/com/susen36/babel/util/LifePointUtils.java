@@ -8,8 +8,8 @@ import java.util.Objects;
 
 public class LifePointUtils {
 
+    // Suppresses default constructor, ensuring non-instantiability.
     private LifePointUtils() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     public static HealthCapability get(Entity entity) {

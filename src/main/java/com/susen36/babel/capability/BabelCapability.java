@@ -36,8 +36,8 @@ public class BabelCapability {
     public static final ResourceLocation EP_CAP_ID = new ResourceLocation(BabelMod.MODID, "ep_cap");
     public static final ResourceLocation HEALTH_CAP_ID = new ResourceLocation(BabelMod.MODID, "health_cap");
 
+    // Suppresses default constructor, ensuring non-instantiability.
     private BabelCapability() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     public static void register(IEventBus modBus) {

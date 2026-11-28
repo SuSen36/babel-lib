@@ -9,7 +9,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
@@ -94,16 +93,13 @@ public class CollectibleItemEvents {
             CollectibleItem.CustomCollectibleItem.RangeBinding<T> binding,
             Map<RangeKey, List<? extends LivingEntity>> rangedEntities,
             Player player, int layer) {
-        RangeKey key = new RangeKey(binding.entityType(), binding.range());
-        List<? extends LivingEntity> entities = rangedEntities.get(key);
-        if (entities == null) {
-            entities = player.level().getEntitiesOfClass(binding.entityType(),
-                    new AABB(player.position(), player.position()).inflate(binding.range()));
-            rangedEntities.put(key, entities);
-        }
+        CollectibleItem.CustomCollectibleItem.RangeTargetSelector<T> selector = binding.selector();
+        RangeKey key = new RangeKey(selector.entityType(), selector.range());
+        List<? extends LivingEntity> entities = rangedEntities.computeIfAbsent(key, ignored -> selector.scanCandidates(player));
         for (LivingEntity living : entities) {
-            if (living != player && (binding.ownerFilter() == null || binding.ownerFilter().test(living, player))) {
-                binding.effect().apply(binding.entityType().cast(living), player, layer);
+            T target = selector.entityType().cast(living);
+            if (selector.matches(target, player)) {
+                binding.effect().apply(target, player, layer);
             }
         }
     }

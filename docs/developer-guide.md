@@ -2,7 +2,7 @@
 
 本文面向需要依赖 Babel 的模组作者，说明对外稳定接口、事件时机与扩展流程。示例基于 Forge 1.20.1 与 Java 17。
 
-当前开发版本为 `1.2.53`。重构将分阶段推进到 `1.5.0`；[重构迁移指南](api-migration-1.5.0.md) 记录已落地的变化。从 `1.2.6` 升级时，使用旧签名的模组需重新编译。
+当前开发版本为 `1.2.68`。重构将分阶段推进到 `1.5.0`；[重构迁移指南](api-migration-1.5.0.md) 记录已落地的变化。从 `1.2.6` 升级时，使用旧签名的模组需重新编译。
 
 ## 目录
 
@@ -28,7 +28,7 @@
 
 ```groovy
 dependencies {
-    implementation fg.deobf("com.susen36.babel:babel-lib:1.2.53")
+    implementation fg.deobf("com.susen36.babel:babel-lib:1.2.68")
 }
 ```
 
@@ -203,7 +203,7 @@ int scaled = NDifficulty.multiplier(world, 10, new float[]{1.0F, 1.2F, 1.5F, 2.0
 
 ## 版本与兼容策略
 
-- 重构期间请用 `fg.deobf` 固定依赖到已验证的构建。例如，针对 `1.2.53` 验证后，下游可在 `mods.toml` 中用 `[1.2.53]` 精确匹配。
+- 重构期间请用 `fg.deobf` 固定依赖到已验证的构建。例如，针对 `1.2.68` 验证后，下游可在 `mods.toml` 中用 `[1.2.68]` 精确匹配。
 - `1.5.0` 是重构目标，不是当前版本。后续升级逐版核对迁移指南，不预先声明兼容尚未验证的版本。
 - MixinExtras 由 jarJar 内嵌提供，依赖方不要重复打包，否则会出现重复类。
 - 升级前先对照本指南的事件表检查是否有新增的取消语义或参数变化。
@@ -231,3 +231,5 @@ Capability 由实体加入世界时附加，刚创建尚未入世界、或实体
 - 元素损伤、目标生命、护盾均为服务端结算，客户端只负责渲染，多人服务器下需客户端与服务端同时安装本模组。
 - 本模组通过 jarJar 内嵌 MixinExtras，作为依赖引入时不会把你的 MixinExtras 打包进本体。
 - 玩家无需安装 Jade、JEI。开发环境默认仅使用编译依赖；要联调完整模组，运行 `gradlew runClient -PdevCompatRuntime=true`。开关只向本项目的 `runtimeClasspath` 加入完整模组，不向下游发布运行时依赖；即使在发布时开启也一样。Jade 的编译 API 仍取自 `jade_version` 固定的 CurseMaven 文件。
+
+配置扩展请区分本机 HUD 的 CLIENT 与游戏数值的 COMMON；不要缓存从 `BabelConfig` 读到的值。配置迁移与 Mixin 降级范围见[迁移指南](api-migration-1.5.0.md)。

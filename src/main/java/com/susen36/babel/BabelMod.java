@@ -18,8 +18,7 @@ import org.slf4j.Logger;
 @Mod(BabelMod.MODID)
 public class BabelMod {
 
-    // 实现层统一使用 MODID；引用 API 常量，避免注册 API 反向依赖模组主类。
-    public static final String MODID = CollectibleRegistration.BABEL_MOD_ID;
+    public static final String MODID = "babel";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public BabelMod() {

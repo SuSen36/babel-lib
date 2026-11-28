@@ -5,9 +5,11 @@ import com.susen36.babel.capability.ep.EPCapability;
 import com.susen36.babel.capability.health.HealthCapability;
 import com.susen36.babel.collectible.Collectibles;
 import com.susen36.babel.entity.robbery.RobberyCapability;
+import com.susen36.babel.init.BabelAttributes;
 import com.susen36.babel.network.BabelNetwork;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -18,8 +20,8 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = BabelMod.MODID)
 public class BabelCapabilityEvents {
 
+    // Suppresses default constructor, ensuring non-instantiability.
     private BabelCapabilityEvents() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     @SubscribeEvent
@@ -32,6 +34,9 @@ public class BabelCapabilityEvents {
             }
             HealthCapability health = BabelCapability.getHealth(living);
             if (health != null) {
+                if (living instanceof Player) {
+                    health.setLives(health.getLives());
+                }
                 health.sync();
             }
             if (living instanceof Player player) {
@@ -110,6 +115,10 @@ public class BabelCapabilityEvents {
             HealthCapability oldHealth = BabelCapability.getHealth(oldPlayer);
             HealthCapability health = BabelCapability.getHealth(player);
             if (oldHealth != null && health != null) {
+                AttributeInstance oldMax = oldPlayer.getAttribute(BabelAttributes.MAX_LIFE_POINT.get());
+                if (oldMax != null) {
+                    health.setMaxLives(oldMax.getBaseValue());
+                }
                 health.deserializeNBT(oldHealth.serializeNBT());
                 health.sync();
             }

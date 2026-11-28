@@ -17,7 +17,9 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class BlockUtils {
 
-    private BlockUtils() {}
+    // Suppresses default constructor, ensuring non-instantiability.
+    private BlockUtils() {
+    }
 
     /**
      * 方块放置流程

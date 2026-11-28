@@ -14,8 +14,8 @@ public class DataUtils {
     public static final TagKey<DamageType> FORGE_MAGIC = TagKey.create(
             Registries.DAMAGE_TYPE, new ResourceLocation("forge", "is_magic"));
 
+    // Suppresses default constructor, ensuring non-instantiability.
     private DataUtils() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     public static boolean isBoss(LivingEntity entity) {

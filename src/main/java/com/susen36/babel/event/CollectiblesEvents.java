@@ -9,6 +9,7 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -104,5 +105,10 @@ public class CollectiblesEvents {
                 && NorthwindConstructItem.isInRange(attacker)) {
             NorthwindConstructItem.onMobAttack(attacker);
         }
+    }
+
+    @SubscribeEvent
+    public static void onStruckByLightning(@NotNull EntityStruckByLightningEvent event) {
+        HandOfDiffusionItem.onStruckByLightning(event.getLightning(), event.getEntity());
     }
 }

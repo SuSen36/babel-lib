@@ -18,11 +18,12 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = BabelMod.MODID)
 public class BarrierEvents {
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    // LOWEST 殿后：次数盾在 LOW 阶段若已归零伤害，此处不再响应
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onBarrierDamageAbsorption(LivingDamageEvent event) {
         DamageSource source = event.getSource();
         LivingEntity entity = event.getEntity();
-        if (!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !source.is(DamageTypeTags.BYPASSES_EFFECTS)) {
+        if (event.getAmount() > 0.0F && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !source.is(DamageTypeTags.BYPASSES_EFFECTS)) {
             AttributeInstance instance = entity.getAttribute(BabelAttributes.BARRIER.get());
             if (instance != null) {
                 float amount = event.getAmount();
